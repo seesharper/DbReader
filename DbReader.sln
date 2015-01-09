@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbReader", "DbReader\DbReader.csproj", "{02759164-70F2-49DD-8C1A-4179582851B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbReader.Tests", "DbReader.Tests\DbReader.Tests.csproj", "{ABA303F0-9FE0-48E1-9B7E-016F1F7BCA77}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02759164-70F2-49DD-8C1A-4179582851B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02759164-70F2-49DD-8C1A-4179582851B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02759164-70F2-49DD-8C1A-4179582851B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02759164-70F2-49DD-8C1A-4179582851B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABA303F0-9FE0-48E1-9B7E-016F1F7BCA77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABA303F0-9FE0-48E1-9B7E-016F1F7BCA77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABA303F0-9FE0-48E1-9B7E-016F1F7BCA77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABA303F0-9FE0-48E1-9B7E-016F1F7BCA77}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
