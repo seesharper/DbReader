@@ -50,6 +50,7 @@
     </Compile>
     <Compile Include="FieldSelector.cs" />
     <Compile Include="FirstConstructorSelector.cs" />
+    <Compile Include="Guard.cs" />
     <Compile Include="IConstructorSelector.cs" />
     <Compile Include="IFieldSelector.cs" />
     <Compile Include="IInstanceMethodBuilder.cs" />

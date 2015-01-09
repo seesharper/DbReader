@@ -28,7 +28,7 @@ namespace DbReader
 
     /// <summary>
     /// A <see cref="IConstructorSelector"/> decorator that validates
-    /// the selected <see cref="ConstructorInfo"/>,
+    /// the selected <see cref="ConstructorInfo"/>.
     /// </summary>
     public class ConstructorValidator : IConstructorSelector
     {
@@ -50,13 +50,9 @@ namespace DbReader
         /// <returns><see cref="ConstructorInfo"/></returns>
         public ConstructorInfo Execute(Type type)
         {
+            Require.IsNotNull(type, "type");                        
             var constructor = constructorSelector.Execute(type);
-            if (constructor == null)
-            {
-                throw new ArgumentOutOfRangeException("type", ErrorMessages.ConstructorNotFound.FormatWith(type));
-            }
-
-            return constructor;
+            return Ensure.IsNotNull(constructor, ErrorMessages.ConstructorNotFound.FormatWith(type));            
         }
     }
 }

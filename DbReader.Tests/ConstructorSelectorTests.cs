@@ -18,7 +18,7 @@
         [Theory, InjectData]
         public void Execute_PrivateParameterLess_ThrowsException(IConstructorSelector parameterlessConstructorSelector)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(
+            Assert.Throws<InvalidOperationException>(
                 () => parameterlessConstructorSelector.Execute(typeof(ClassWithPrivateParameterlessConstructor)));
         }
     }
