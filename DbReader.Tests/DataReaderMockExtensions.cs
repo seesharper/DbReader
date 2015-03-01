@@ -197,9 +197,13 @@
 
             #region IDataRecord Members
 
-            public int FieldCount
+            public int FieldCount   
             {
-                get { return this.properties.Count; }
+                get
+                {
+                    Console.WriteLine(this.properties.Count);
+                    return this.properties.Count;
+                }
             }
 
             /// <summary>

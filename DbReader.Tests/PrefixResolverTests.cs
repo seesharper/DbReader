@@ -1,5 +1,7 @@
 ﻿namespace DbReader.Tests
 {
+    using DbReader.Interfaces;
+
     using Should;
 
     using Xunit.Extensions;

@@ -5,6 +5,8 @@
     using System.Collections.ObjectModel;
     using System.Data;
 
+    using DbReader.Interfaces;
+
     /// <summary>
     /// A class that returns a dictionary containing the column name and the column ordinal.
     /// </summary>

@@ -77,5 +77,23 @@ namespace DbReader {
                 return ResourceManager.GetString("DuplicateFieldName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type ({0}) does not contain any properties that is considered a key property..
+        /// </summary>
+        internal static string MissingKeyProperties {
+            get {
+                return ResourceManager.GetString("MissingKeyProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property ({0}) is considered a key property, but is not available in the result set. Please make sure that the result set contains a field that can be mapped this property..
+        /// </summary>
+        internal static string UnmappedKeyProperty {
+            get {
+                return ResourceManager.GetString("UnmappedKeyProperty", resourceCulture);
+            }
+        }
     }
 }

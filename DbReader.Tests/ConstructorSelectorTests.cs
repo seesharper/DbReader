@@ -2,6 +2,8 @@
 {
     using System;
 
+    using DbReader.Interfaces;
+
     using Should;
     using Should.Core.Assertions;
 
@@ -20,6 +22,13 @@
         {
             Assert.Throws<InvalidOperationException>(
                 () => parameterlessConstructorSelector.Execute(typeof(ClassWithPrivateParameterlessConstructor)));
+        }
+
+        [Theory]
+        [InjectData]
+        public void Execute_TupleClass_ReturnsConstructor(IConstructorSelector firstConstructorSelector)
+        {
+            firstConstructorSelector.Execute(typeof(Tuple<int>)).ShouldNotBeNull();
         }
     }
 

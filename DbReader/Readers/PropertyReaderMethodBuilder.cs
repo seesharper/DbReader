@@ -23,9 +23,15 @@
 ******************************************************************************/
 namespace DbReader.Readers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Data;
+    using System.Diagnostics;
     using System.Reflection;
     using System.Reflection.Emit;
+
+    using DbReader.Interfaces;
 
     /// <summary>
     /// A class that is capable of creating a delegate that creates and populates an instance of <typeparamref name="T"/> from an 
@@ -34,7 +40,10 @@ namespace DbReader.Readers
     /// <typeparam name="T">The type of object to be created.</typeparam> 
     public class PropertyReaderMethodBuilder<T> : ReaderMethodBuilder<T> 
     {       
-        private readonly IPropertySelector propertySelector;
+        private readonly IPropertySelector simplePropertySelector;
+
+        private readonly IPropertySelector oneToManyPropertySelector;
+
         private readonly IConstructorSelector constructorSelector;
 
         /// <summary>
@@ -44,16 +53,19 @@ namespace DbReader.Readers
         /// creating an <see cref="IMethodSkeleton"/>.</param>
         /// <param name="methodSelector">The <see cref="IMethodSelector"/> that is responsible for selecting the <see cref="IDataRecord"/> 
         /// get method that corresponds to the property type.</param>
-        /// <param name="propertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting the target properties.</param>
+        /// <param name="simplePropertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting the target properties.</param>
+        /// <param name="oneToManyPropertySelector"></param>
         /// <param name="parameterlessConstructorSelector">The <see cref="IConstructorSelector"/> that is responsible for selecting the constructor.</param>
         public PropertyReaderMethodBuilder(
             IMethodSkeletonFactory methodSkeletonFactory,
             IMethodSelector methodSelector,
-            IPropertySelector propertySelector,
+            IPropertySelector simplePropertySelector,
+            IPropertySelector oneToManyPropertySelector,
             IConstructorSelector parameterlessConstructorSelector)
             : base(methodSkeletonFactory, methodSelector)
         {
-            this.propertySelector = propertySelector;
+            this.simplePropertySelector = simplePropertySelector;
+            this.oneToManyPropertySelector = oneToManyPropertySelector;
             constructorSelector = parameterlessConstructorSelector;
         }
 
@@ -65,10 +77,35 @@ namespace DbReader.Readers
         {
             var instanceVariable = EmitNewInstance(il, GetParameterlessConstructor());
             EmitPropertySetters(il, instanceVariable);
+            InitializeEnumerableProperties(il, instanceVariable);
             LoadInstance(il, instanceVariable);
             EmitReturn(il);
         }
-                       
+
+        private void InitializeEnumerableProperties(ILGenerator il, LocalBuilder instanceVariable)
+        {
+            var properties = oneToManyPropertySelector.Execute(typeof(T));
+            foreach (var property in properties)
+            {
+                InitializeEnumerableProperty(il, instanceVariable, property);
+            }
+
+        }
+
+        private void InitializeEnumerableProperty(ILGenerator il, LocalBuilder instanceVariable, PropertyInfo property)
+        {
+            if (property.PropertyType.IsEnumerable())
+            {
+                var projectionType = property.PropertyType.GetProjectionType();
+                var collectionType = typeof(Collection<>).MakeGenericType(projectionType);
+                var collectionConstructor = collectionType.GetConstructor(Type.EmptyTypes);
+                var setMethod = property.GetSetMethod();
+                LoadInstance(il, instanceVariable);
+                il.Emit(OpCodes.Newobj, collectionConstructor);
+                il.Emit(OpCodes.Callvirt, setMethod);
+            }
+        }
+
         private static void LoadInstance(ILGenerator il, LocalBuilder instanceVariable)
         {
             il.Emit(OpCodes.Ldloc, instanceVariable);
@@ -95,7 +132,7 @@ namespace DbReader.Readers
 
         private void EmitPropertySetters(ILGenerator generator, LocalBuilder instanceVariable)
         {
-            var properties = propertySelector.Execute(typeof(T));
+            var properties = simplePropertySelector.Execute(typeof(T));
             for (int i = 0; i < properties.Length; i++)
             {
                 EmitPropertySetter(generator, properties[i], i, instanceVariable);

@@ -6,6 +6,8 @@
     using System.Linq;
     using System.Reflection;
 
+    using DbReader.Interfaces;
+
     /// <summary>
     /// A class that maps the fields from an <see cref="IDataRecord"/> to
     /// the properties of a <see cref="Type"/>.

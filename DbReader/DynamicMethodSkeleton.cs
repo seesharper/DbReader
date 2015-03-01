@@ -3,6 +3,8 @@
     using System;
     using System.Reflection.Emit;
 
+    using DbReader.Interfaces;
+
     /// <summary>
     /// A <see cref="IMethodSkeleton"/> that uses the <see cref="DynamicMethod"/> class.
     /// </summary>

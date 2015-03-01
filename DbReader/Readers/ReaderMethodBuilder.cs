@@ -5,6 +5,8 @@
     using System.Reflection;
     using System.Reflection.Emit;
 
+    using DbReader.Interfaces;
+
     /// <summary>
     /// Base class containing the common methods for <see cref="IReaderMethodBuilder{T}"/>
     /// implementations.

@@ -2,6 +2,8 @@
 {
     using System;
 
+    using DbReader.Interfaces;
+
     public class MethodSkeletonFactory : IMethodSkeletonFactory
     {
         private readonly Func<Type, Type[], IMethodSkeleton> factoryDelegate;

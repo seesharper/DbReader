@@ -5,6 +5,8 @@
     using System.Linq;
     using System.Reflection;
 
+    using DbReader.Interfaces;
+
     /// <summary>
     /// A class that is capable of resolving the prefix 
     /// for a navigation property.

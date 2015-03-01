@@ -13,7 +13,7 @@
     using Xunit;
     using Xunit.Extensions;
 
-    using IPropertySelector = DbReader.IPropertySelector;
+    using IPropertySelector = DbReader.Interfaces.IPropertySelector;
 
     public class SimplePropertySelectorTests
     {
@@ -89,6 +89,16 @@
     public class ClassWithEnumerableProperty
     {
         public IEnumerable<ClassWithPublicProperty> EnumerableProperty { get; set; }
+    }
+
+    public class ClassWithStringProperty
+    {
+        public string StringProperty { get; set; }
+    }
+
+    public class ClassWithByteArrayProperty
+    {
+        public byte[] ByteArrayProperty { get; set; }
     }
 
 }

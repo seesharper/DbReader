@@ -1,23 +1,27 @@
-﻿namespace DbReader
-{
-    using System;
-    using System.Data;
+﻿//namespace DbReader
+//{
+//    using System;
+//    using System.Data;
 
-    public class PropertyReader<T> : IReader<T> where T : new()
-    {
-        private readonly IReaderMethodBuilder<T> readerMethodBuilder;
+//    using DbReader.Readers;
 
-        private readonly Func<IDataRecord, int[], T> readMethod;
+//    public class PropertyReader<T> : IReader<T>
+//    {
+//        private readonly IReaderMethodBuilder<T> propertyReaderMethodBuilder;
 
-        public PropertyReader(IReaderMethodBuilder<T> readerMethodBuilder)
-        {
-            this.readerMethodBuilder = readerMethodBuilder;
-            readMethod = readerMethodBuilder.CreateMethod();
-        }
+//        private readonly IOrdinalSelector ordinalSelector;
+                
+//        public PropertyReader(IReaderMethodBuilder<T> propertyReaderMethodBuilder, IOrdinalSelector ordinalSelector)
+//        {
+//            this.propertyReaderMethodBuilder = propertyReaderMethodBuilder;
+//            this.ordinalSelector = ordinalSelector;
+//        }
 
-        public T Read(IDataRecord dataRecord, int[] ordinals)
-        {
-            return readMethod(dataRecord, ordinals);
-        }
-    }
-}
+//        public T Read(IDataRecord dataRecord, int[] ordinals)
+//        {
+//            var readMethod = propertyReaderMethodBuilder.CreateMethod();
+
+
+//        }
+//    }
+//}

@@ -36,6 +36,7 @@
       <HintPath>..\packages\Should.1.1.20\lib\Should.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -56,6 +57,9 @@
     <Compile Include="CustomValueType.cs" />
     <Compile Include="DataReaderMockExtensions.cs" />
     <Compile Include="FieldSelectorTests.cs" />
+    <Compile Include="InstanceReaderTests.cs" />
+    <Compile Include="KeyPropertyMapperTests.cs" />
+    <Compile Include="KeyReaderTests.cs" />
     <Compile Include="ManyToOneMethodBuilderTests.cs" />
     <Compile Include="ManyToOnePropertySelectorTests.cs" />
     <Compile Include="MethodSelectorTests.cs" />

@@ -24,7 +24,10 @@
 namespace DbReader
 {
     using System;
+    using System.Diagnostics.Contracts;
     using System.Reflection;
+
+    using DbReader.Interfaces;
 
     /// <summary>
     /// A <see cref="IConstructorSelector"/> decorator that validates
@@ -49,7 +52,7 @@ namespace DbReader
         /// <param name="type">The <see cref="Type"/> for which to get a <see cref="ConstructorInfo"/>.</param>
         /// <returns><see cref="ConstructorInfo"/></returns>
         public ConstructorInfo Execute(Type type)
-        {
+        {                        
             Require.IsNotNull(type, "type");                        
             var constructor = constructorSelector.Execute(type);
             return Ensure.IsNotNull(constructor, ErrorMessages.ConstructorNotFound.FormatWith(type));            

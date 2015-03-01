@@ -4,6 +4,8 @@
     using System.Data;
     using System.Reflection;
 
+    using DbReader.Interfaces;
+
     public class MethodSelector : IMethodSelector
     {
         /// <summary>

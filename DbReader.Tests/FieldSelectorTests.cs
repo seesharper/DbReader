@@ -6,6 +6,8 @@
     using System.Data;
     using System.Runtime.InteropServices;
 
+    using DbReader.Interfaces;
+
     using Should;
     using Should.Core.Assertions;
 

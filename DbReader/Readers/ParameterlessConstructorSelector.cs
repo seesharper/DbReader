@@ -3,6 +3,8 @@
     using System;
     using System.Reflection;
 
+    using DbReader.Interfaces;
+
     /// <summary>
     /// An <see cref="IConstructorSelector"/> that looks for a parameterless 
     /// constructor for a given <see cref="Type"/>.

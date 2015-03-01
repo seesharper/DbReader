@@ -1,5 +1,7 @@
 ﻿namespace DbReader.Tests
 {
+    using DbReader.Interfaces;
+
     using Should;
 
     using Xunit.Extensions;
@@ -24,6 +26,17 @@
             manyToOnePropertySelector.Execute(typeof(ClassWithEnumerableProperty)).ShouldBeEmpty();
         }
 
-        
+        [Theory, InjectData]
+        public void Execute_StringProperty_ReturnsEmptyList(IPropertySelector manyToOnePropertySelector)
+        {
+            manyToOnePropertySelector.Execute(typeof(ClassWithStringProperty)).ShouldBeEmpty();
+        }
+
+        [Theory, InjectData]
+        public void Execute_ByteArrayProperty_ReturnsEmptyList(IPropertySelector manyToOnePropertySelector)
+        {
+            manyToOnePropertySelector.Execute(typeof(ClassWithByteArrayProperty)).ShouldBeEmpty();
+        }
+
     }
 }

@@ -4,6 +4,8 @@
     using System.Linq;
     using System.Reflection;
 
+    using DbReader.Interfaces;
+
     /// <summary>
     /// A <see cref="IPropertySelector"/> that selects writeable properties that is considered
     /// a "simple" property. 

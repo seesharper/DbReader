@@ -1,5 +1,7 @@
 ﻿namespace DbReader.Tests
 {
+    using DbReader.Interfaces;
+
     using Should;
 
     public class PropertyMapperTests
@@ -15,7 +17,7 @@
         {
             var dataRecord = new { Int32Property = 42 }.ToDataRecord();
 
-            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, "");
+            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
 
             result[0].Ordinal.ShouldEqual(0);
         }
@@ -25,7 +27,7 @@
         {
             var dataRecord = new { UnknownProperty = 42 }.ToDataRecord();
 
-            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, "");
+            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
 
             result[0].Ordinal.ShouldEqual(-1);
         }
@@ -45,8 +47,8 @@
         {
             var dataRecord = new { Int32Property = 42 }.ToDataRecord();
 
-            propertyMapper.Execute(typeof(SampleClass), dataRecord, "");
-            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, "");
+            propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
+            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
 
             result[0].Ordinal.ShouldEqual(-1);
         }

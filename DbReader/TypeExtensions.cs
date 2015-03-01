@@ -12,7 +12,14 @@
     {        
         private static readonly Type[] SimpleTypes = new Type[6];
 
-        private static readonly ConcurrentDictionary<Type, Type> ProjectionTypeCache = new ConcurrentDictionary<Type, Type>(); 
+        private static readonly ConcurrentDictionary<Type, Type> ProjectionTypeCache = new ConcurrentDictionary<Type, Type>();
+
+        private static readonly Type[] OpenGenericTupleTypes =
+            {
+                typeof(Tuple<>), typeof(Tuple<,>), typeof(Tuple<,,>), typeof(Tuple<,,,>),
+                typeof(Tuple<,,,,>), typeof(Tuple<,,,,,>), typeof(Tuple<,,,,,,>),
+                typeof(Tuple<,,,,,,,>)
+            }; 
 
         static TypeExtensions()
         {
@@ -21,10 +28,19 @@
             SimpleTypes[2] = typeof(decimal);
             SimpleTypes[3] = typeof(DateTime);
             SimpleTypes[4] = typeof(byte[]);
-            SimpleTypes[4] = typeof(char[]);
+            SimpleTypes[5] = typeof(char[]);
         }
-                  
-        
+
+        /// <summary>
+        /// Creates a closed generic <see cref="Tuple"/> type based on the given <paramref name="typeArguments"/>.
+        /// </summary>
+        /// <param name="typeArguments">The types to be used to create the closed generic <see cref="Tuple"/> type.</param>
+        /// <returns><see cref="Tuple"/>.</returns>
+        public static Type ToTupleType(this Type[] typeArguments)
+        {
+            Type openGenericType = OpenGenericTupleTypes[typeArguments.Length - 1];
+            return openGenericType.MakeGenericType(typeArguments);
+        }
 
         /// <summary>
         /// Gets the underlying <see cref="Type"/> for the given <paramref name="type"/>.
@@ -56,7 +72,6 @@
             return Nullable.GetUnderlyingType(type) != null;
         }
 
-
         /// <summary>
         /// Determines if a given type is a "simple" type.
         /// </summary>
@@ -69,11 +84,11 @@
         }
 
         /// <summary>
-        /// Determines if a given type implements the <see cref="ICollection{T}"/> interface.
+        /// Determines if a given type implements the <see cref="IEnumerable{T}"/> interface.
         /// </summary>
         /// <param name="type">The target <see cref="Type"/>.</param>
         /// <returns><b>true</b> if the <paramref name="type"/> implements <see cref="ICollection{T}"/>, otherwise <b>false</b></returns>       
-        public static bool IsCollectionType(this Type type)
+        public static bool IsEnumerable(this Type type)
         {
             return IsEnumerableOfT(type) || (!type.IsArray && type.GetInterfaces().Any(IsEnumerableOfT));
         }

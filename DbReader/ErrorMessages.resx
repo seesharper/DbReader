@@ -123,4 +123,10 @@
   <data name="DuplicateFieldName" xml:space="preserve">
     <value>The data record contains a duplicate field name ({0}). Make sure that every column/field name in the data record is unique.</value>
   </data>
+  <data name="MissingKeyProperties" xml:space="preserve">
+    <value>The type ({0}) does not contain any properties that is considered a key property.</value>
+  </data>
+  <data name="UnmappedKeyProperty" xml:space="preserve">
+    <value>The property ({0}) is considered a key property, but is not available in the result set. Please make sure that the result set contains a field that can be mapped this property.</value>
+  </data>
 </root>
