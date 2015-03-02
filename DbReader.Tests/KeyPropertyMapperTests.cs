@@ -15,7 +15,7 @@
             var dataRecord = new { Id = 42 }.ToDataRecord();
             var result = keyPropertyMapper.Execute(typeof(ClassWithIdProperty), dataRecord, string.Empty);
             result.Length.ShouldEqual(1);
-            result[0].Ordinal.ShouldEqual(0);
+            result[0].ColumnInfo.Ordinal.ShouldEqual(0);
         }
 
         [ScopedTheory, InjectData]
@@ -24,7 +24,7 @@
             var dataRecord = new { ClassWithTypeNamePrefixedIdPropertyId = 42 }.ToDataRecord();
             var result = keyPropertyMapper.Execute(typeof(ClassWithTypeNamePrefixedIdProperty), dataRecord, string.Empty);
             result.Length.ShouldEqual(1);
-            result[0].Ordinal.ShouldEqual(0);
+            result[0].ColumnInfo.Ordinal.ShouldEqual(0);
         }
 
         [ScopedTheory, InjectData]

@@ -64,7 +64,7 @@ namespace DbReader
         {
             MappingInfo[] keyProperties = keyPropertyMapper.Execute(type, dataRecord, prefix);
             Type[] keyTypes = keyProperties.Select(pm => pm.Property.PropertyType).ToArray();
-            int[] ordinals = keyProperties.Select(pm => pm.Ordinal).ToArray();
+            int[] ordinals = keyProperties.Select(pm => pm.ColumnInfo.Ordinal).ToArray();
             Type tupleType = keyTypes.ToTupleType();
             IReaderMethodBuilder<IStructuralEquatable> methodBuilder = constructorReaderMethodBuilderFactory(tupleType);
             var method = methodBuilder.CreateMethod();

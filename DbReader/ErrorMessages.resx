@@ -123,6 +123,9 @@
   <data name="DuplicateFieldName" xml:space="preserve">
     <value>The data record contains a duplicate field name ({0}). Make sure that every column/field name in the data record is unique.</value>
   </data>
+  <data name="IncompatibleTypes" xml:space="preserve">
+    <value>The property ({0}) is not compatible with the column ({1})returned from the data record. Please make sure that the property is declared as ({2}) or that the column is returned as ({3}).</value>
+  </data>
   <data name="MissingKeyProperties" xml:space="preserve">
     <value>The type ({0}) does not contain any properties that is considered a key property.</value>
   </data>

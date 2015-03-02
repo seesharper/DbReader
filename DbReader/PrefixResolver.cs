@@ -99,7 +99,7 @@
 
         private bool HasAtLeastOneMappedProperty(Type type, IDataRecord dataRecord, string prefix)
         {
-            return propertyMapper.Execute(type.GetProjectionType(), dataRecord, prefix).Any(pm => pm.Ordinal > -1);
+            return propertyMapper.Execute(type.GetProjectionType(), dataRecord, prefix).Any(pm => pm.ColumnInfo.Ordinal > -1);
         }
     }
 }

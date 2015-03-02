@@ -13,6 +13,6 @@
         /// </summary>
         /// <param name="dataRecord">The <see cref="IDataRecord"/> for which to select the fieldname and ordinal.</param>
         /// <returns>An <see cref="IReadOnlyDictionary{TKey,TValue}"/> containing the field name and the ordinal.</returns>
-        IReadOnlyDictionary<string, int> Execute(IDataRecord dataRecord);
+        IReadOnlyDictionary<string, ColumnInfo> Execute(IDataRecord dataRecord);
     }
 }

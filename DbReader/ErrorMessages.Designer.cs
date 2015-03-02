@@ -79,6 +79,15 @@ namespace DbReader {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The property ({0}) is not compatible with the column ({1})returned from the data record. Please make sure that the property is declared as ({2}) or that the column is returned as ({3})..
+        /// </summary>
+        internal static string IncompatibleTypes {
+            get {
+                return ResourceManager.GetString("IncompatibleTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type ({0}) does not contain any properties that is considered a key property..
         /// </summary>
         internal static string MissingKeyProperties {

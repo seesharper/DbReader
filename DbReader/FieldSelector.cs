@@ -17,23 +17,24 @@
         /// </summary>
         /// <param name="dataRecord">The <see cref="IDataRecord"/> for which to select the fieldname and ordinal.</param>
         /// <returns>An <see cref="IReadOnlyDictionary{TKey,TValue}"/> containing the field name and the ordinal.</returns>
-        public IReadOnlyDictionary<string, int> Execute(IDataRecord dataRecord)
+        public IReadOnlyDictionary<string, ColumnInfo> Execute(IDataRecord dataRecord)
         {
             int fieldCount = dataRecord.FieldCount;
-            var result = new Dictionary<string, int>(fieldCount, StringComparer.InvariantCultureIgnoreCase);
+            var result = new Dictionary<string, ColumnInfo>(fieldCount, StringComparer.InvariantCultureIgnoreCase);
             
             for (int i = 0; i < fieldCount; i++)
             {
+                Type fieldType = dataRecord.GetFieldType(i);
                 string fieldName = dataRecord.GetName(i);                
                 if (result.ContainsKey(fieldName))
                 {
                     throw new ArgumentOutOfRangeException("dataRecord", ErrorMessages.DuplicateFieldName.FormatWith(fieldName));
                 }
 
-                result.Add(dataRecord.GetName(i), i);                
+                result.Add(dataRecord.GetName(i), new ColumnInfo(i, fieldName, fieldType));                
             }
 
-            return new ReadOnlyDictionary<string, int>(result);
+            return new ReadOnlyDictionary<string, ColumnInfo>(result);
         }
     }
 }

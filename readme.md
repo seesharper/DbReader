@@ -116,7 +116,7 @@ The convention can easily be changed
 
 	DbReaderOption.KeyConvention = (property) => property.IsDefined(typeof(KeyAttribute));
 
-The key properties can also be set per type.
+The key properties can also be set per type overriding the default convention.
 
 	DbReaderOptions.KeySelector<Order>(o => o.OrderId);
 

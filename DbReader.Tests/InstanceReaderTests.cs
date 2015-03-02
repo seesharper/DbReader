@@ -1,14 +1,189 @@
 ﻿namespace DbReader.Tests
 {
+    using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
+    using System.Security.Cryptography.X509Certificates;
 
     using DbReader.Interfaces;
 
     using Should;
+    using Should.Core.Assertions;
 
     public class InstanceReaderTests
-    {
+    {                
+        [ScopedTheory, InjectData]
+        public void ShouldReadStringValue(IInstanceReader<ClassWithProperty<string>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual("SomeValue");
+        }
+       
+        [ScopedTheory, InjectData]
+        public void ShouldReadInt64Value(IInstanceReader<ClassWithProperty<long>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (long)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableInt64Value(IInstanceReader<ClassWithProperty<long?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (long?)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadInt32Value(IInstanceReader<ClassWithProperty<int>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = 84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableInt32Value(IInstanceReader<ClassWithProperty<int?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = 84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadInt16Value(IInstanceReader<ClassWithProperty<short>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (short)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual((short)84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableInt16Value(IInstanceReader<ClassWithProperty<short?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (short?)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual((short)84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadByteValue(IInstanceReader<ClassWithProperty<byte>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (byte)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual((byte)84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableByteValue(IInstanceReader<ClassWithProperty<byte?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (byte?)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual((byte)84);
+        }
+
+        [ScopedTheory]
+        [InjectData]
+        public void ShouldReadByteArrayValue(IInstanceReader<ClassWithProperty<byte[]>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = new byte[] { 1, 2, 3 } }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.SequenceEqual(new byte[] { 1, 2, 3 });
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldNullableReadDateTimeValue(IInstanceReader<ClassWithProperty<DateTime?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = new DateTime(2014, 2, 5) }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(new DateTime(2014, 2, 5));
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadDateTimeValue(IInstanceReader<ClassWithProperty<DateTime>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = new DateTime(2014, 2, 5) }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(new DateTime(2014, 2, 5));
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadDecimalValue(IInstanceReader<ClassWithProperty<decimal>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (decimal)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableDecimalValue(IInstanceReader<ClassWithProperty<decimal?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (decimal?)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadDoubleValue(IInstanceReader<ClassWithProperty<double>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (double)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableDoubleValue(IInstanceReader<ClassWithProperty<double?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (double?)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadFloatValue(IInstanceReader<ClassWithProperty<float>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (float)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableFloatValue(IInstanceReader<ClassWithProperty<float?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = (float?)84 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual(84);
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadCharValue(IInstanceReader<ClassWithProperty<char>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = 'A' }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual('A');
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadNullableCharValue(IInstanceReader<ClassWithProperty<char?>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = 'A' }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldEqual('A');
+        }
+
+        [ScopedTheory, InjectData]
+        public void ShouldReadCharArrayValue(IInstanceReader<ClassWithProperty<char[]>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = new[] { 'A', 'B', 'C' } }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.SequenceEqual(new[] { 'A', 'B', 'C' });
+        }
+
+
         [ScopedTheory, InjectData]
         public void ShouldReadInstance(IInstanceReader<ClassWithNoRelations> instanceReader)
         {
@@ -53,6 +228,13 @@
             instance.TopLevelOneToManyRelation.First().OneToManyRelation.Count().ShouldEqual(1);
             instance.TopLevelOneToManyRelation.First().OneToManyRelation.First().Id.ShouldEqual(168);
         }
+
+        [ScopedTheory, InjectData]
+        public void ShouldThrowExceptionWhenTypesAreIncompatible(IInstanceReader<ClassWithProperty<int>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
+            Assert.Throws<InvalidOperationException>(() => reader.Read(dataRecord, string.Empty));
+        }
     }
 
 
@@ -81,4 +263,9 @@
 
         public IEnumerable<ClassWithOneToManyRelation> TopLevelOneToManyRelation { get; set; }
     }
+
+    //public class ClassWithStringProperty
+    //{
+    //    public string Property { get; set; }
+    //}
 }

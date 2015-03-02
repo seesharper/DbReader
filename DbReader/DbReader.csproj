@@ -43,6 +43,7 @@
     <Compile Include="CachedPropertyMapper.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="DbReaderOptions.cs" />
+    <Compile Include="ColumnInfo.cs" />
     <Compile Include="Interfaces\IKeyReader.cs" />
     <Compile Include="Interfaces\IOneToManyMethodBuilder.cs" />
     <Compile Include="OneToManyMethodBuilder.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="ManyToOneMethodBuilder.cs" />
     <Compile Include="ManyToOnePropertySelector.cs" />
     <Compile Include="PrefixResolver.cs" />
+    <Compile Include="PropertyTypeValidator.cs" />
     <Compile Include="Readers\IKeyReader.cs" />
     <Compile Include="Readers\IReader.cs" />
     <Compile Include="Readers\IReaderMethodBuilder.cs" />

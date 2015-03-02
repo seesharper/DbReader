@@ -48,7 +48,9 @@
                 factory => (type) => CreateConstructorReaderMethodBuilder(type, factory), new PerContainerLifetime());
 
             serviceRegistry.Register<IPropertyMapper, KeyPropertyMapper>("KeyPropertyMapper", new PerScopeLifetime());
+            serviceRegistry.Decorate<IPropertyMapper, PropertyTypeValidator>();
             serviceRegistry.Decorate(typeof(IPropertyMapper), typeof(KeyPropertyMapperValidator), sr => sr.ImplementingType == typeof(KeyPropertyMapper));
+            
 
             serviceRegistry.Register(factory => IsKeyProperty());
 

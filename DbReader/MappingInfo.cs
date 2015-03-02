@@ -13,10 +13,10 @@
         /// </summary>
         /// <param name="property">The target <see cref="PropertyInfo"/>.</param>
         /// <param name="ordinal">The ordinal for the <paramref name="property"/>.</param>
-        public MappingInfo(PropertyInfo property, int ordinal)
+        public MappingInfo(PropertyInfo property, ColumnInfo columnInfo)
         {
             Property = property;
-            Ordinal = ordinal;
+            ColumnInfo = columnInfo;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@
         /// <summary>
         /// Gets the ordinal for the <see cref="Property"/>.
         /// </summary>
-        public int Ordinal { get; private set; }
+        public ColumnInfo ColumnInfo { get; private set; }
 
         /// <summary>
         /// Returns a string that represents the current object.
@@ -37,7 +37,7 @@
         /// </returns>       
         public override string ToString()
         {
-            return "[{0}] Property: {1}, Ordinal: {2}".FormatWith(Property.DeclaringType, Property, Ordinal);            
+            return "[{0}] Property: {1}, Ordinal: {2}".FormatWith(Property.DeclaringType, Property, ColumnInfo.Ordinal);            
         }
     }
 }

@@ -58,34 +58,31 @@
             return prefix + "_" + property.Name;
         }
 
-        private static int GetProperyOrdinal(PropertyInfo property, IReadOnlyDictionary<string, int> fieldOrdinals, string prefix)
+        private static ColumnInfo GetColumnInfo(PropertyInfo property, IReadOnlyDictionary<string, ColumnInfo> fields, string prefix)
         {
             string fieldName = GetFieldName(property, prefix);
-            int ordinal;
-            if (!fieldOrdinals.TryGetValue(fieldName, out ordinal))
+            ColumnInfo columnInfo;
+            if (!fields.TryGetValue(fieldName, out columnInfo))
             {
-                ordinal = -1;
+               columnInfo = new ColumnInfo(-1, null, null);
             }
 
-            return ordinal;
+            return columnInfo;
         }
 
-        private int TryMapProperty(
+        private ColumnInfo TryMapProperty(
             PropertyInfo property,
             string prefix,
-            IReadOnlyDictionary<string, int> fieldOrdinals)
+            IReadOnlyDictionary<string, ColumnInfo> fields)
         {
-            int ordinal = GetProperyOrdinal(property, fieldOrdinals, prefix);
-            if (ordinal != -1 && mappedOrdinals.Contains(ordinal))
+            ColumnInfo columnInfo = GetColumnInfo(property, fields, prefix);
+            if (mappedOrdinals.Contains(columnInfo.Ordinal))
             {
-                ordinal = -1;
+                return new ColumnInfo(-1, null, null);
             }
-            else
-            {
-                mappedOrdinals.Add(ordinal);
-            }
+            mappedOrdinals.Add(columnInfo.Ordinal);
 
-            return ordinal;
+            return columnInfo;
         }      
     }
 }

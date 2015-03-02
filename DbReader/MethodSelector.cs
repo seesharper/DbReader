@@ -123,6 +123,16 @@
                 return typeof(IDataRecord).GetMethod("GetInt32");
             }
 
+            if (type == typeof(long))
+            {
+                return typeof(IDataRecord).GetMethod("GetInt64");
+            }
+
+            if (type == typeof(short))
+            {
+                return typeof(IDataRecord).GetMethod("GetInt16");
+            }
+
             throw new ArgumentOutOfRangeException("type", string.Format("Unable to determine the get method for {0}", type));
         }        
     }

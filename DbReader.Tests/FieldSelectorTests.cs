@@ -23,8 +23,8 @@
         public void Execute_ValidColumnns_ReturnsDictionary(IFieldSelector fieldSelector)
         {
             IDataRecord dataRecord = new { SomeColumn = 42 }.ToDataRecord();
-            IReadOnlyDictionary<string, int> result = fieldSelector.Execute(dataRecord);
-            result["SomeColumn"].ShouldEqual(0);
+            IReadOnlyDictionary<string, ColumnInfo> result = fieldSelector.Execute(dataRecord);
+            result["SomeColumn"].Ordinal.ShouldEqual(0);
         }
 
         [ScopedTheory, InjectData]

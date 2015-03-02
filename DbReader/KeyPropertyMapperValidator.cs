@@ -41,7 +41,7 @@
 
             foreach (MappingInfo keyMappingInfo in result)
             {
-                if (keyMappingInfo.Ordinal == -1)
+                if (keyMappingInfo.ColumnInfo.Ordinal == -1)
                 {
                     throw new InvalidOperationException(ErrorMessages.UnmappedKeyProperty.FormatWith(keyMappingInfo.Property));
                 }

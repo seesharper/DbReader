@@ -19,7 +19,7 @@
 
             var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
 
-            result[0].Ordinal.ShouldEqual(0);
+            result[0].ColumnInfo.Ordinal.ShouldEqual(0);
         }
 
         [ScopedTheory, InjectData]
@@ -29,7 +29,7 @@
 
             var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
 
-            result[0].Ordinal.ShouldEqual(-1);
+            result[0].ColumnInfo.Ordinal.ShouldEqual(-1);
         }
 
         [ScopedTheory, InjectData]
@@ -39,7 +39,7 @@
 
             var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, "SomePrefix");
 
-            result[0].Ordinal.ShouldEqual(0);
+            result[0].ColumnInfo.Ordinal.ShouldEqual(0);
         }
 
         [ScopedTheory, InjectData]
@@ -50,7 +50,7 @@
             propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
             var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
 
-            result[0].Ordinal.ShouldEqual(-1);
+            result[0].ColumnInfo.Ordinal.ShouldEqual(-1);
         }
 
 

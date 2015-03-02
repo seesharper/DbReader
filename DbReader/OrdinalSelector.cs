@@ -33,7 +33,7 @@
         /// <returns>A list of ordinals.</returns>
         public int[] Execute(Type type, IDataRecord dataRecord, string prefix)
         {
-            return propertyMapper.Execute(type, dataRecord, prefix).Select(pm => pm.Ordinal).ToArray();
+            return propertyMapper.Execute(type, dataRecord, prefix).Select(pm => pm.ColumnInfo.Ordinal).ToArray();
         }
     }
 }

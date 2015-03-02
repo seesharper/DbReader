@@ -61,6 +61,11 @@
         }
     }
 
+    public class ClassWithId
+    {
+        public int Id { get; set; }
+    }
+
     public class ClassWithPublicProperty
     {
         public int PublicProperty { get; set; }
@@ -91,9 +96,19 @@
         public IEnumerable<ClassWithPublicProperty> EnumerableProperty { get; set; }
     }
 
-    public class ClassWithStringProperty
+    public class ClassWithStringProperty : ClassWithId
+    {        
+        public string Property { get; set; }
+    }
+
+    public class ClassWithProperty<T> : ClassWithId
     {
-        public string StringProperty { get; set; }
+        public T Property { get; set; }
+    }
+
+    public class ClassWithDateTimeProperty : ClassWithId
+    {
+        public DateTime Property { get; set; }
     }
 
     public class ClassWithByteArrayProperty
