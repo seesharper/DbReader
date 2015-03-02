@@ -98,6 +98,29 @@
 	ON 
 		o.OrderId = od.OrderId
 
+## Keys ##
+
+The only requirement with regards to metadata is that the .Net types expose a "key" property. The default convention is to look for a property named ***Id*** or ***[classname]Id***.
+
+	public class Order
+	{
+		public int Id { get; set; }
+	}
+
+	public class Order
+	{
+		public int OrderId { get; set; }
+	}
+
+The convention can easily be changed 
+
+	DbReaderOption.KeyConvention = (property) => property.IsDefined(typeof(KeyAttribute));
+
+The key properties can also be set per type.
+
+	DbReaderOptions.KeySelector<Order>(o => o.OrderId);
+
+
 ## Prefixes ##
 
 A prefix is used to identify the target navigation property.

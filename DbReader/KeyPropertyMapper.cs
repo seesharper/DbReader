@@ -39,7 +39,7 @@
             MappingInfo[] propertyMappings = propertyMapper.Execute(type, dataRecord, prefix);
             
             MappingInfo[] keyPropertyMappings =
-                propertyMappings.Where(pm => DbReaderOptions.KeySelector(pm.Property)).ToArray();
+                propertyMappings.Where(pm => DbReaderOptions.KeyConvention(pm.Property)).ToArray();
 
             return keyPropertyMappings;
         }
