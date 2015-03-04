@@ -20,6 +20,7 @@
             KeyConvention = p =>
                 p.Name.Equals("Id", StringComparison.InvariantCultureIgnoreCase)
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.InvariantCultureIgnoreCase);
+            ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");
         }
 
         public static Func<PropertyInfo, bool> KeyConvention
@@ -38,6 +39,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IParameterParser"/> that is 
+        /// reponsible for parsing the parameter names from a given sql statement.
+        /// </summary>
+        public static IParameterParser ParameterParser { get; set; } 
+
         public static void KeySelector<T>(params Expression<Func<T, object>>[] keyExpressions)
         {
             PropertyInfo[] properties = new PropertyInfo[keyExpressions.Length];
@@ -52,5 +59,7 @@
 
             keyProperties.AddOrUpdate(typeof(T), type => properties, (type, infos) => properties);
         }
+
+        
     }
 }

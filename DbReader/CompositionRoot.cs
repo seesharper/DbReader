@@ -64,6 +64,8 @@
             serviceRegistry.Register(typeof(IInstanceReaderMethodBuilder<>), typeof(InstanceReaderMethodBuilder<>), new PerScopeLifetime());
 
             serviceRegistry.Register<IOrdinalSelector, OrdinalSelector>();
+
+            serviceRegistry.Register(factory => DbReaderOptions.ParameterParser, new PerContainerLifetime());
         }
 
         private static Func<PropertyInfo, bool> IsKeyProperty()

@@ -11,10 +11,12 @@
     using Should;
     using Should.Core.Assertions;
 
+    using Xunit.Extensions;
+
     public class InstanceReaderTests
     {                
-        [ScopedTheory, InjectData]
-        public void ShouldReadStringValue(IInstanceReader<ClassWithProperty<string>> reader)
+        [ScopedTheory, InjectData, InlineData(20)]
+        public void ShouldReadStringValue(IInstanceReader<ClassWithProperty<string>> reader, int value)
         {
             var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
@@ -125,7 +127,6 @@
             var instance = reader.Read(dataRecord, string.Empty);
             instance.Property.ShouldEqual(84);
         }
-
 
         [ScopedTheory, InjectData]
         public void ShouldReadDoubleValue(IInstanceReader<ClassWithProperty<double>> reader)
@@ -262,10 +263,5 @@
         public int Id { get; set; }
 
         public IEnumerable<ClassWithOneToManyRelation> TopLevelOneToManyRelation { get; set; }
-    }
-
-    //public class ClassWithStringProperty
-    //{
-    //    public string Property { get; set; }
-    //}
+    }   
 }

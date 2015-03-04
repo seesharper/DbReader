@@ -20,6 +20,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,10 +46,15 @@
   <ItemGroup>
     <Compile Include="CachedPropertyMapper.cs" />
     <Compile Include="CollectionExtensions.cs" />
+    <Compile Include="DataReaderExtensions.cs" />
+    <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DbReaderOptions.cs" />
     <Compile Include="ColumnInfo.cs" />
+    <Compile Include="IArgumentProvider.cs" />
+    <Compile Include="ICommandFactory.cs" />
     <Compile Include="Interfaces\IKeyReader.cs" />
     <Compile Include="Interfaces\IOneToManyMethodBuilder.cs" />
+    <Compile Include="IParameterParser.cs" />
     <Compile Include="OneToManyMethodBuilder.cs" />
     <Compile Include="OneToManyPropertySelector.cs" />
     <Compile Include="OrdinalSelector.cs" />
@@ -100,6 +109,7 @@
     <Compile Include="PropertyInfoExtensions.cs" />
     <Compile Include="PropertyMapper.cs" />
     <Compile Include="Readers\ReaderMethodBuilder.cs" />
+    <Compile Include="RegExParameterParser.cs" />
     <Compile Include="SimplePropertySelector.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="TypeExtensions.cs" />

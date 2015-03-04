@@ -29,7 +29,7 @@
         /// <typeparam name="T">The element type of the collection.</typeparam>
         /// <param name="collection">The target <see cref="ICollection{T}"/>.</param>
         /// <param name="value">The value to be added to the collection.</param>
-        public static void TryAdd<T>(ICollection<T> collection, T value)
+        public static void TryAdd<T>(this ICollection<T> collection, T value)
         {
             if (!collection.Contains(value))
             {
