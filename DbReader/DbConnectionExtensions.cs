@@ -3,6 +3,8 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Data;
+    using System.Data.Common;
+    using System.Threading.Tasks;
 
     using DbReader.Interfaces;
     using DbReader.LightInject;
@@ -33,7 +35,20 @@
 
                 return result;
             }                                    
-        }        
+        }
+
+        public static async Task<IEnumerable<T>> ReadAsync<T>(
+            this IDbConnection dbConnection,
+            string sql,
+            object arguments)
+        {
+            var result = new Collection<T>();
+            var commandFactory = serviceContainer.GetInstance<ICommandFactory>();
+            var command = (DbCommand)commandFactory.CreateCommand(dbConnection, sql, arguments);           
+            var reader = command.ExecuteReaderAsync().ConfigureAwait(false);
+            var instanceReader = serviceContainer.GetInstance<IInstanceReader<T>>();
+            return null;
+        }
     }
 
 
