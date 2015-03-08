@@ -15,19 +15,25 @@
     public class ArgumentProvider : IArgumentProvider
     {
         private readonly IParameterParser parameterParser;
-        private readonly IPropertySelector simplePropertySelector;
 
-        public ArgumentProvider(IParameterParser parameterParser, IPropertySelector simplePropertySelector)
+        private readonly IPropertySelector readablePropertySelector;
+
+        public ArgumentProvider(IParameterParser parameterParser, IPropertySelector readablePropertySelector)
         {
             this.parameterParser = parameterParser;
-            this.simplePropertySelector = simplePropertySelector;
+            this.readablePropertySelector = readablePropertySelector;
         }
 
         public IReadOnlyDictionary<string, object> GetArguments(string sql, object arguments)
         {
             var result = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+            if (arguments == null)
+            {
+                return result;
+            }
             var parameterNames = parameterParser.GetParameters(sql);
-            Dictionary<string, PropertyInfo> properties = simplePropertySelector.Execute(arguments.GetType()).ToDictionary(p => p.Name, StringComparer.InvariantCultureIgnoreCase);
+            var test = arguments.GetType().GetProperties();
+            Dictionary<string, PropertyInfo> properties = readablePropertySelector.Execute(arguments.GetType()).ToDictionary(p => p.Name, StringComparer.InvariantCultureIgnoreCase);
             foreach (var parameterName in parameterNames)
             {
                 PropertyInfo propertyInfo;

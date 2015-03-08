@@ -93,6 +93,7 @@
     <Compile Include="ManyToOnePropertySelector.cs" />
     <Compile Include="PrefixResolver.cs" />
     <Compile Include="PropertyTypeValidator.cs" />
+    <Compile Include="ReadablePropertySelector.cs" />
     <Compile Include="Readers\IKeyReader.cs" />
     <Compile Include="Readers\IReader.cs" />
     <Compile Include="Readers\IReaderMethodBuilder.cs" />

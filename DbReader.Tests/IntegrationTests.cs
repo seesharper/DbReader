@@ -1,15 +1,19 @@
 ﻿namespace DbReader.Tests
 {
+    using System.Data;
     using System.Data.SQLite;
     using System.IO;
-
-    using Xunit;
+    using System.Linq;
+    using Should;
 
     public class IntegrationTests
     {
+        private string dbFile = @"..\..\db\northwind.db";
+
+        private string connectionString = @"Data Source = ..\..\db\northwind.db";
+
         public IntegrationTests()
         {
-            string dbFile = @"..\..\db\northwind.db";
 
             if (!File.Exists(dbFile))
             {
@@ -19,8 +23,8 @@
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText = ReadScript();
-                    command.ExecuteNonQuery();    
-                }                
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
@@ -32,10 +36,39 @@
             }
         }
 
-        [Fact]
-        public void SomeTest()
+        private IDbConnection CreateConnection()
         {
-            
+            var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+            return connection;
         }
+
+
+        public void ShouldReadCustomers()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers", null);
+                customers.Count().ShouldEqual(93);
+            }
+        }
+
+        public void ShouldReadCustomerById()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId", new { CustomerId = "ALFKI" });
+                customers.Count().ShouldEqual(1);
+            }
+        }
+
+
+
     }
+
+
+    //public class Customer
+    //{
+    //    public string CustomerId { get; set; }
+    //}
 }

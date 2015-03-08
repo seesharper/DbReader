@@ -66,6 +66,12 @@
             serviceRegistry.Register<IOrdinalSelector, OrdinalSelector>();
 
             serviceRegistry.Register(factory => DbReaderOptions.ParameterParser, new PerContainerLifetime());
+
+            serviceRegistry.Register<ICommandFactory, CommandFactory>(new PerContainerLifetime());
+
+            serviceRegistry.Register<IArgumentProvider, ArgumentProvider>(new PerContainerLifetime());
+
+            serviceRegistry.Register<IPropertySelector, ReadablePropertySelector>("ReadablePropertySelector", new PerContainerLifetime());
         }
 
         private static Func<PropertyInfo, bool> IsKeyProperty()

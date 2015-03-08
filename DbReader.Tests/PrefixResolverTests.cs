@@ -1,14 +1,10 @@
 ﻿namespace DbReader.Tests
 {
     using DbReader.Interfaces;
-
     using Should;
-
-    using Xunit.Extensions;
 
     public class PrefixResolverTests
     {
-        [ScopedTheory, InjectData]
         public void GetPrefix_NoPrefix_ReturnsEmptyPrefix(IPrefixResolver prefixResolver)
         {
             var property = typeof(Order).GetProperty("Customer");
@@ -19,7 +15,6 @@
             prefix.ShouldBeEmpty();
         }
 
-        [ScopedTheory, InjectData]
         public void GetPrefix_FullPrefix_ReturnsPrefix(IPrefixResolver prefixResolver)
         {
             var property = typeof(Order).GetProperty("Customer");
@@ -30,7 +25,6 @@
             prefix.ShouldEqual("Customer");
         }
 
-        [ScopedTheory, InjectData]
         public void GetPrefix_UpperCasePrefix_ReturnsPrefix(IPrefixResolver prefixResolver)
         {
             var property = typeof(Order).GetProperty("Customer");
@@ -41,7 +35,6 @@
             prefix.ShouldEqual("C");
         }
 
-        [ScopedTheory, InjectData]
         public void GetPrefix_ExistingPrefix_AppendsToExistingPrefix(IPrefixResolver prefixResolver)
         {
             var property = typeof(Order).GetProperty("Customer");
@@ -52,7 +45,6 @@
             prefix.ShouldEqual("Order_Customer");
         }
 
-        [ScopedTheory, InjectData]
         public void GetPrefix_UnknownPrefix_ReturnsNull(IPrefixResolver prefixResolver)
         {
             var property = typeof(Order).GetProperty("Customer");
@@ -63,7 +55,6 @@
             prefix.ShouldBeNull();
         }
 
-        [ScopedTheory, InjectData]
         public void GetPrefix_UnknownField_ReturnsNull(IPrefixResolver prefixResolver)
         {
             var property = typeof(Order).GetProperty("Customer");
@@ -75,7 +66,6 @@
             prefix.ShouldBeNull();
         }
 
-        [ScopedTheory, InjectData]
         public void GetPrefix_UnknownFieldWithPrefix_ReturnsNull(IPrefixResolver prefixResolver)
         {
             var property = typeof(Order).GetProperty("Customer");

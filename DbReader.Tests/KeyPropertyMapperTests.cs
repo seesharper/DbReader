@@ -9,7 +9,6 @@
 
     public class KeyPropertyMapperTests
     {
-        [ScopedTheory, InjectData]
         public void Execute_ClassWithIdProperty_ReturnsMapping(IPropertyMapper keyPropertyMapper)
         {
             var dataRecord = new { Id = 42 }.ToDataRecord();
@@ -18,7 +17,6 @@
             result[0].ColumnInfo.Ordinal.ShouldEqual(0);
         }
 
-        [ScopedTheory, InjectData]
         public void Execute_ClassWithTypeNamePrefixedIdProperty_ReturnsMapping(IPropertyMapper keyPropertyMapper)
         {
             var dataRecord = new { ClassWithTypeNamePrefixedIdPropertyId = 42 }.ToDataRecord();
@@ -27,7 +25,6 @@
             result[0].ColumnInfo.Ordinal.ShouldEqual(0);
         }
 
-        [ScopedTheory, InjectData]
         public void Execute_UnMappedKeyProperty_ThrowsException(IPropertyMapper keyPropertyMapper)
         {
             var dataRecord = new { InvalidField = 42 }.ToDataRecord();
@@ -35,7 +32,6 @@
                 () => keyPropertyMapper.Execute(typeof(ClassWithIdProperty), dataRecord, string.Empty));
         }
 
-        [ScopedTheory, InjectData]
         public void Execute_MissingKeyProperty_ThrowsException(IPropertyMapper keyPropertyMapper)
         {
             var dataRecord = new { InvalidField = 42 }.ToDataRecord();

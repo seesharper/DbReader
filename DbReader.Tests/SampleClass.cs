@@ -16,7 +16,7 @@
     }
 
 
-    public class Customer 
+    public class Customer
     {
         public string CustomerId { get; set; }
     }

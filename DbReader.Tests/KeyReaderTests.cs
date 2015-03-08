@@ -12,12 +12,11 @@
     public class KeyReaderTests
     {
         public KeyReaderTests()
-        {            
+        {
             DbReaderOptions.KeySelector<ClassWithSingleKey>(c => c.KeyProperty);
             DbReaderOptions.KeySelector<ClassWithCompositeKey>(c => c.FirstKeyProperty, c => c.SecondKeyProperty);
         }
-
-        [ScopedTheory, InjectData]        
+        
         public void ShouldReadSingleKey(IKeyReader keyReader)
         {
             var dataRecord = new { KeyProperty = 42 }.ToDataRecord();
@@ -25,13 +24,12 @@
             key.ShouldEqual(Tuple.Create(42));
         }
 
-        [ScopedTheory, InjectData]
         public void ShouldReadCompositeKey(IKeyReader keyReader)
         {
             var dataRecord = new { FirstKeyProperty = 42, SecondKeyProperty = 84 }.ToDataRecord();
             IStructuralEquatable key = keyReader.Read(typeof(ClassWithCompositeKey), dataRecord, string.Empty);
             key.ShouldEqual(Tuple.Create(42, 84));
-        }        
+        }
     }
 
 

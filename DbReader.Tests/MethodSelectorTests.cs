@@ -2,72 +2,67 @@
 {
     using System;
     using System.Data;
-    using System.Reflection;
-    using System.Xml;
-
+    using DbReader.Interfaces;
     using Should;
-
-    using Xunit;
-
+    
     public class MethodSelectorTests
     {
-        [Fact]
-        public void Invoke_Boolean_ReadsValue()
-        {                        
+        private readonly IMethodSelector methodSelector;
+
+        public MethodSelectorTests(IMethodSelector methodSelector)
+        {
+            this.methodSelector = methodSelector;
+        }
+       
+        public void ShouldReadBoolean()
+        {
             var dataRecord = new { SomeColumn = true }.ToDataRecord();
             var result = InvokeMethod<bool>(dataRecord);
             result.ShouldBeTrue();
         }
 
-        [Fact]
-        public void Invoke_NullableBoolean_ReadsValue()
+        public void ShouldReadNullableBoolean()
         {
             var dataRecord = new { SomeColumn = true }.ToDataRecord();
-            var result = InvokeMethod<bool?>(dataRecord);            
+            var result = InvokeMethod<bool?>(dataRecord);
             result.Value.ShouldBeTrue();
         }
 
-        [Fact]
-        public void Invoke_Byte_ReadsValue()
+        public void ShouldReadByte()
         {
             var dataRecord = new { SomeColumn = (byte)42 }.ToDataRecord();
             var result = InvokeMethod<byte>(dataRecord);
             result.ShouldEqual((byte)42);
         }
 
-        [Fact]
-        public void Invoke_NullableByte_ReadsValue()
+        public void ShouldNullableReadByte()
         {
             var dataRecord = new { SomeColumn = (byte?)42 }.ToDataRecord();
             var result = InvokeMethod<byte?>(dataRecord);
             result.ShouldEqual((byte?)42);
         }
 
-        [Fact]
-        public void Invoke_Char_ReadsValue()
+        public void ShouldReadChar()
         {
             var dataRecord = new { SomeColumn = 'A' }.ToDataRecord();
             var result = InvokeMethod<char>(dataRecord);
             result.ShouldEqual('A');
         }
 
-        [Fact]
-        public void Invoke_NullableChar_ReadsValue()
+        public void ShouldReadNullableChar()
         {
             var dataRecord = new { SomeColumn = (char?)'A' }.ToDataRecord();
             var result = InvokeMethod<char?>(dataRecord);
             result.ShouldEqual('A');
         }
 
-        [Fact]
-        public void Invoke_CharArray_ReadsValue()
+        public void ShouldReadCharArray_ReadsValue()
         {
             var dataRecord = new { SomeColumn = new[] { 'A' } }.ToDataRecord();
             var result = InvokeMethod<char[]>(dataRecord);
-            result[0].ShouldEqual('A');                        
+            result[0].ShouldEqual('A');
         }
 
-        [Fact]
         public void Invoke_DateTime_ReadsValue()
         {
             var dataRecord = new { SomeColumn = new DateTime(2014, 2, 5) }.ToDataRecord();
@@ -75,7 +70,6 @@
             result.ShouldEqual(new DateTime(2014, 2, 5));
         }
 
-        [Fact]
         public void Invoke_NullableDateTime_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (DateTime?)new DateTime(2014, 2, 5) }.ToDataRecord();
@@ -83,7 +77,6 @@
             result.ShouldEqual(new DateTime(2014, 2, 5));
         }
 
-        [Fact]
         public void Invoke_Decimal_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (decimal)42 }.ToDataRecord();
@@ -91,7 +84,6 @@
             result.ShouldEqual(42);
         }
 
-        [Fact]
         public void Invoke_NullableDecimal_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (decimal?)42 }.ToDataRecord();
@@ -99,7 +91,6 @@
             result.ShouldEqual(42);
         }
 
-        [Fact]
         public void Invoke_Double_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (double)42 }.ToDataRecord();
@@ -107,7 +98,6 @@
             result.ShouldEqual(42);
         }
 
-        [Fact]
         public void Invoke_NullableDouble_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (double?)42 }.ToDataRecord();
@@ -115,7 +105,6 @@
             result.ShouldEqual(42);
         }
 
-        [Fact]
         public void Invoke_Float_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (float)42 }.ToDataRecord();
@@ -123,15 +112,12 @@
             result.ShouldEqual(42);
         }
 
-        [Fact]
         public void Invoke_NullableFloat_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (float?)42 }.ToDataRecord();
             var result = InvokeMethod<float?>(dataRecord);
             result.ShouldEqual(42);
         }
-
-
 
         private T InvokeMethod<T>(IDataRecord dataRecord)
         {
@@ -141,7 +127,7 @@
             {
                 return (T)method.Invoke(null, new object[] { dataRecord, 0 });
             }
-            
+
             return (T)method.Invoke(dataRecord, new object[] { 0 });
         }
     }
