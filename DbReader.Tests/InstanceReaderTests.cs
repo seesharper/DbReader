@@ -196,11 +196,11 @@
             instance.TopLevelOneToManyRelation.First().OneToManyRelation.First().Id.ShouldEqual(168);
         }
 
-        public void ShouldThrowExceptionWhenTypesAreIncompatible(IInstanceReader<ClassWithProperty<int>> reader)
-        {
-            var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
-            Assert.Throws<InvalidOperationException>(() => reader.Read(dataRecord, string.Empty));
-        }
+        //public void ShouldThrowExceptionWhenTypesAreIncompatible(IInstanceReader<ClassWithProperty<int>> reader)
+        //{
+        //    var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
+        //    Assert.Throws<InvalidOperationException>(() => reader.Read(dataRecord, string.Empty));
+        //}
     }
 
 

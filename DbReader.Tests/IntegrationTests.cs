@@ -48,10 +48,21 @@
         {
             using (var connection = CreateConnection())
             {
-                var customers = connection.Read<Customer>("SELECT * FROM Customers", null);
+                var customers = connection.Read<Customer>("SELECT * FROM Customers");
                 customers.Count().ShouldEqual(93);
             }
         }
+
+        public void ShouldReadCustomersAndOrders()
+        {            
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>(SQL.CustomersAndOrders);
+                customers.Count().ShouldEqual(89);
+                customers.SelectMany(c => c.Orders).Count().ShouldEqual(830);
+            }
+        }
+
 
         public void ShouldReadCustomerById()
         {

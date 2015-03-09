@@ -18,7 +18,7 @@
             serviceContainer.RegisterFrom<CompositionRoot>();
         }
 
-        public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string sql, object arguments)
+        public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string sql, object arguments = null)
         {
             using (serviceContainer.BeginScope())
             {

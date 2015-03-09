@@ -30,10 +30,7 @@
                 return record =>
                     {
                         var instance = propertyReaderMethod(record, ordinals);
-                        if (manyToOneMethod != null)
-                        {
-                            manyToOneMethod(dataRecord, instance);
-                        }
+                        manyToOneMethod(dataRecord, instance);
                         return instance;
                     };
             }

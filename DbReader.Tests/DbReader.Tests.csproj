@@ -67,6 +67,11 @@
     <Compile Include="RegExParameterParserTests.cs" />
     <Compile Include="SampleClass.cs" />
     <Compile Include="SimplePropertySelectorTests.cs" />
+    <Compile Include="SQL.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SQL.resx</DependentUpon>
+    </Compile>
     <Compile Include="TypeExtensionTests.cs" />
     <Compile Include="ValueConverterTests.cs" />
   </ItemGroup>
@@ -82,6 +87,16 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SQL.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SQL.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Queries\CustomersAndOrders.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

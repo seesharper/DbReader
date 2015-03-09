@@ -40,7 +40,7 @@
         /// <returns>A list of <see cref="MappingInfo"/> instances that represents the mapping between a field and a property.</returns>
         public MappingInfo[] Execute(Type type, IDataRecord dataRecord, string prefix)
         {
-            var fieldOrdinals = fieldSelector.Execute(dataRecord);
+            IReadOnlyDictionary<string, ColumnInfo> fieldOrdinals = fieldSelector.Execute(dataRecord);
             var simpleProperties = propertySelector.Execute(type);
             
             return

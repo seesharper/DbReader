@@ -44,13 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CachedInstanceReaderMethodBuilder.cs" />
+    <Compile Include="CachedKeyReaderMethodBuilder.cs" />
+    <Compile Include="CachedOneToManyMethodBuilder.cs" />
     <Compile Include="CachedPropertyMapper.cs" />
+    <Compile Include="CachedReaderMethodBuilder.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DbReaderOptions.cs" />
     <Compile Include="ColumnInfo.cs" />
     <Compile Include="IArgumentProvider.cs" />
+    <Compile Include="ICacheKeyFactory.cs" />
     <Compile Include="ICommandFactory.cs" />
     <Compile Include="Interfaces\IKeyReader.cs" />
     <Compile Include="Interfaces\IOneToManyMethodBuilder.cs" />

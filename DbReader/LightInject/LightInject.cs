@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject version 3.0.2.1
+    LightInject version 3.0.2.5
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
@@ -34,7 +34,7 @@
 
 namespace DbReader.LightInject
 {
-    using System;    
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -53,7 +53,7 @@ namespace DbReader.LightInject
     /// Defines a set of methods used to register services into the service container.
     /// </summary>
     internal interface IServiceRegistry
-    {           
+    {
         /// <summary>
         /// Gets a list of <see cref="ServiceRegistration"/> instances that represents the 
         /// registered services.          
@@ -159,7 +159,7 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         void Register<TService>();
-                
+
         /// <summary>
         /// Registers a concrete type as a service.
         /// </summary>
@@ -179,7 +179,7 @@ namespace DbReader.LightInject
         /// <param name="serviceType">The concrete type to register.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
         void Register(Type serviceType, ILifetime lifetime);
-       
+
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that 
         /// describes the dependencies of the service. 
@@ -324,7 +324,7 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="serviceRegistration">The <see cref="ServiceRegistration"/> instance that contains service metadata.</param>
         void Register(ServiceRegistration serviceRegistration);
-        
+
         /// <summary>
         /// Registers composition roots from the given <paramref name="assembly"/>.
         /// </summary>
@@ -376,11 +376,29 @@ namespace DbReader.LightInject
         void RegisterFrom<TCompositionRoot>() where TCompositionRoot : ICompositionRoot, new();
 
         /// <summary>
+        /// Registers a factory delegate to be used when resolving a constructor dependency for 
+        /// a implicitly registered service.
+        /// </summary>
+        /// <typeparam name="TDependency">The dependency type.</typeparam>
+        /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
+        void RegisterConstructorDependency<TDependency>(
+            Expression<Func<IServiceFactory, ParameterInfo, TDependency>> factory);
+
+        /// <summary>
+        /// Registers a factory delegate to be used when resolving a constructor dependency for 
+        /// a implicitly registered service.
+        /// </summary>
+        /// <typeparam name="TDependency">The dependency type.</typeparam>
+        /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
+        void RegisterPropertyDependency<TDependency>(
+            Expression<Func<IServiceFactory, PropertyInfo, TDependency>> factory);
+
+        /// <summary>
         /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
         /// </summary>
         /// <param name="searchPattern">The search pattern used to filter the assembly files.</param>
-        void RegisterAssembly(string searchPattern);    
-   
+        void RegisterAssembly(string searchPattern);
+
         /// <summary>
         /// Decorates the <paramref name="serviceType"/> with the given <paramref name="decoratorType"/>.
         /// </summary>
@@ -428,7 +446,7 @@ namespace DbReader.LightInject
             Func<ServiceRegistration, bool> serviceSelector,
             Func<IServiceFactory, ServiceRegistration, ServiceRegistration> serviceRegistrationFactory);
     }
-    
+
     /// <summary>
     /// Defines a set of methods used to retrieve service instances.
     /// </summary>
@@ -662,7 +680,7 @@ namespace DbReader.LightInject
         /// for providing the <see cref="ScopeManager"/> used to manage scopes.
         /// </summary>
         IScopeManagerProvider ScopeManagerProvider { get; set; }
-        
+
         /// <summary>
         /// Returns <b>true</b> if the container can create the requested service, otherwise <b>false</b>.
         /// </summary>
@@ -670,7 +688,7 @@ namespace DbReader.LightInject
         /// <param name="serviceName">The name of the service.</param>
         /// <returns><b>true</b> if the container can create the requested service, otherwise <b>false</b>.</returns>
         bool CanGetInstance(Type serviceType, string serviceName);
-        
+
         /// <summary>
         /// Injects the property dependencies for a given <paramref name="instance"/>.
         /// </summary>
@@ -907,7 +925,7 @@ namespace DbReader.LightInject
         /// <param name="code">The MSIL instruction to be put onto the stream.</param>
         /// <param name="arg">The numerical argument pushed onto the stream immediately after the instruction.</param>
         void Emit(OpCode code, int arg);
-       
+
         /// <summary>
         /// Puts the specified instruction and numerical argument onto the Microsoft intermediate language (MSIL) stream of instructions.
         /// </summary>
@@ -928,7 +946,7 @@ namespace DbReader.LightInject
         /// <param name="code">The MSIL instruction to be put onto the stream.</param>
         /// <param name="type">A <see cref="Type"/> representing the type metadata token.</param>
         void Emit(OpCode code, Type type);
-        
+
         /// <summary>
         /// Puts the specified instruction and metadata token for the specified constructor onto the Microsoft intermediate language (MSIL) stream of instructions.
         /// </summary>
@@ -942,7 +960,7 @@ namespace DbReader.LightInject
         /// <param name="code">The MSIL instruction to be emitted onto the stream.</param>
         /// <param name="localBuilder">A local variable.</param>
         void Emit(OpCode code, LocalBuilder localBuilder);
-        
+
         /// <summary>
         /// Puts the specified instruction onto the Microsoft intermediate language (MSIL) stream followed by the metadata token for the given method.
         /// </summary>
@@ -955,7 +973,7 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="type">A <see cref="Type"/> object that represents the type of the local variable.</param>
         /// <returns>The declared local variable.</returns>
-        LocalBuilder DeclareLocal(Type type);        
+        LocalBuilder DeclareLocal(Type type);
     }
 
     /// <summary>
@@ -974,7 +992,7 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="delegateType">A delegate type whose signature matches that of the dynamic method.</param>
         /// <returns>A delegate of the specified type, which can be used to execute the dynamic method.</returns>
-        Delegate CreateDelegate(Type delegateType); 
+        Delegate CreateDelegate(Type delegateType);
     }
 
     /// <summary>
@@ -1062,7 +1080,7 @@ namespace DbReader.LightInject
                     }
                 }
             }
-            
+
             return default(TValue);
         }
 
@@ -1145,7 +1163,7 @@ namespace DbReader.LightInject
     internal static class FuncTypeExtensions
     {
         private static readonly ThreadSafeDictionary<Type, Type> FuncTypes = new ThreadSafeDictionary<Type, Type>();
-            
+
         public static Type GetFuncType(this Type returnType)
         {
             return FuncTypes.GetOrAdd(returnType, CreateFuncType);
@@ -1159,7 +1177,7 @@ namespace DbReader.LightInject
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class LifetimeHelper
-    {        
+    {
         static LifetimeHelper()
         {
             GetInstanceMethod = typeof(ILifetime).GetMethod("GetInstance");
@@ -1182,7 +1200,7 @@ namespace DbReader.LightInject
 
         private static readonly ThreadSafeDictionary<Type, MethodInfo> GetInstanceMethods =
             new ThreadSafeDictionary<Type, MethodInfo>();
-                
+
         public static Delegate CreateGetInstanceDelegate(this Type serviceType, IServiceFactory serviceFactory)
         {
             Type delegateType = serviceType.GetFuncType();
@@ -1198,20 +1216,20 @@ namespace DbReader.LightInject
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class NamedDelegateTypeExtensions
-    {        
+    {
         private static readonly MethodInfo CreateInstanceDelegateMethodInfo =
             typeof(NamedDelegateTypeExtensions).GetPrivateStaticMethod("CreateInstanceDelegate");
 
         private static readonly ThreadSafeDictionary<Type, MethodInfo> CreateInstanceDelegateMethods =
             new ThreadSafeDictionary<Type, MethodInfo>();
-       
+
         public static Delegate CreateNamedGetInstanceDelegate(this Type serviceType, string serviceName, IServiceFactory factory)
-        {                        
+        {
             MethodInfo createInstanceDelegateMethodInfo = CreateInstanceDelegateMethods.GetOrAdd(
                 serviceType,
                 CreateClosedGenericCreateInstanceDelegateMethod);
 
-            return (Delegate)createInstanceDelegateMethodInfo.Invoke(null, new object[] { factory, serviceName });                        
+            return (Delegate)createInstanceDelegateMethodInfo.Invoke(null, new object[] { factory, serviceName });
         }
 
         private static MethodInfo CreateClosedGenericCreateInstanceDelegateMethod(Type type)
@@ -1229,19 +1247,19 @@ namespace DbReader.LightInject
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class ReflectionHelper
-    {                                        
-        private static readonly Lazy<ThreadSafeDictionary<Type, MethodInfo>> GetInstanceWithParametersMethods;        
-        
+    {
+        private static readonly Lazy<ThreadSafeDictionary<Type, MethodInfo>> GetInstanceWithParametersMethods;
+
         static ReflectionHelper()
-        {                                    
-            GetInstanceWithParametersMethods = CreateLazyGetInstanceWithParametersMethods();            
+        {
+            GetInstanceWithParametersMethods = CreateLazyGetInstanceWithParametersMethods();
         }
-                               
+
         public static MethodInfo GetGetInstanceWithParametersMethod(Type serviceType)
         {
             return GetInstanceWithParametersMethods.Value.GetOrAdd(serviceType, CreateGetInstanceWithParametersMethod);
         }
-                                                     
+
         public static Delegate CreateGetNamedInstanceWithParametersDelegate(IServiceFactory factory, Type delegateType, string serviceName)
         {
             Type[] genericTypeArguments = delegateType.GetGenericTypeArguments();
@@ -1254,13 +1272,13 @@ namespace DbReader.LightInject
             var closedGenericMethod = openGenericMethod.MakeGenericMethod(genericTypeArguments);
             return (Delegate)closedGenericMethod.Invoke(null, new object[] { factory, serviceName });
         }
-        
+
         private static Lazy<ThreadSafeDictionary<Type, MethodInfo>> CreateLazyGetInstanceWithParametersMethods()
         {
             return new Lazy<ThreadSafeDictionary<Type, MethodInfo>>(
                 () => new ThreadSafeDictionary<Type, MethodInfo>());
         }
-                                         
+
         private static MethodInfo CreateGetInstanceWithParametersMethod(Type serviceType)
         {
             Type[] genericTypeArguments = serviceType.GetGenericTypeArguments();
@@ -1272,7 +1290,7 @@ namespace DbReader.LightInject
 
             return closedGenericMethod;
         }
-                                                                           
+
         // ReSharper disable UnusedMember.Local
         private static Func<TArg, TService> CreateGenericGetNamedParameterizedInstanceDelegate<TArg, TService>(IServiceFactory factory, string serviceName)
         // ReSharper restore UnusedMember.Local
@@ -1308,8 +1326,8 @@ namespace DbReader.LightInject
         public static Type[] GetGenericTypeArguments(this Type type)
         {
             return type.GetGenericArguments();
-        }        
-        
+        }
+
         public static bool IsClass(this Type type)
         {
             return type.IsClass;
@@ -1344,7 +1362,7 @@ namespace DbReader.LightInject
         {
             return type.IsGenericTypeDefinition;
         }
-   
+
         public static Assembly GetAssembly(this Type type)
         {
             return type.Assembly;
@@ -1353,7 +1371,7 @@ namespace DbReader.LightInject
         public static bool IsValueType(this Type type)
         {
             return type.IsValueType;
-        }        
+        }
 
         public static MethodInfo GetMethodInfo(this Delegate del)
         {
@@ -1361,7 +1379,7 @@ namespace DbReader.LightInject
         }
 
         public static MethodInfo GetPrivateMethod(this Type type, string name)
-        {            
+        {
             return type.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic);
         }
 
@@ -1379,7 +1397,7 @@ namespace DbReader.LightInject
         {
             return assembly.GetCustomAttributes(attributeType, false).Cast<Attribute>();
         }
-        
+
         public static bool IsEnumerableOfT(this Type serviceType)
         {
             return serviceType.IsGenericType() && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
@@ -1394,7 +1412,7 @@ namespace DbReader.LightInject
         {
             return serviceType.IsGenericType() && serviceType.GetGenericTypeDefinition() == typeof(ICollection<>);
         }
-        
+
         public static bool IsReadOnlyCollectionOfT(this Type serviceType)
         {
             return serviceType.IsGenericType() && serviceType.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>);
@@ -1404,7 +1422,7 @@ namespace DbReader.LightInject
         {
             return serviceType.IsGenericType() && serviceType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>);
         }
-        
+
         public static bool IsLazy(this Type serviceType)
         {
             return serviceType.IsGenericType() && serviceType.GetGenericTypeDefinition() == typeof(Lazy<>);
@@ -1432,14 +1450,14 @@ namespace DbReader.LightInject
         {
             return serviceType.IsGenericType() && !serviceType.IsGenericTypeDefinition();
         }
-      
+
         public static Type GetElementType(Type type)
         {
             if (type.IsGenericType() && type.GetGenericTypeArguments().Count() == 1)
             {
                 return type.GetGenericTypeArguments()[0];
             }
-           
+
             return type.GetElementType();
         }
     }
@@ -1473,7 +1491,7 @@ namespace DbReader.LightInject
         /// <param name="type">The requested stack type.</param>
         public static void PushConstant(this IEmitter emitter, int index, Type type)
         {
-            emitter.PushConstant(index);           
+            emitter.PushConstant(index);
             emitter.UnboxOrCast(type);
         }
 
@@ -1529,7 +1547,7 @@ namespace DbReader.LightInject
                     parameters[i].ParameterType);
             }
         }
-       
+
         /// <summary>
         /// Calls a late-bound method on an object, pushing the return value onto the stack.
         /// </summary>
@@ -1581,9 +1599,9 @@ namespace DbReader.LightInject
             else
             {
                 emitter.Emit(OpCodes.Ldloc, index);
-            }                
+            }
         }
-        
+
         /// <summary>
         /// Pushes an argument with the given <paramref name="index"/> onto the stack.
         /// </summary>
@@ -1604,7 +1622,7 @@ namespace DbReader.LightInject
                     return;
                 case 3:
                     emitter.Emit(OpCodes.Ldarg_3);
-                    return;                
+                    return;
             }
 
             if (index <= 255)
@@ -1614,7 +1632,7 @@ namespace DbReader.LightInject
             else
             {
                 emitter.Emit(OpCodes.Ldarg, index);
-            }           
+            }
         }
 
         /// <summary>
@@ -1648,9 +1666,9 @@ namespace DbReader.LightInject
             else
             {
                 emitter.Emit(OpCodes.Stloc, index);
-            }                                                    
+            }
         }
-        
+
         /// <summary>
         /// Pushes a new array of the given <paramref name="elementType"/> onto the stack.
         /// </summary>
@@ -1669,7 +1687,7 @@ namespace DbReader.LightInject
         public static void Push(this IEmitter emitter, int value)
         {
             switch (value)
-            {                
+            {
                 case 0:
                     emitter.Emit(OpCodes.Ldc_I4_0);
                     return;
@@ -1728,7 +1746,7 @@ namespace DbReader.LightInject
             emitter.Emit(OpCodes.Ret);
         }
     }
- 
+
     /// <summary>
     /// An ultra lightweight service container.
     /// </summary>
@@ -1738,25 +1756,26 @@ namespace DbReader.LightInject
         private const string UnresolvedDependencyError = "Unresolved dependency {0}";
         private readonly Func<Type, Type[], IMethodSkeleton> methodSkeletonFactory;
         private readonly ServiceRegistry<Action<IEmitter>> emitters = new ServiceRegistry<Action<IEmitter>>();
+        private readonly ServiceRegistry<Expression> constructorDependencyFactories = new ServiceRegistry<Expression>();
+        private readonly ServiceRegistry<Expression> propertyDependencyFactories = new ServiceRegistry<Expression>();
+        private readonly ServiceRegistry<ServiceRegistration> availableServices = new ServiceRegistry<ServiceRegistration>();
+
         private readonly object lockObject = new object();
 
         private readonly Storage<object> constants = new Storage<object>();
-        
-        private readonly Storage<FactoryRule> factoryRules = new Storage<FactoryRule>();
-        private readonly Stack<Action<IEmitter>> dependencyStack = new Stack<Action<IEmitter>>();
-
-        private readonly ServiceRegistry<ServiceRegistration> availableServices = new ServiceRegistry<ServiceRegistration>();
-
         private readonly Storage<DecoratorRegistration> decorators = new Storage<DecoratorRegistration>();
         private readonly Storage<ServiceOverride> overrides = new Storage<ServiceOverride>();
+        private readonly Storage<FactoryRule> factoryRules = new Storage<FactoryRule>();
+
+        private readonly Stack<Action<IEmitter>> dependencyStack = new Stack<Action<IEmitter>>();
 
         private readonly Lazy<IConstructionInfoProvider> constructionInfoProvider;
         private readonly ICompositionRootExecutor compositionRootExecutor;
-
         private readonly ITypeExtractor compositionRootTypeExtractor;
+
         private ImmutableHashTree<Type, Func<object[], object>> delegates =
-            ImmutableHashTree<Type, Func<object[], object>>.Empty;        
-        
+            ImmutableHashTree<Type, Func<object[], object>>.Empty;
+
         private ImmutableHashTree<Tuple<Type, string>, Func<object[], object>> namedDelegates =
             ImmutableHashTree<Tuple<Type, string>, Func<object[], object>>.Empty;
 
@@ -1764,12 +1783,12 @@ namespace DbReader.LightInject
             ImmutableHashTree<Type, Func<object[], object, object>>.Empty;
 
         private bool isLocked;
-                
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
         /// </summary>
         public ServiceContainer()
-        {            
+        {
             var concreteTypeExtractor = new CachedTypeExtractor(new ConcreteTypeExtractor());
             compositionRootTypeExtractor = new CachedTypeExtractor(new CompositionRootTypeExtractor());
             compositionRootExecutor = new CompositionRootExecutor(this);
@@ -1780,9 +1799,9 @@ namespace DbReader.LightInject
             constructionInfoProvider = new Lazy<IConstructionInfoProvider>(CreateConstructionInfoProvider);
             methodSkeletonFactory = (returnType, parameterTypes) => new DynamicMethodSkeleton(returnType, parameterTypes);
             ScopeManagerProvider = new PerThreadScopeManagerProvider();
-            AssemblyLoader = new AssemblyLoader();            
+            AssemblyLoader = new AssemblyLoader();
         }
- 
+
         /// <summary>
         /// Gets or sets the <see cref="IScopeManagerProvider"/> that is responsible 
         /// for providing the <see cref="ScopeManager"/> used to manage scopes.
@@ -1824,7 +1843,7 @@ namespace DbReader.LightInject
         {
             get
             {
-                return availableServices.Values.SelectMany(t => t.Values);                
+                return availableServices.Values.SelectMany(t => t.Values);
             }
         }
 
@@ -1863,7 +1882,7 @@ namespace DbReader.LightInject
         /// <param name="instance">The target instance for which to inject its property dependencies.</param>
         /// <returns>The <paramref name="instance"/> with its property dependencies injected.</returns>
         public object InjectProperties(object instance)
-        {            
+        {
             var type = instance.GetType();
 
             var del = propertyInjectionDelegates.Search(type);
@@ -1874,7 +1893,7 @@ namespace DbReader.LightInject
                 propertyInjectionDelegates = propertyInjectionDelegates.Add(type, del);
             }
 
-            return del(constants.Items, instance);            
+            return del(constants.Items, instance);
         }
 
         /// <summary>
@@ -1916,15 +1935,15 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="serviceRegistration">The <see cref="ServiceRegistration"/> instance that contains service metadata.</param>
         public void Register(ServiceRegistration serviceRegistration)
-        {            
-            var services = GetAvailableServices(serviceRegistration.ServiceType);            
+        {
+            var services = GetAvailableServices(serviceRegistration.ServiceType);
             var sr = serviceRegistration;
             services.AddOrUpdate(
                 serviceRegistration.ServiceName,
                 s => AddServiceRegistration(sr),
-                (k, existing) => UpdateServiceRegistration(existing, sr));            
+                (k, existing) => UpdateServiceRegistration(existing, sr));
         }
-      
+
         /// <summary>
         /// Registers composition roots from the given <paramref name="assembly"/>.
         /// </summary>
@@ -1943,7 +1962,7 @@ namespace DbReader.LightInject
             else
             {
                 AssemblyScanner.Scan(assembly, this);
-            }    
+            }
         }
 
         /// <summary>
@@ -1999,17 +2018,45 @@ namespace DbReader.LightInject
         }
 
         /// <summary>
+        /// Registers a factory delegate to be used when resolving a constructor dependency for 
+        /// a implicitly registered service.
+        /// </summary>
+        /// <typeparam name="TDependency">The dependency type.</typeparam>
+        /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
+        public void RegisterConstructorDependency<TDependency>(Expression<Func<IServiceFactory, ParameterInfo, TDependency>> factory)
+        {
+            GetConstructorDependencyFactories(typeof(TDependency)).AddOrUpdate(
+                string.Empty,
+                s => factory,
+                (s, e) => isLocked ? e : factory);
+        }
+
+        /// <summary>
+        /// Registers a factory delegate to be used when resolving a constructor dependency for 
+        /// a implicitly registered service.
+        /// </summary>
+        /// <typeparam name="TDependency">The dependency type.</typeparam>
+        /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
+        public void RegisterPropertyDependency<TDependency>(Expression<Func<IServiceFactory, PropertyInfo, TDependency>> factory)
+        {
+            GetPropertyDependencyFactories(typeof(TDependency)).AddOrUpdate(
+                string.Empty,
+                s => factory,
+                (s, e) => isLocked ? e : factory);
+        }
+
+        /// <summary>
         /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
         /// </summary>
         /// <param name="searchPattern">The search pattern used to filter the assembly files.</param>
         public void RegisterAssembly(string searchPattern)
         {
             foreach (Assembly assembly in AssemblyLoader.Load(searchPattern))
-            {                
-                RegisterAssembly(assembly);               
+            {
+                RegisterAssembly(assembly);
             }
-        }    
-    
+        }
+
         /// <summary>
         /// Decorates the <paramref name="serviceType"/> with the given <paramref name="decoratorType"/>.
         /// </summary>
@@ -2051,7 +2098,7 @@ namespace DbReader.LightInject
         public void Decorate<TService>(Expression<Func<IServiceFactory, TService, TService>> factory)
         {
             var decoratorRegistration = new DecoratorRegistration { FactoryExpression = factory, ServiceType = typeof(TService), CanDecorate = si => true };
-            Decorate(decoratorRegistration);            
+            Decorate(decoratorRegistration);
         }
 
         /// <summary>
@@ -2061,7 +2108,7 @@ namespace DbReader.LightInject
         public void Decorate(DecoratorRegistration decoratorRegistration)
         {
             int index = decorators.Add(decoratorRegistration);
-            decoratorRegistration.Index = index;            
+            decoratorRegistration.Index = index;
         }
 
         /// <summary>
@@ -2074,10 +2121,10 @@ namespace DbReader.LightInject
         public void Override(Func<ServiceRegistration, bool> serviceSelector, Func<IServiceFactory, ServiceRegistration, ServiceRegistration> serviceRegistrationFactory)
         {
             var serviceOverride = new ServiceOverride
-                                      {
-                                          CanOverride = serviceSelector,
-                                          ServiceRegistrationFactory = serviceRegistrationFactory
-                                      };
+            {
+                CanOverride = serviceSelector,
+                ServiceRegistrationFactory = serviceRegistrationFactory
+            };
             overrides.Add(serviceOverride);
         }
 
@@ -2147,7 +2194,7 @@ namespace DbReader.LightInject
         {
             Register(typeof(TService), typeof(TImplementation), serviceName, lifetime);
         }
-       
+
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that 
         /// describes the dependencies of the service. 
@@ -2240,7 +2287,7 @@ namespace DbReader.LightInject
         {
             RegisterInstance(serviceType, instance, string.Empty);
         }
-       
+
         /// <summary>
         /// Registers the <paramref name="serviceType"/> with the given <paramref name="instance"/>. 
         /// </summary>
@@ -2409,7 +2456,7 @@ namespace DbReader.LightInject
                 instanceDelegate = CreateDefaultDelegate(serviceType, throwError: true);
             }
 
-            return instanceDelegate(constants.Items);            
+            return instanceDelegate(constants.Items);
         }
 
         /// <summary>
@@ -2428,7 +2475,7 @@ namespace DbReader.LightInject
 
             object[] constantsWithArguments = constants.Items.Concat(new object[] { arguments }).ToArray();
 
-            return instanceDelegate(constantsWithArguments);                         
+            return instanceDelegate(constantsWithArguments);
         }
 
         /// <summary>
@@ -2446,10 +2493,10 @@ namespace DbReader.LightInject
             {
                 instanceDelegate = CreateNamedDelegate(key, throwError: true);
             }
-            
+
             object[] constantsWithArguments = constants.Items.Concat(new object[] { arguments }).ToArray();
 
-            return instanceDelegate(constantsWithArguments);                                    
+            return instanceDelegate(constantsWithArguments);
         }
 
         /// <summary>
@@ -2610,7 +2657,7 @@ namespace DbReader.LightInject
                 instanceDelegate = CreateDefaultDelegate(serviceType, throwError: false);
             }
 
-            return instanceDelegate(constants.Items); 
+            return instanceDelegate(constants.Items);
         }
 
         /// <summary>
@@ -2628,7 +2675,7 @@ namespace DbReader.LightInject
                 instanceDelegate = CreateNamedDelegate(key, throwError: false);
             }
 
-            return instanceDelegate(constants.Items);       
+            return instanceDelegate(constants.Items);
         }
 
         /// <summary>
@@ -2667,7 +2714,7 @@ namespace DbReader.LightInject
                 instanceDelegate = CreateNamedDelegate(key, throwError: true);
             }
 
-            return instanceDelegate(constants.Items);              
+            return instanceDelegate(constants.Items);
         }
 
         /// <summary>
@@ -2725,7 +2772,7 @@ namespace DbReader.LightInject
             foreach (var disposableLifetimeInstance in disposableLifetimeInstances)
             {
                 disposableLifetimeInstance.Dispose();
-            }            
+            }
         }
 
         /// <summary>
@@ -2744,22 +2791,22 @@ namespace DbReader.LightInject
         private static void EmitNewArray(IList<Action<IEmitter>> emitMethods, Type elementType, IEmitter emitter)
         {
             LocalBuilder array = emitter.DeclareLocal(elementType.MakeArrayType());
-            emitter.Push(emitMethods.Count);            
+            emitter.Push(emitMethods.Count);
             emitter.PushNewArray(elementType);
-            emitter.Store(array);            
+            emitter.Store(array);
 
             for (int index = 0; index < emitMethods.Count; index++)
-            {                
+            {
                 emitter.Push(array);
                 emitter.Push(index);
-                emitMethods[index](emitter);                
-                emitter.UnboxOrCast(elementType);                                    
+                emitMethods[index](emitter);
+                emitter.UnboxOrCast(elementType);
                 emitter.Emit(OpCodes.Stelem, elementType);
             }
 
             emitter.Push(array);
         }
-        
+
         private static ILifetime CloneLifeTime(ILifetime lifetime)
         {
             return lifetime == null ? null : (ILifetime)Activator.CreateInstance(lifetime.GetType());
@@ -2773,7 +2820,11 @@ namespace DbReader.LightInject
                     cd =>
                     cd.ServiceType == decoratorRegistration.ServiceType
                     || (cd.ServiceType.IsLazy()
-                        && cd.ServiceType.GetGenericTypeArguments()[0] == decoratorRegistration.ServiceType));
+                        && cd.ServiceType.GetGenericTypeArguments()[0] == decoratorRegistration.ServiceType)
+                        || (cd.ServiceType.IsFunc()
+                        && cd.ServiceType.GetGenericTypeArguments()[0] == decoratorRegistration.ServiceType)
+                        );
+
             return constructorDependency;
         }
 
@@ -2783,7 +2834,7 @@ namespace DbReader.LightInject
             Type implementingType = openGenericDecorator.ImplementingType;
             Type[] genericTypeArguments = serviceRegistration.ServiceType.GetGenericTypeArguments();
             Type closedGenericDecoratorType = implementingType.MakeGenericType(genericTypeArguments);
-                               
+
             var decoratorInfo = new DecoratorRegistration
             {
                 ServiceType = serviceRegistration.ServiceType,
@@ -2805,10 +2856,10 @@ namespace DbReader.LightInject
                 return null;
             }
         }
-       
+
         private void EmitEnumerable(IList<Action<IEmitter>> serviceEmitters, Type elementType, IEmitter emitter)
         {
-            EmitNewArray(serviceEmitters, elementType, emitter);                       
+            EmitNewArray(serviceEmitters, elementType, emitter);
         }
 
         private Func<object[], object, object> CreatePropertyInjectionDelegate(Type concreteType)
@@ -2816,10 +2867,10 @@ namespace DbReader.LightInject
             lock (lockObject)
             {
                 IMethodSkeleton methodSkeleton = methodSkeletonFactory(typeof(object), new[] { typeof(object[]), typeof(object) });
-                ConstructionInfo constructionInfo = GetContructionInfoForConcreteType(concreteType);                
+                ConstructionInfo constructionInfo = GetContructionInfoForConcreteType(concreteType);
                 var emitter = methodSkeleton.GetEmitter();
                 emitter.PushArgument(1);
-                emitter.Cast(concreteType);                
+                emitter.Cast(concreteType);
                 try
                 {
                     EmitPropertyDependencies(constructionInfo, emitter);
@@ -2834,20 +2885,20 @@ namespace DbReader.LightInject
 
                 isLocked = true;
 
-                return (Func<object[], object, object>)methodSkeleton.CreateDelegate(typeof(Func<object[], object, object>));                                        
-            }            
+                return (Func<object[], object, object>)methodSkeleton.CreateDelegate(typeof(Func<object[], object, object>));
+            }
         }
 
         private ConstructionInfo GetContructionInfoForConcreteType(Type concreteType)
         {
-            var serviceRegistration = GetServiceRegistrationForConcreteType(concreteType);                        
+            var serviceRegistration = GetServiceRegistrationForConcreteType(concreteType);
             return GetConstructionInfo(serviceRegistration);
         }
 
         private ServiceRegistration GetServiceRegistrationForConcreteType(Type concreteType)
         {
-            var services = GetAvailableServices(concreteType);            
-            return services.GetOrAdd(string.Empty, s => CreateServiceRegistrationBasedOnConcreteType(concreteType));            
+            var services = GetAvailableServices(concreteType);
+            return services.GetOrAdd(string.Empty, s => CreateServiceRegistrationBasedOnConcreteType(concreteType));
         }
 
         private ServiceRegistration CreateServiceRegistrationBasedOnConcreteType(Type type)
@@ -2874,7 +2925,26 @@ namespace DbReader.LightInject
 
         private TypeConstructionInfoBuilder CreateTypeConstructionInfoBuilder()
         {
-            return new TypeConstructionInfoBuilder(ConstructorSelector, ConstructorDependencySelector, PropertyDependencySelector);
+            return new TypeConstructionInfoBuilder(
+                ConstructorSelector,
+                ConstructorDependencySelector,
+                PropertyDependencySelector,
+                GetConstructorDependencyExpression,
+                GetPropertyDependencyExpression);
+        }
+
+        private Expression GetConstructorDependencyExpression(Type type, string serviceName)
+        {
+            Expression expression;
+            GetConstructorDependencyFactories(type).TryGetValue(serviceName, out expression);
+            return expression;
+        }
+
+        private Expression GetPropertyDependencyExpression(Type type, string serviceName)
+        {
+            Expression expression;
+            GetPropertyDependencyFactories(type).TryGetValue(serviceName, out expression);
+            return expression;
         }
 
         private Func<object[], object> CreateDynamicMethodDelegate(Action<IEmitter> serviceEmitter)
@@ -2898,16 +2968,16 @@ namespace DbReader.LightInject
 
             isLocked = true;
 
-            return (Func<object[], object>)methodSkeleton.CreateDelegate(typeof(Func<object[], object>));                                    
+            return (Func<object[], object>)methodSkeleton.CreateDelegate(typeof(Func<object[], object>));
         }
 
         private Func<object> WrapAsFuncDelegate(Func<object[], object> instanceDelegate)
         {
             return () => instanceDelegate(constants.Items);
         }
-       
+
         private Action<IEmitter> GetEmitMethod(Type serviceType, string serviceName)
-        {           
+        {
             Action<IEmitter> emitMethod = GetRegisteredEmitMethod(serviceType, serviceName);
 
             if (emitMethod == null)
@@ -2917,8 +2987,8 @@ namespace DbReader.LightInject
 
             if (emitMethod == null)
             {
-                AssemblyScanner.Scan(serviceType.GetAssembly(), this);                
-                emitMethod = GetRegisteredEmitMethod(serviceType, serviceName);                
+                AssemblyScanner.Scan(serviceType.GetAssembly(), this);
+                emitMethod = GetRegisteredEmitMethod(serviceType, serviceName);
             }
 
             if (emitMethod == null)
@@ -2987,11 +3057,11 @@ namespace DbReader.LightInject
                 GetEmitMethods(serviceType).AddOrUpdate(serviceName, s => emitMethod, (s, m) => emitMethod);
             }
         }
-        
+
         private ServiceRegistration AddServiceRegistration(ServiceRegistration serviceRegistration)
         {
             var emitDelegate = ResolveEmitMethod(serviceRegistration);
-            GetEmitMethods(serviceRegistration.ServiceType).TryAdd(serviceRegistration.ServiceName, emitDelegate);                
+            GetEmitMethods(serviceRegistration.ServiceType).TryAdd(serviceRegistration.ServiceName, emitDelegate);
             return serviceRegistration;
         }
 
@@ -3003,10 +3073,10 @@ namespace DbReader.LightInject
             }
 
             Invalidate();
-            Action<IEmitter> emitMethod = ResolveEmitMethod(newRegistration);            
-            
+            Action<IEmitter> emitMethod = ResolveEmitMethod(newRegistration);
+
             var serviceEmitters = GetEmitMethods(newRegistration.ServiceType);
-            serviceEmitters[newRegistration.ServiceName] = emitMethod;                                               
+            serviceEmitters[newRegistration.ServiceName] = emitMethod;
             return newRegistration;
         }
 
@@ -3017,7 +3087,7 @@ namespace DbReader.LightInject
             {
                 serviceRegistration = serviceOverride.ServiceRegistrationFactory(this, serviceRegistration);
             }
-                                   
+
             var serviceDecorators = GetDecorators(serviceRegistration);
             if (serviceDecorators.Length > 0)
             {
@@ -3031,10 +3101,10 @@ namespace DbReader.LightInject
 
         private DecoratorRegistration[] GetDecorators(ServiceRegistration serviceRegistration)
         {
-            var registeredDecorators = decorators.Items.Where(d => d.ServiceType == serviceRegistration.ServiceType).ToList();            
+            var registeredDecorators = decorators.Items.Where(d => d.ServiceType == serviceRegistration.ServiceType).ToList();
 
-            registeredDecorators.AddRange(GetOpenGenericDecoratorRegistrations(serviceRegistration));            
-            registeredDecorators.AddRange(GetDeferredDecoratorRegistrations(serviceRegistration));                      
+            registeredDecorators.AddRange(GetOpenGenericDecoratorRegistrations(serviceRegistration));
+            registeredDecorators.AddRange(GetDeferredDecoratorRegistrations(serviceRegistration));
             return registeredDecorators.OrderBy(d => d.Index).ToArray();
         }
 
@@ -3059,9 +3129,9 @@ namespace DbReader.LightInject
             ServiceRegistration serviceRegistration)
         {
             var registrations = new List<DecoratorRegistration>();
-            
+
             var deferredDecorators =
-                decorators.Items.Where(ds => ds.CanDecorate(serviceRegistration) && ds.HasDeferredImplementingType);            
+                decorators.Items.Where(ds => ds.CanDecorate(serviceRegistration) && ds.HasDeferredImplementingType);
             foreach (var deferredDecorator in deferredDecorators)
             {
                 var decoratorRegistration = new DecoratorRegistration
@@ -3069,7 +3139,7 @@ namespace DbReader.LightInject
                     ServiceType = serviceRegistration.ServiceType,
                     ImplementingType =
                         deferredDecorator.ImplementingTypeFactory(this, serviceRegistration),
-                    CanDecorate = sr => true, 
+                    CanDecorate = sr => true,
                     Index = deferredDecorator.Index
                 };
                 registrations.Add(decoratorRegistration);
@@ -3083,7 +3153,7 @@ namespace DbReader.LightInject
             ConstructionInfo constructionInfo = GetConstructionInfo(decoratorRegistration);
             var constructorDependency = GetConstructorDependencyThatRepresentsDecoratorTarget(
                 decoratorRegistration, constructionInfo);
-                
+
             if (constructorDependency != null)
             {
                 constructorDependency.IsDecoratorTarget = true;
@@ -3105,8 +3175,8 @@ namespace DbReader.LightInject
             var serviceFactoryIndex = constants.Add(this);
             Type funcType = factoryDelegate.GetType();
             emitter.PushConstant(factoryDelegateIndex, funcType);
-            emitter.PushConstant(serviceFactoryIndex, typeof(IServiceFactory));            
-            pushInstance(emitter);            
+            emitter.PushConstant(serviceFactoryIndex, typeof(IServiceFactory));
+            pushInstance(emitter);
             MethodInfo invokeMethod = funcType.GetMethod("Invoke");
             emitter.Emit(OpCodes.Callvirt, invokeMethod);
         }
@@ -3117,7 +3187,7 @@ namespace DbReader.LightInject
             {
                 int index = constants.Add(serviceRegistration.Value);
                 Type serviceType = serviceRegistration.ServiceType;
-                emitter.PushConstant(index, serviceType);                
+                emitter.PushConstant(index, serviceType);
             }
             else
             {
@@ -3130,8 +3200,8 @@ namespace DbReader.LightInject
                 else
                 {
                     EmitNewInstanceUsingImplementingType(emitter, constructionInfo, null);
-                }    
-            }                        
+                }
+            }
         }
 
         private void EmitDecorators(ServiceRegistration serviceRegistration, IEnumerable<DecoratorRegistration> serviceDecorators, IEmitter emitter, Action<IEmitter> decoratorTargetEmitMethod)
@@ -3142,13 +3212,13 @@ namespace DbReader.LightInject
                 {
                     continue;
                 }
-                
+
                 Action<IEmitter> currentDecoratorTargetEmitter = decoratorTargetEmitMethod;
-                DecoratorRegistration currentDecorator = decorator;                
+                DecoratorRegistration currentDecorator = decorator;
                 decoratorTargetEmitMethod = e => EmitNewDecoratorInstance(currentDecorator, e, currentDecoratorTargetEmitter);
             }
 
-            decoratorTargetEmitMethod(emitter);            
+            decoratorTargetEmitMethod(emitter);
         }
 
         private void EmitNewInstanceUsingImplementingType(IEmitter emitter, ConstructionInfo constructionInfo, Action<IEmitter> decoratorTargetEmitMethod)
@@ -3159,19 +3229,19 @@ namespace DbReader.LightInject
         }
 
         private void EmitNewInstanceUsingFactoryDelegate(Delegate factoryDelegate, IEmitter emitter)
-        {                        
+        {
             var factoryDelegateIndex = constants.Add(factoryDelegate);
             var serviceFactoryIndex = constants.Add(this);
             Type funcType = factoryDelegate.GetType();
             emitter.PushConstant(factoryDelegateIndex, funcType);
-            emitter.PushConstant(serviceFactoryIndex, typeof(IServiceFactory));            
+            emitter.PushConstant(serviceFactoryIndex, typeof(IServiceFactory));
             if (factoryDelegate.GetMethodInfo().GetParameters().Length > 2)
             {
                 var parameters = factoryDelegate.GetMethodInfo().GetParameters().Skip(2).ToArray();
-                emitter.PushArguments(parameters);                
+                emitter.PushArguments(parameters);
             }
-                                   
-            MethodInfo invokeMethod = funcType.GetMethod("Invoke");            
+
+            MethodInfo invokeMethod = funcType.GetMethod("Invoke");
             emitter.Call(invokeMethod);
         }
 
@@ -3184,12 +3254,22 @@ namespace DbReader.LightInject
                     EmitConstructorDependency(emitter, dependency);
                 }
                 else
-                {                    
+                {
                     if (dependency.ServiceType.IsLazy())
                     {
-                        Action<IEmitter> instanceEmitter = decoratorTargetEmitter;                        
+                        Action<IEmitter> instanceEmitter = decoratorTargetEmitter;
                         decoratorTargetEmitter = CreateEmitMethodBasedOnLazyServiceRequest(
                             dependency.ServiceType, t => CreateTypedInstanceDelegate(instanceEmitter, t));
+                    }
+
+                    if (dependency.ServiceType.IsFunc())
+                    {
+                        Type actualServiceType = dependency.ServiceType.GetGenericTypeArguments()[0];
+                        Action<IEmitter> instanceEmitter = decoratorTargetEmitter;
+                        var typedInstanceDelegate = CreateTypedInstanceDelegate(instanceEmitter, actualServiceType);
+                        var constantIndex = constants.Add(typedInstanceDelegate);
+                        Type delegateType = dependency.ServiceType;
+                        decoratorTargetEmitter = e => e.PushConstant(constantIndex, delegateType);
                     }
 
                     decoratorTargetEmitter(emitter);
@@ -3198,7 +3278,7 @@ namespace DbReader.LightInject
         }
 
         private Delegate CreateTypedInstanceDelegate(Action<IEmitter> emitter, Type serviceType)
-        {                        
+        {
             var openGenericMethod = GetType().GetPrivateMethod("CreateGenericDynamicMethodDelegate");
             var closedGenericMethod = openGenericMethod.MakeGenericMethod(serviceType);
             var del = WrapAsFuncDelegate(CreateDynamicMethodDelegate(emitter));
@@ -3208,18 +3288,18 @@ namespace DbReader.LightInject
         // ReSharper disable UnusedMember.Local
         private Func<T> CreateGenericDynamicMethodDelegate<T>(Func<object> del)
         // ReSharper restore UnusedMember.Local
-        {            
+        {
             return () => (T)del();
         }
-        
+
         private void EmitConstructorDependency(IEmitter emitter, Dependency dependency)
         {
             var emitMethod = GetEmitMethodForDependency(dependency);
-                        
+
             try
             {
-                emitMethod(emitter);                
-                emitter.UnboxOrCast(dependency.ServiceType);                                    
+                emitMethod(emitter);
+                emitter.UnboxOrCast(dependency.ServiceType);
             }
             catch (InvalidOperationException ex)
             {
@@ -3237,7 +3317,7 @@ namespace DbReader.LightInject
             }
 
             emitter.Push(instanceVariable);
-            propertyDependencyEmitMethod(emitter);                
+            propertyDependencyEmitMethod(emitter);
             emitter.UnboxOrCast(propertyDependency.ServiceType);
             emitter.Call(propertyDependency.Property.GetSetMethod());
         }
@@ -3252,7 +3332,7 @@ namespace DbReader.LightInject
             Action<IEmitter> emitter = GetEmitMethod(dependency.ServiceType, dependency.ServiceName);
             if (emitter == null)
             {
-                emitter = GetEmitMethod(dependency.ServiceType, dependency.Name);                
+                emitter = GetEmitMethod(dependency.ServiceType, dependency.Name);
                 if (emitter == null && dependency.IsRequired)
                 {
                     throw new InvalidOperationException(string.Format(UnresolvedDependencyError, dependency));
@@ -3264,23 +3344,44 @@ namespace DbReader.LightInject
 
         private void EmitDependencyUsingFactoryExpression(IEmitter emitter, Dependency dependency)
         {
-            var parameterExpression = (ParameterExpression)dependency.FactoryExpression.AsEnumerable().FirstOrDefault(e => e is ParameterExpression && e.Type == typeof(IServiceFactory));
+            var actions = new List<Action<IEmitter>>();
+            var parameterExpressions = dependency.FactoryExpression.AsEnumerable().Where(e => e is ParameterExpression).Distinct().Cast<ParameterExpression>().ToList();
 
-            if (parameterExpression != null)
+            Expression factoryExpression = dependency.FactoryExpression;
+
+            if (dependency.FactoryExpression.NodeType == ExpressionType.Lambda)
             {
-                var lambda = Expression.Lambda(dependency.FactoryExpression, new[] { parameterExpression }).Compile();
-                MethodInfo methodInfo = lambda.GetType().GetMethod("Invoke");
-                emitter.PushConstant(constants.Add(lambda), lambda.GetType());
-                emitter.PushConstant(constants.Add(this), typeof(IServiceFactory));
-                emitter.Call(methodInfo);                
+                factoryExpression = ((LambdaExpression)factoryExpression).Body;
             }
-            else
+
+            foreach (var parametersExpression in parameterExpressions)
             {
-                var lambda = Expression.Lambda(dependency.FactoryExpression, new ParameterExpression[] { }).Compile();
-                MethodInfo methodInfo = lambda.GetType().GetMethod("Invoke");
-                emitter.PushConstant(constants.Add(lambda), lambda.GetType());
-                emitter.Call(methodInfo);                
-            }            
+                if (parametersExpression.Type == typeof(IServiceFactory))
+                {
+                    actions.Add(e => e.PushConstant(constants.Add(this), typeof(IServiceFactory)));
+                }
+
+                if (parametersExpression.Type == typeof(ParameterInfo))
+                {
+                    actions.Add(e => e.PushConstant(constants.Add(((ConstructorDependency)dependency).Parameter), typeof(ParameterInfo)));
+                }
+
+                if (parametersExpression.Type == typeof(PropertyInfo))
+                {
+                    actions.Add(e => e.PushConstant(constants.Add(((PropertyDependency)dependency).Property), typeof(PropertyInfo)));
+                }
+            }
+
+            var lambda = Expression.Lambda(factoryExpression, parameterExpressions.ToArray()).Compile();
+
+            MethodInfo methodInfo = lambda.GetType().GetMethod("Invoke");
+            emitter.PushConstant(constants.Add(lambda), lambda.GetType());
+            foreach (var action in actions)
+            {
+                action(emitter);
+            }
+
+            emitter.Call(methodInfo);
         }
 
         private void EmitPropertyDependencies(ConstructionInfo constructionInfo, IEmitter emitter)
@@ -3291,20 +3392,20 @@ namespace DbReader.LightInject
             }
 
             LocalBuilder instanceVariable = emitter.DeclareLocal(constructionInfo.ImplementingType);
-            emitter.Store(instanceVariable);            
+            emitter.Store(instanceVariable);
             foreach (var propertyDependency in constructionInfo.PropertyDependencies)
             {
                 EmitPropertyDependency(emitter, propertyDependency, instanceVariable);
             }
 
-            emitter.Push(instanceVariable);            
+            emitter.Push(instanceVariable);
         }
 
         private Action<IEmitter> CreateEmitMethodForUnknownService(Type serviceType, string serviceName)
         {
             Action<IEmitter> emitter = null;
             if (serviceType.IsLazy())
-            {                
+            {
                 emitter = CreateEmitMethodBasedOnLazyServiceRequest(serviceType, t => t.CreateGetInstanceDelegate(this));
             }
             else if (serviceType.IsFuncWithParameters())
@@ -3326,7 +3427,7 @@ namespace DbReader.LightInject
             else if (serviceType.IsReadOnlyCollectionOfT() || serviceType.IsReadOnlyListOfT())
             {
                 emitter = CreateEmitMethodForReadOnlyCollectionServiceRequest(serviceType);
-            }            
+            }
             else if (serviceType.IsListOfT())
             {
                 emitter = CreateEmitMethodForListServiceRequest(serviceType);
@@ -3334,7 +3435,7 @@ namespace DbReader.LightInject
             else if (serviceType.IsCollectionOfT())
             {
                 emitter = CreateEmitMethodForListServiceRequest(serviceType);
-            }     
+            }
             else if (CanRedirectRequestForDefaultServiceToSingleNamedService(serviceType, serviceName))
             {
                 emitter = CreateServiceEmitterBasedOnSingleNamedInstance(serviceType);
@@ -3348,9 +3449,9 @@ namespace DbReader.LightInject
 
             return emitter;
         }
-        
+
         private Action<IEmitter> CreateEmitMethodBasedOnFuncServiceRequest(Type serviceType, string serviceName)
-        {            
+        {
             Delegate getInstanceDelegate;
             var returnType = serviceType.GetGenericTypeArguments().Single();
             if (string.IsNullOrEmpty(serviceName))
@@ -3358,14 +3459,14 @@ namespace DbReader.LightInject
                 getInstanceDelegate = returnType.CreateGetInstanceDelegate(this);
             }
             else
-            {                
+            {
                 getInstanceDelegate = returnType.CreateNamedGetInstanceDelegate(serviceName, this);
-            }  
-                      
+            }
+
             var constantIndex = constants.Add(getInstanceDelegate);
-            return e => e.PushConstant(constantIndex, serviceType);            
+            return e => e.PushConstant(constantIndex, serviceType);
         }
-                      
+
         private Action<IEmitter> CreateEmitMethodBasedParameterizedFuncRequest(Type serviceType, string serviceName)
         {
             Delegate getInstanceDelegate;
@@ -3384,7 +3485,7 @@ namespace DbReader.LightInject
             var constantIndex = constants.Add(getInstanceDelegate);
             return e => e.PushConstant(constantIndex, serviceType);
         }
-        
+
         private Delegate CreateGetInstanceWithParametersDelegate(Type serviceType)
         {
             var getInstanceMethod = ReflectionHelper.GetGetInstanceWithParametersMethod(serviceType);
@@ -3415,7 +3516,7 @@ namespace DbReader.LightInject
         private Action<IEmitter> CreateEmitMethodForArrayServiceRequest(Type serviceType)
         {
             Action<IEmitter> enumerableEmitter = CreateEmitMethodForEnumerableServiceServiceRequest(serviceType);
-            return enumerableEmitter;            
+            return enumerableEmitter;
         }
 
         private Action<IEmitter> CreateEmitMethodForListServiceRequest(Type serviceType)
@@ -3431,7 +3532,7 @@ namespace DbReader.LightInject
                 ms.Emit(OpCodes.Call, closedGenericToListMethod);
             };
         }
-        
+
         private Action<IEmitter> CreateEmitMethodForReadOnlyCollectionServiceRequest(Type serviceType)
         {
             Type elementType = TypeHelper.GetElementType(serviceType);
@@ -3439,14 +3540,14 @@ namespace DbReader.LightInject
             ConstructorInfo constructorInfo = closedGenericReadOnlyCollectionType.GetConstructors()[0];
 
             Action<IEmitter> listEmitMethod = CreateEmitMethodForListServiceRequest(serviceType);
-            
+
             return emitter =>
             {
                 listEmitMethod(emitter);
-                emitter.New(constructorInfo);                
+                emitter.New(constructorInfo);
             };
         }
-        
+
         private void EnsureEmitMethodsForOpenGenericTypesAreCreated(Type actualServiceType)
         {
             var openGenericServiceType = actualServiceType.GetGenericTypeDefinition();
@@ -3458,7 +3559,7 @@ namespace DbReader.LightInject
         }
 
         private Action<IEmitter> CreateEmitMethodBasedOnLazyServiceRequest(Type serviceType, Func<Type, Delegate> valueFactoryDelegate)
-        {            
+        {
             Type actualServiceType = serviceType.GetGenericTypeArguments()[0];
             Type funcType = actualServiceType.GetFuncType();
             ConstructorInfo lazyConstructor = actualServiceType.GetLazyConstructor();
@@ -3466,20 +3567,20 @@ namespace DbReader.LightInject
             var constantIndex = constants.Add(getInstanceDelegate);
 
             return emitter =>
-                {
-                    emitter.PushConstant(constantIndex, funcType);      
-                    emitter.New(lazyConstructor);                    
-                };
+            {
+                emitter.PushConstant(constantIndex, funcType);
+                emitter.New(lazyConstructor);
+            };
         }
-             
+
         private ServiceRegistration GetOpenGenericServiceRegistration(Type openGenericServiceType, string serviceName)
         {
             var services = GetAvailableServices(openGenericServiceType);
             if (services.Count == 0)
             {
                 return null;
-            } 
-           
+            }
+
             ServiceRegistration openGenericServiceRegistration;
             services.TryGetValue(serviceName, out openGenericServiceRegistration);
             if (openGenericServiceRegistration == null && string.IsNullOrEmpty(serviceName) && services.Count == 1)
@@ -3495,12 +3596,12 @@ namespace DbReader.LightInject
             Type openGenericServiceType = closedGenericServiceType.GetGenericTypeDefinition();
             ServiceRegistration openGenericServiceRegistration =
                 GetOpenGenericServiceRegistration(openGenericServiceType, serviceName);
-           
+
             if (openGenericServiceRegistration == null)
             {
                 return null;
             }
-            
+
             Type[] closedGenericArguments = closedGenericServiceType.GetGenericTypeArguments();
 
             Type closedGenericImplementingType = TryMakeGenericType(
@@ -3513,18 +3614,18 @@ namespace DbReader.LightInject
             }
 
             var serviceRegistration = new ServiceRegistration
-                                                          {
-                                                              ServiceType = closedGenericServiceType,
-                                                              ImplementingType =
-                                                                  closedGenericImplementingType,
-                                                              ServiceName = serviceName,
-                                                              Lifetime =
-                                                                  CloneLifeTime(
-                                                                      openGenericServiceRegistration
-                                                                  .Lifetime)
-                                                          };            
+            {
+                ServiceType = closedGenericServiceType,
+                ImplementingType =
+                    closedGenericImplementingType,
+                ServiceName = serviceName,
+                Lifetime =
+                    CloneLifeTime(
+                        openGenericServiceRegistration
+                    .Lifetime)
+            };
             Register(serviceRegistration);
-            return GetEmitMethod(serviceRegistration.ServiceType, serviceRegistration.ServiceName);            
+            return GetEmitMethod(serviceRegistration.ServiceType, serviceRegistration.ServiceName);
         }
 
         private Action<IEmitter> CreateEmitMethodForEnumerableServiceServiceRequest(Type serviceType)
@@ -3535,7 +3636,7 @@ namespace DbReader.LightInject
                 EnsureEmitMethodsForOpenGenericTypesAreCreated(actualServiceType);
             }
 
-            IList<Action<IEmitter>> emitMethods = GetEmitMethods(actualServiceType).Values.ToList();
+            var emitMethods = emitters.Where(kv => actualServiceType.IsAssignableFrom(kv.Key)).SelectMany(kv => kv.Value.Values).ToList();
 
             if (dependencyStack.Count > 0 && emitMethods.Contains(dependencyStack.Peek()))
             {
@@ -3554,7 +3655,7 @@ namespace DbReader.LightInject
         {
             return string.IsNullOrEmpty(serviceName) && GetEmitMethods(serviceType).Count == 1;
         }
-        
+
         private ConstructionInfo GetConstructionInfo(Registration registration)
         {
             return constructionInfoProvider.Value.GetConstructionInfo(registration);
@@ -3564,20 +3665,34 @@ namespace DbReader.LightInject
         {
             return emitters.GetOrAdd(serviceType, s => new ThreadSafeDictionary<string, Action<IEmitter>>(StringComparer.CurrentCultureIgnoreCase));
         }
-       
+
         private ThreadSafeDictionary<string, ServiceRegistration> GetAvailableServices(Type serviceType)
         {
             return availableServices.GetOrAdd(serviceType, s => new ThreadSafeDictionary<string, ServiceRegistration>(StringComparer.CurrentCultureIgnoreCase));
         }
 
+        private ThreadSafeDictionary<string, Expression> GetConstructorDependencyFactories(Type dependencyType)
+        {
+            return constructorDependencyFactories.GetOrAdd(
+                dependencyType,
+                d => new ThreadSafeDictionary<string, Expression>(StringComparer.CurrentCultureIgnoreCase));
+        }
+
+        private ThreadSafeDictionary<string, Expression> GetPropertyDependencyFactories(Type dependencyType)
+        {
+            return propertyDependencyFactories.GetOrAdd(
+                dependencyType,
+                d => new ThreadSafeDictionary<string, Expression>(StringComparer.CurrentCultureIgnoreCase));
+        }
+
         private void RegisterService(Type serviceType, Type implementingType, ILifetime lifetime, string serviceName)
         {
             var serviceRegistration = new ServiceRegistration { ServiceType = serviceType, ImplementingType = implementingType, ServiceName = serviceName, Lifetime = lifetime };
-            Register(serviceRegistration);         
+            Register(serviceRegistration);
         }
-        
+
         private Action<IEmitter> ResolveEmitMethod(ServiceRegistration serviceRegistration)
-        {                    
+        {
             if (serviceRegistration.Lifetime == null)
             {
                 return methodSkeleton => EmitNewInstanceWithDecorators(serviceRegistration, methodSkeleton);
@@ -3585,16 +3700,16 @@ namespace DbReader.LightInject
 
             return methodSkeleton => EmitLifetime(serviceRegistration, ms => EmitNewInstanceWithDecorators(serviceRegistration, ms), methodSkeleton);
         }
-        
+
         private void EmitLifetime(ServiceRegistration serviceRegistration, Action<IEmitter> emitMethod, IEmitter emitter)
         {
             if (serviceRegistration.Lifetime is PerContainerLifetime)
             {
                 Func<object> instanceDelegate =
-                    WrapAsFuncDelegate(CreateDynamicMethodDelegate(emitMethod));                        
+                    WrapAsFuncDelegate(CreateDynamicMethodDelegate(emitMethod));
                 var instance = serviceRegistration.Lifetime.GetInstance(instanceDelegate, null);
                 var instanceIndex = constants.Add(instance);
-                emitter.PushConstant(instanceIndex, instance.GetType());                
+                emitter.PushConstant(instanceIndex, instance.GetType());
             }
             else
             {
@@ -3610,7 +3725,7 @@ namespace DbReader.LightInject
                 emitter.Call(getInstanceMethod);
             }
         }
-       
+
         private int CreateScopeManagerProviderIndex()
         {
             return constants.Add(ScopeManagerProvider);
@@ -3619,7 +3734,7 @@ namespace DbReader.LightInject
         private int CreateInstanceDelegateIndex(Action<IEmitter> emitMethod)
         {
             return constants.Add(WrapAsFuncDelegate(CreateDynamicMethodDelegate(emitMethod)));
-        }                
+        }
 
         private int CreateLifetimeIndex(ILifetime lifetime)
         {
@@ -3651,7 +3766,7 @@ namespace DbReader.LightInject
         }
 
         private Func<object[], object> CreateDelegate(Type serviceType, string serviceName, bool throwError)
-        {            
+        {
             lock (lockObject)
             {
                 var serviceEmitter = GetEmitMethod(serviceType, serviceName);
@@ -3665,7 +3780,7 @@ namespace DbReader.LightInject
                 {
                     try
                     {
-                        return CreateDynamicMethodDelegate(serviceEmitter);                        
+                        return CreateDynamicMethodDelegate(serviceEmitter);
                     }
                     catch (InvalidOperationException ex)
                     {
@@ -3679,22 +3794,22 @@ namespace DbReader.LightInject
                 return null;
             }
         }
-                    
+
         private void RegisterValue(Type serviceType, object value, string serviceName)
         {
             var serviceRegistration = new ServiceRegistration { ServiceType = serviceType, ServiceName = serviceName, Value = value, Lifetime = new PerContainerLifetime() };
-            Register(serviceRegistration);            
+            Register(serviceRegistration);
         }
 
         private void RegisterServiceFromLambdaExpression<TService>(
             LambdaExpression factory, ILifetime lifetime, string serviceName)
         {
             var serviceRegistration = new ServiceRegistration { ServiceType = typeof(TService), FactoryExpression = factory, ServiceName = serviceName, Lifetime = lifetime };
-            Register(serviceRegistration);            
+            Register(serviceRegistration);
         }
 
         private class Storage<T>
-        {            
+        {
             public T[] Items = new T[0];
 
             private readonly object lockObject = new object();
@@ -3750,12 +3865,12 @@ namespace DbReader.LightInject
         }
 
         private class DynamicMethodSkeleton : IMethodSkeleton
-        {            
+        {
             private IEmitter emitter;
             private DynamicMethod dynamicMethod;
 
             public DynamicMethodSkeleton(Type returnType, Type[] parameterTypes)
-            {         
+            {
                 CreateDynamicMethod(returnType, parameterTypes);
             }
 
@@ -3765,7 +3880,7 @@ namespace DbReader.LightInject
             }
 
             public Delegate CreateDelegate(Type delegateType)
-            {                                                                       
+            {
                 return dynamicMethod.CreateDelegate(delegateType);
             }
 
@@ -3780,7 +3895,7 @@ namespace DbReader.LightInject
         private class ServiceRegistry<T> : ThreadSafeDictionary<Type, ThreadSafeDictionary<string, T>>
         {
         }
-        
+
         private class FactoryRule
         {
             public Func<Type, string, bool> CanCreateInstance { get; set; }
@@ -3826,14 +3941,14 @@ namespace DbReader.LightInject
     {
         private readonly LogicalThreadStorage<ScopeManager> scopeManagers =
             new LogicalThreadStorage<ScopeManager>(() => new ScopeManager());
-                
+
         /// <summary>
         /// Returns the <see cref="ScopeManager"/> that is responsible for managing scopes.
         /// </summary>
         /// <returns>The <see cref="ScopeManager"/> that is responsible for managing scopes.</returns>
         public ScopeManager GetScopeManager()
         {
-            return scopeManagers.Value;                        
+            return scopeManagers.Value;
         }
     }
 
@@ -3929,7 +4044,7 @@ namespace DbReader.LightInject
         private bool CanCreateParameterDependency(ParameterInfo parameterInfo)
         {
             return canGetInstance(parameterInfo.ParameterType, string.Empty) || canGetInstance(parameterInfo.ParameterType, GetServiceName(parameterInfo));
-        }       
+        }
     }
 
     /// <summary>
@@ -3952,12 +4067,12 @@ namespace DbReader.LightInject
                            .Select(
                                p =>
                                new ConstructorDependency
-                                   {
-                                       ServiceName = string.Empty,
-                                       ServiceType = p.ParameterType,
-                                       Parameter = p,
-                                       IsRequired = true
-                                   });
+                               {
+                                   ServiceName = string.Empty,
+                                   ServiceType = p.ParameterType,
+                                   Parameter = p,
+                                   IsRequired = true
+                               });
         }
     }
 
@@ -4005,6 +4120,9 @@ namespace DbReader.LightInject
         private readonly IConstructorSelector constructorSelector;
         private readonly IConstructorDependencySelector constructorDependencySelector;
         private readonly IPropertyDependencySelector propertyDependencySelector;
+        private readonly Func<Type, string, Expression> getConstructorDependencyExpression;
+
+        private readonly Func<Type, string, Expression> getPropertyDependencyExpression;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeConstructionInfoBuilder"/> class.
@@ -4015,14 +4133,20 @@ namespace DbReader.LightInject
         /// responsible for selecting the constructor dependencies for a given <see cref="ConstructionInfo"/>.</param>
         /// <param name="propertyDependencySelector">The <see cref="IPropertyDependencySelector"/> that is responsible
         /// for selecting the property dependencies for a given <see cref="Type"/>.</param>
+        /// <param name="getConstructorDependencyExpression">A function delegate that returns the registered constructor dependency expression, if any.</param>
+        /// <param name="getPropertyDependencyExpression">A function delegate that returns the registered property dependency expression, if any.</param>
         public TypeConstructionInfoBuilder(
             IConstructorSelector constructorSelector,
             IConstructorDependencySelector constructorDependencySelector,
-            IPropertyDependencySelector propertyDependencySelector)
+            IPropertyDependencySelector propertyDependencySelector,
+            Func<Type, string, Expression> getConstructorDependencyExpression,
+            Func<Type, string, Expression> getPropertyDependencyExpression)
         {
             this.constructorSelector = constructorSelector;
             this.constructorDependencySelector = constructorDependencySelector;
             this.propertyDependencySelector = propertyDependencySelector;
+            this.getConstructorDependencyExpression = getConstructorDependencyExpression;
+            this.getPropertyDependencyExpression = getPropertyDependencyExpression;
         }
 
         /// <summary>
@@ -4033,16 +4157,44 @@ namespace DbReader.LightInject
         public ConstructionInfo Execute(Registration registration)
         {
             var implementingType = registration.ImplementingType;
-            var constructionInfo = new ConstructionInfo();            
+            var constructionInfo = new ConstructionInfo();
             constructionInfo.ImplementingType = implementingType;
-            constructionInfo.PropertyDependencies.AddRange(propertyDependencySelector.Execute(implementingType));
+            constructionInfo.PropertyDependencies.AddRange(GetPropertyDependencies(implementingType));
             if (!registration.IgnoreConstructorDependencies)
             {
                 constructionInfo.Constructor = constructorSelector.Execute(implementingType);
-                constructionInfo.ConstructorDependencies.AddRange(constructorDependencySelector.Execute(constructionInfo.Constructor));    
-            }          
-  
+                constructionInfo.ConstructorDependencies.AddRange(GetConstructorDependencies(constructionInfo.Constructor));
+            }
+
             return constructionInfo;
+        }
+
+        private IEnumerable<ConstructorDependency> GetConstructorDependencies(ConstructorInfo constructorInfo)
+        {
+            var constructorDependencies = constructorDependencySelector.Execute(constructorInfo).ToArray();
+            foreach (var constructorDependency in constructorDependencies)
+            {
+                constructorDependency.FactoryExpression =
+                    getConstructorDependencyExpression(
+                        constructorDependency.ServiceType,
+                        constructorDependency.ServiceName);
+            }
+
+            return constructorDependencies;
+        }
+
+        private IEnumerable<PropertyDependency> GetPropertyDependencies(Type implementingType)
+        {
+            var propertyDependencies = propertyDependencySelector.Execute(implementingType).ToArray();
+            foreach (var property in propertyDependencies)
+            {
+                property.FactoryExpression =
+                    getPropertyDependencyExpression(
+                        property.ServiceType,
+                        property.ServiceName);
+            }
+
+            return propertyDependencies;
         }
     }
 
@@ -4094,7 +4246,7 @@ namespace DbReader.LightInject
     {
         private readonly Lazy<ILambdaConstructionInfoBuilder> lambdaConstructionInfoBuilder;
         private readonly Lazy<ITypeConstructionInfoBuilder> typeConstructionInfoBuilder;
- 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstructionInfoBuilder"/> class.             
         /// </summary>
@@ -4123,12 +4275,12 @@ namespace DbReader.LightInject
                 ? CreateConstructionInfoFromLambdaExpression(registration.FactoryExpression)
                 : CreateConstructionInfoFromImplementingType(registration);
         }
-        
+
         private ConstructionInfo CreateConstructionInfoFromLambdaExpression(LambdaExpression lambdaExpression)
         {
             return lambdaConstructionInfoBuilder.Value.Execute(lambdaExpression);
         }
-        
+
         private ConstructionInfo CreateConstructionInfoFromImplementingType(Registration registration)
         {
             return typeConstructionInfoBuilder.Value.Execute(registration);
@@ -4140,19 +4292,19 @@ namespace DbReader.LightInject
     /// </summary>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal class LambdaConstructionInfoBuilder : ILambdaConstructionInfoBuilder
-    {                
+    {
         /// <summary>
         /// Parses the <paramref name="lambdaExpression"/> and returns a <see cref="ConstructionInfo"/> instance.
         /// </summary>
         /// <param name="lambdaExpression">The <see cref="LambdaExpression"/> to parse.</param>
         /// <returns>A <see cref="ConstructionInfo"/> instance.</returns>
         public ConstructionInfo Execute(LambdaExpression lambdaExpression)
-        {            
+        {
             if (!CanParse(lambdaExpression))
             {
                 return CreateConstructionInfoBasedOnLambdaExpression(lambdaExpression);
             }
-            
+
             switch (lambdaExpression.Body.NodeType)
             {
                 case ExpressionType.New:
@@ -4164,9 +4316,9 @@ namespace DbReader.LightInject
             }
         }
 
-        private bool CanParse(LambdaExpression lambdaExpression)
+        private static bool CanParse(LambdaExpression lambdaExpression)
         {
-            return lambdaExpression.Parameters.Count <= 1;
+            return lambdaExpression.Body.AsEnumerable().All(e => e != null && e.NodeType != ExpressionType.Lambda) && lambdaExpression.Parameters.Count <= 1;
         }
 
         private static ConstructionInfo CreateConstructionInfoBasedOnLambdaExpression(LambdaExpression lambdaExpression)
@@ -4260,7 +4412,7 @@ namespace DbReader.LightInject
         {
             return methodInfo.DeclaringType == typeof(IServiceFactory);
         }
-        
+
         private static void ApplyDependecyDetailsFromExpression(Expression expression, Dependency dependency)
         {
             dependency.FactoryExpression = expression;
@@ -4305,7 +4457,7 @@ namespace DbReader.LightInject
             return argument.NodeType == ExpressionType.Constant;
         }
     }
-   
+
     /// <summary>
     /// Contains information about a service request that originates from a rule based service registration.
     /// </summary>    
@@ -4398,7 +4550,7 @@ namespace DbReader.LightInject
             {
                 return ImplementingType == null && FactoryExpression == null;
             }
-        }       
+        }
     }
 
     /// <summary>
@@ -4459,7 +4611,7 @@ namespace DbReader.LightInject
             return result;
         }
     }
-    
+
     /// <summary>
     /// Contains information about how to create a service instance.
     /// </summary>
@@ -4522,7 +4674,7 @@ namespace DbReader.LightInject
         /// Gets or sets the <see cref="FactoryExpression"/> that represent getting the value of the <see cref="Dependency"/>.
         /// </summary>            
         public Expression FactoryExpression { get; set; }
-       
+
         /// <summary>
         /// Gets the name of the dependency accessor.
         /// </summary>
@@ -4927,7 +5079,7 @@ namespace DbReader.LightInject
             CompositionRootTypeAttribute[] compositionRootAttributes =
                 assembly.GetCustomAttributes(typeof(CompositionRootTypeAttribute))
                         .Cast<CompositionRootTypeAttribute>().ToArray();
-            
+
             if (compositionRootAttributes.Length > 0)
             {
                 return compositionRootAttributes.Select(a => a.CompositionRootType).ToArray();
@@ -4975,10 +5127,10 @@ namespace DbReader.LightInject
     internal class ConcreteTypeExtractor : ITypeExtractor
     {
         private static readonly List<Type> InternalTypes = new List<Type>();
-       
+
         static ConcreteTypeExtractor()
-        {        
-            InternalTypes.Add(typeof(LambdaConstructionInfoBuilder));       
+        {
+            InternalTypes.Add(typeof(LambdaConstructionInfoBuilder));
             InternalTypes.Add(typeof(ConstructorDependency));
             InternalTypes.Add(typeof(PropertyDependency));
             InternalTypes.Add(typeof(ThreadSafeDictionary<,>));
@@ -4992,11 +5144,11 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(Registration));
             InternalTypes.Add(typeof(ServiceContainer));
             InternalTypes.Add(typeof(ConstructionInfo));
-            InternalTypes.Add(typeof(AssemblyLoader));            
+            InternalTypes.Add(typeof(AssemblyLoader));
             InternalTypes.Add(typeof(TypeConstructionInfoBuilder));
             InternalTypes.Add(typeof(ConstructionInfoProvider));
-            InternalTypes.Add(typeof(ConstructionInfoBuilder));            
-            InternalTypes.Add(typeof(MostResolvableConstructorSelector));            
+            InternalTypes.Add(typeof(ConstructionInfoBuilder));
+            InternalTypes.Add(typeof(MostResolvableConstructorSelector));
             InternalTypes.Add(typeof(PerContainerLifetime));
             InternalTypes.Add(typeof(PerContainerLifetime));
             InternalTypes.Add(typeof(PerRequestLifeTime));
@@ -5012,7 +5164,7 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(ImmutableList<>));
             InternalTypes.Add(typeof(KeyValue<,>));
             InternalTypes.Add(typeof(ImmutableHashTree<,>));
-            InternalTypes.Add(typeof(PerThreadScopeManagerProvider));            
+            InternalTypes.Add(typeof(PerThreadScopeManagerProvider));
             InternalTypes.Add(typeof(Emitter));
             InternalTypes.Add(typeof(Instruction));
             InternalTypes.Add(typeof(Instruction<>));
@@ -5026,10 +5178,10 @@ namespace DbReader.LightInject
         /// <param name="assembly">The <see cref="Assembly"/> for which to extract types.</param>
         /// <returns>A set of concrete types found in the given <paramref name="assembly"/>.</returns>
         public Type[] Execute(Assembly assembly)
-        {            
+        {
             return assembly.GetTypes().Where(t => t.IsClass()
                                                && !t.IsNestedPrivate()
-                                               && !t.IsAbstract() 
+                                               && !t.IsAbstract()
                                                && !Equals(t.GetAssembly(), typeof(string).GetAssembly())
                                                && !IsCompilerGenerated(t)).Except(InternalTypes).ToArray();
         }
@@ -5049,7 +5201,7 @@ namespace DbReader.LightInject
         private readonly IServiceRegistry serviceRegistry;
 
         private readonly IList<Type> executedCompositionRoots = new List<Type>();
-        
+
         private readonly object syncRoot = new object();
 
         /// <summary>
@@ -5078,8 +5230,8 @@ namespace DbReader.LightInject
                         compositionRoot.Compose(serviceRegistry);
                     }
                 }
-            }            
-        }       
+            }
+        }
     }
 
     /// <summary>
@@ -5117,7 +5269,7 @@ namespace DbReader.LightInject
         /// <param name="lifetimeFactory">The <see cref="ILifetime"/> factory that controls the lifetime of the registered service.</param>
         /// <param name="shouldRegister">A function delegate that determines if a service implementation should be registered.</param>
         public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetimeFactory, Func<Type, Type, bool> shouldRegister)
-        {            
+        {
             Type[] concreteTypes = GetConcreteTypes(assembly);
             foreach (Type type in concreteTypes)
             {
@@ -5137,7 +5289,7 @@ namespace DbReader.LightInject
             {
                 currentAssembly = assembly;
                 ExecuteCompositionRoots(compositionRootTypes);
-            }            
+            }
         }
 
         private static string GetServiceName(Type serviceType, Type implementingType)
@@ -5179,7 +5331,7 @@ namespace DbReader.LightInject
 
         private Type[] GetConcreteTypes(Assembly assembly)
         {
-            return concreteTypeExtractor.Execute(assembly);            
+            return concreteTypeExtractor.Execute(assembly);
         }
 
         private Type[] GetCompositionRootTypes(Assembly assembly)
@@ -5284,7 +5436,7 @@ namespace DbReader.LightInject
             return true;
         }
     }
-  
+
     /// <summary>
     /// Defines an immutable representation of a key and a value.  
     /// </summary>
@@ -5623,7 +5775,7 @@ namespace DbReader.LightInject
         /// <param name="parameterTypes">The list of parameter types used by the current dynamic method.</param>
         public Emitter(ILGenerator generator, Type[] parameterTypes)
         {
-            this.generator = generator;            
+            this.generator = generator;
             this.parameterTypes = parameterTypes;
         }
 
@@ -5646,7 +5798,7 @@ namespace DbReader.LightInject
             get
             {
                 return instructions;
-            }            
+            }
         }
 
         /// <summary>
@@ -5658,7 +5810,7 @@ namespace DbReader.LightInject
             if (code == OpCodes.Ldarg_0)
             {
                 stack.Push(parameterTypes[0]);
-            }            
+            }
             else if (code == OpCodes.Ldarg_1)
             {
                 stack.Push(parameterTypes[1]);
@@ -5705,7 +5857,7 @@ namespace DbReader.LightInject
             }
             else if (code == OpCodes.Ldelem_Ref)
             {
-                stack.Pop();                
+                stack.Pop();
                 Type arrayType = stack.Pop();
                 stack.Push(arrayType.GetElementType());
             }
@@ -5754,7 +5906,7 @@ namespace DbReader.LightInject
             else if (code == OpCodes.Ldc_I4_8)
             {
                 stack.Push(typeof(int));
-            }            
+            }
             else if (code == OpCodes.Sub)
             {
                 stack.Pop();
@@ -5788,7 +5940,7 @@ namespace DbReader.LightInject
         {
             if (code == OpCodes.Ldc_I4)
             {
-                stack.Push(typeof(int));                
+                stack.Push(typeof(int));
             }
             else if (code == OpCodes.Ldarg)
             {
@@ -5807,9 +5959,9 @@ namespace DbReader.LightInject
                 throw new NotSupportedException(code.ToString());
             }
 
-            instructions.Add(new Instruction<int>(code, arg, il => il.Emit(code, arg)));            
+            instructions.Add(new Instruction<int>(code, arg, il => il.Emit(code, arg)));
         }
-       
+
         /// <summary>
         /// Puts the specified instruction and numerical argument onto the Microsoft intermediate language (MSIL) stream of instructions.
         /// </summary>
@@ -5819,14 +5971,14 @@ namespace DbReader.LightInject
         {
             if (code == OpCodes.Ldc_I4_S)
             {
-                stack.Push(typeof(sbyte));    
+                stack.Push(typeof(sbyte));
             }
             else
             {
                 throw new NotSupportedException(code.ToString());
             }
 
-            instructions.Add(new Instruction<sbyte>(code, arg, il => il.Emit(code, arg)));            
+            instructions.Add(new Instruction<sbyte>(code, arg, il => il.Emit(code, arg)));
         }
 
         /// <summary>
@@ -5853,7 +6005,7 @@ namespace DbReader.LightInject
                 throw new NotSupportedException(code.ToString());
             }
 
-            instructions.Add(new Instruction<byte>(code, arg, il => il.Emit(code, arg)));            
+            instructions.Add(new Instruction<byte>(code, arg, il => il.Emit(code, arg)));
         }
 
         /// <summary>
@@ -5866,35 +6018,35 @@ namespace DbReader.LightInject
             if (code == OpCodes.Newarr)
             {
                 stack.Pop();
-                stack.Push(type.MakeArrayType());                
+                stack.Push(type.MakeArrayType());
             }
             else if (code == OpCodes.Stelem)
             {
                 stack.Pop();
                 stack.Pop();
-                stack.Pop();                
+                stack.Pop();
             }
             else if (code == OpCodes.Castclass)
             {
                 stack.Pop();
-                stack.Push(type);                
+                stack.Push(type);
             }
             else if (code == OpCodes.Box)
             {
                 stack.Pop();
-                stack.Push(typeof(object));                
+                stack.Push(typeof(object));
             }
             else if (code == OpCodes.Unbox_Any)
             {
                 stack.Pop();
-                stack.Push(type);                
+                stack.Push(type);
             }
             else
             {
                 throw new NotSupportedException(code.ToString());
             }
 
-            instructions.Add(new Instruction<Type>(code, type, il => il.Emit(code, type)));            
+            instructions.Add(new Instruction<Type>(code, type, il => il.Emit(code, type)));
         }
 
         /// <summary>
@@ -5919,7 +6071,7 @@ namespace DbReader.LightInject
                 throw new NotSupportedException(code.ToString());
             }
 
-            instructions.Add(new Instruction<ConstructorInfo>(code, constructor, il => il.Emit(code, constructor)));            
+            instructions.Add(new Instruction<ConstructorInfo>(code, constructor, il => il.Emit(code, constructor)));
         }
 
         /// <summary>
@@ -5941,8 +6093,8 @@ namespace DbReader.LightInject
             {
                 throw new NotSupportedException(code.ToString());
             }
-            
-            instructions.Add(new Instruction<LocalBuilder>(code, localBuilder, il => il.Emit(code, localBuilder)));                        
+
+            instructions.Add(new Instruction<LocalBuilder>(code, localBuilder, il => il.Emit(code, localBuilder)));
         }
 
         /// <summary>
@@ -5975,7 +6127,7 @@ namespace DbReader.LightInject
                 throw new NotSupportedException(code.ToString());
             }
 
-            instructions.Add(new Instruction<MethodInfo>(code, methodInfo, il => il.Emit(code, methodInfo)));                                   
+            instructions.Add(new Instruction<MethodInfo>(code, methodInfo, il => il.Emit(code, methodInfo)));
         }
 
         /// <summary>
@@ -5990,14 +6142,14 @@ namespace DbReader.LightInject
             return localBuilder;
         }
     }
-    
+
     /// <summary>
     /// Provides storage per logical thread of execution.
     /// </summary>
     /// <typeparam name="T">The type of the value contained in this <see cref="LogicalThreadStorage{T}"/>.</typeparam>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal class LogicalThreadStorage<T>
-    {      
+    {
         private readonly Func<T> valueFactory;
 
         private readonly string key;
