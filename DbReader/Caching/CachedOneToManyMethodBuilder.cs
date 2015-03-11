@@ -1,7 +1,6 @@
-﻿namespace DbReader
+﻿namespace DbReader.Caching
 {
     using System;
-    using System.Collections;
     using System.Collections.Concurrent;
     using System.Data;
 

@@ -62,6 +62,19 @@ namespace DbReader.Tests {
         
         /// <summary>
         ///   Looks up a localized string similar to SELECT 
+        ///	CustomerId
+        ///FROM 
+        ///	Customers
+        ///.
+        /// </summary>
+        internal static string Customers {
+            get {
+                return ResourceManager.GetString("Customers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT 
         ///	c.CustomerID,
         ///	o.OrderId
         ///FROM 

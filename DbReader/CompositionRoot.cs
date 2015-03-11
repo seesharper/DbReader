@@ -5,6 +5,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.Reflection;
 
+    using DbReader.Caching;
     using DbReader.Interfaces;
     using DbReader.LightInject;
     using DbReader.Readers;

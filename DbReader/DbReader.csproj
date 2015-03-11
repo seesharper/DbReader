@@ -44,11 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachedInstanceReaderMethodBuilder.cs" />
-    <Compile Include="CachedKeyReaderMethodBuilder.cs" />
-    <Compile Include="CachedOneToManyMethodBuilder.cs" />
-    <Compile Include="CachedPropertyMapper.cs" />
-    <Compile Include="CachedReaderMethodBuilder.cs" />
+    <Compile Include="Caching\CachedInstanceReader.cs" />
+    <Compile Include="Caching\CachedInstanceReaderMethodBuilder.cs" />
+    <Compile Include="Caching\CachedKeyReaderMethodBuilder.cs" />
+    <Compile Include="Caching\CachedOneToManyMethodBuilder.cs" />
+    <Compile Include="Caching\CachedPropertyMapper.cs" />
+    <Compile Include="Caching\CachedReaderMethodBuilder.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
@@ -63,7 +64,6 @@
     <Compile Include="OneToManyMethodBuilder.cs" />
     <Compile Include="OneToManyPropertySelector.cs" />
     <Compile Include="OrdinalSelector.cs" />
-    <Compile Include="CachedInstanceReader.cs" />
     <Compile Include="Interfaces\IConstructorSelector.cs" />
     <Compile Include="Interfaces\IFieldSelector.cs" />
     <Compile Include="Interfaces\IInstanceReader.cs" />

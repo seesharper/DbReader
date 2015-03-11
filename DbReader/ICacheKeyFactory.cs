@@ -14,13 +14,14 @@
     public class CacheKeyFactory : ICacheKeyFactory
     {
         public string CreateKey(Type type, IDataRecord dataRecord, string prefix)
-        {
+        {                        
             var sb = new StringBuilder(type.FullName);
             sb.Append(prefix);
-            for (int i = 0; i < dataRecord.FieldCount; i++)
-            {
-                sb.Append(dataRecord.GetName(i));
-            }            
+            sb.Append(dataRecord.FieldCount);
+            //for (int i = 0; i < dataRecord.FieldCount; i++)
+            //{
+            //    sb.Append(dataRecord.GetName(i));
+            //}            
             return sb.ToString();
         }
     }   

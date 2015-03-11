@@ -22,7 +22,7 @@
         {
             using (serviceContainer.BeginScope())
             {
-                var result = new Collection<T>();
+                var result = new HashSet<T>();
                 var commandFactory = serviceContainer.GetInstance<ICommandFactory>();
                 var command = commandFactory.CreateCommand(dbConnection, sql, arguments);
                 var instanceReader = serviceContainer.GetInstance<IInstanceReader<T>>();
@@ -30,7 +30,8 @@
                 
                 while (dataReader.Read())
                 {
-                    result.TryAdd(instanceReader.Read(dataReader, string.Empty));
+                    result.Add(instanceReader.Read(dataReader, string.Empty));
+                    //result.TryAdd(instanceReader.Read(dataReader, string.Empty));
                 }
 
                 return result;

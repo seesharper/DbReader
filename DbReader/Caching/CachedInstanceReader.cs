@@ -1,9 +1,11 @@
-﻿namespace DbReader
+﻿namespace DbReader.Caching
 {
     using System.Collections;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Data;
-    using DbReader.Interfaces;    
+
+    using DbReader.Interfaces;
 
     /// <summary>
     /// An <see cref="IInstanceReader{T}"/> decorator that caches instances 
@@ -19,6 +21,8 @@
         private readonly IOneToManyMethodBuilder<T> oneToManyMethodBuilder;
 
         private readonly ConcurrentDictionary<IStructuralEquatable, T> queryCache = new ConcurrentDictionary<IStructuralEquatable, T>();
+
+        private readonly Dictionary<IStructuralEquatable, T> queryCache2 = new Dictionary<IStructuralEquatable, T>(); 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedInstanceReader{T}"/> class.
@@ -54,8 +58,18 @@
 
         private T ReadInstance(IDataRecord dataRecord, string currentPrefix)
         {
+            //return instanceReader.Read(dataRecord, currentPrefix);
             var key = keyReader.Read(typeof(T), dataRecord, currentPrefix);
-            return queryCache.GetOrAdd(key, k => instanceReader.Read(dataRecord, currentPrefix));
+
+            T instance;
+            if (!queryCache2.TryGetValue(key, out instance))
+            {
+                instance = instanceReader.Read(dataRecord, currentPrefix);
+                queryCache2.Add(key, instance);
+            }
+            return instance;
+
+            //return queryCache.GetOrAdd(key, k => instanceReader.Read(dataRecord, currentPrefix));
         }
     }
 }

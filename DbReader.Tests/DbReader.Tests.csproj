@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Queries\Customers.sql" />
     <Content Include="Queries\CustomersAndOrders.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

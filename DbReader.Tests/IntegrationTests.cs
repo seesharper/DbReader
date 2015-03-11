@@ -1,5 +1,6 @@
 ﻿namespace DbReader.Tests
 {
+    using System;
     using System.Data;
     using System.Data.SQLite;
     using System.IO;
@@ -17,6 +18,7 @@
 
             if (!File.Exists(dbFile))
             {
+                Console.WriteLine("Hold your horses..creating database...");
                 SQLiteConnection.CreateFile(dbFile);
                 using (var connection = new SQLiteConnection("Data Source = " + dbFile))
                 {
@@ -48,7 +50,7 @@
         {
             using (var connection = CreateConnection())
             {
-                var customers = connection.Read<Customer>("SELECT * FROM Customers");
+                var customers = connection.Read<Customer>(SQL.Customers);
                 customers.Count().ShouldEqual(93);
             }
         }
