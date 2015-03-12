@@ -25,16 +25,19 @@
             serviceRegistry.Register(typeof(IReaderMethodBuilder<>), typeof(ConstructorReaderMethodBuilder<>), "ConstructorReaderMethodBuilder", new PerContainerLifetime());
             serviceRegistry.Decorate(typeof(IReaderMethodBuilder<>), typeof(CachedReaderMethodBuilder<>));
    
-         
             serviceRegistry.Register<IFieldSelector, FieldSelector>(new PerScopeLifetime());
+            serviceRegistry.Decorate<IFieldSelector, CachedFieldSelector>();
+
             serviceRegistry.Register<IPropertySelector, SimplePropertySelector>("SimplePropertySelector", new PerContainerLifetime());
             serviceRegistry.Register<IPropertySelector, ManyToOnePropertySelector>("ManyToOnePropertySelector", new PerContainerLifetime());
             serviceRegistry.Register<IPropertySelector, OneToManyPropertySelector>("OneToManyPropertySelector", new PerContainerLifetime());
+            serviceRegistry.Decorate<IPropertySelector, CachedPropertySelector>();
 
-            serviceRegistry.Register<IPropertyMapper>(factory => new PropertyMapper(factory.GetInstance<IPropertySelector>("SimplePropertySelector"), factory.GetInstance<IFieldSelector>()), "PropertyMapper", new PerScopeLifetime());
-            serviceRegistry.Decorate<IPropertyMapper, CachedPropertyMapper>();
+            
             
             serviceRegistry.Register<IMethodSelector, MethodSelector>(new PerContainerLifetime());
+            //Caching?
+
 
             serviceRegistry.Register<IConstructorSelector, ParameterlessConstructorSelector>("ParameterlessConstructorSelector", new PerContainerLifetime());
             serviceRegistry.Register<IConstructorSelector, FirstConstructorSelector>("FirstConstructorSelector", new PerContainerLifetime());
@@ -47,12 +50,14 @@
             serviceRegistry.Register(typeof(IInstanceReaderMethodBuilder<>), typeof(InstanceReaderMethodBuilder<>), new PerContainerLifetime());
             serviceRegistry.Decorate(typeof(IInstanceReaderMethodBuilder<>),typeof(CachedInstanceReaderMethodBuilder<>));
 
-            serviceRegistry.Register<Func<Type, object>>(factory => (type) => factory.GetInstance(type));
+            serviceRegistry.Register<Func<Type, object>>(factory => type => factory.GetInstance(type));
             serviceRegistry.Register<Func<Type, IReaderMethodBuilder<IStructuralEquatable>>>(
-                factory => (type) => CreateConstructorReaderMethodBuilder(type, factory), new PerContainerLifetime());
+                factory => type => CreateConstructorReaderMethodBuilder(type, factory), new PerContainerLifetime());
 
             serviceRegistry.Register<IPropertyMapper, KeyPropertyMapper>("KeyPropertyMapper", new PerScopeLifetime());
-            serviceRegistry.Decorate<IPropertyMapper, PropertyTypeValidator>();
+            serviceRegistry.Decorate<IPropertyMapper, PropertyTypeValidator>();                        
+            serviceRegistry.Register<IPropertyMapper, PropertyMapper>("PropertyMapper", new PerScopeLifetime());            
+            serviceRegistry.Decorate<IPropertyMapper, CachedPropertyMapper>();
             serviceRegistry.Decorate(typeof(IPropertyMapper), typeof(KeyPropertyMapperValidator), sr => sr.ImplementingType == typeof(KeyPropertyMapper));
             
 

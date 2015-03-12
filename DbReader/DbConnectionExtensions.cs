@@ -4,6 +4,7 @@
     using System.Collections.ObjectModel;
     using System.Data;
     using System.Data.Common;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using DbReader.Interfaces;
@@ -16,6 +17,9 @@
         static DbConnectionExtensions()
         {
             serviceContainer.RegisterFrom<CompositionRoot>();
+
+            
+
         }
 
         public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string sql, object arguments = null)

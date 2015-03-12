@@ -1,5 +1,8 @@
 # DbReader #
 
+* Is **NOT** an ORM
+* Does **NOT** try to abstract the database.
+
 ### Simple ###
 
 	public class Order

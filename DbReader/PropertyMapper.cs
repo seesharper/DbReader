@@ -14,20 +14,20 @@
     /// </summary>
     public class PropertyMapper : IPropertyMapper
     {
-        private readonly IPropertySelector propertySelector;
+        private readonly IPropertySelector simplePropertySelector;
         private readonly IFieldSelector fieldSelector;
         private readonly List<int> mappedOrdinals = new List<int>(); 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMapper"/> class.
         /// </summary>
-        /// <param name="propertySelector">The <see cref="IPropertySelector"/> that is responsible for
+        /// <param name="simplePropertySelector">The <see cref="IPropertySelector"/> that is responsible for
         /// selecting the "simple" properties from a given <see cref="Type"/>.</param>
         /// <param name="fieldSelector">The <see cref="IFieldSelector"/> that is responsible for 
         /// selecting the field names and their ordinals.</param>
-        public PropertyMapper(IPropertySelector propertySelector, IFieldSelector fieldSelector)
+        public PropertyMapper(IPropertySelector simplePropertySelector, IFieldSelector fieldSelector)
         {
-            this.propertySelector = propertySelector;
+            this.simplePropertySelector = simplePropertySelector;
             this.fieldSelector = fieldSelector;
         }
 
@@ -41,7 +41,7 @@
         public MappingInfo[] Execute(Type type, IDataRecord dataRecord, string prefix)
         {
             IReadOnlyDictionary<string, ColumnInfo> fieldOrdinals = fieldSelector.Execute(dataRecord);
-            var simpleProperties = propertySelector.Execute(type);
+            var simpleProperties = simplePropertySelector.Execute(type);
             
             return
                 simpleProperties.Select(

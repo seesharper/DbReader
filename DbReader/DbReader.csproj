@@ -44,11 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\CachedFieldSelector.cs" />
     <Compile Include="Caching\CachedInstanceReader.cs" />
     <Compile Include="Caching\CachedInstanceReaderMethodBuilder.cs" />
     <Compile Include="Caching\CachedKeyReaderMethodBuilder.cs" />
     <Compile Include="Caching\CachedOneToManyMethodBuilder.cs" />
     <Compile Include="Caching\CachedPropertyMapper.cs" />
+    <Compile Include="Caching\CachedPropertySelector.cs" />
     <Compile Include="Caching\CachedReaderMethodBuilder.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="DataReaderExtensions.cs" />
