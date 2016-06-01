@@ -1,4 +1,0 @@
-﻿SELECT 
-	CustomerId
-FROM 
-	Customers

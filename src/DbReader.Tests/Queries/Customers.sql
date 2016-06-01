@@ -1,0 +1,4 @@
+﻿SELECT 
+	CustomerId
+FROM 
+	Customers
