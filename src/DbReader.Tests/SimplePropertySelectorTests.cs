@@ -6,7 +6,7 @@
 
     using DbReader.LightInject;
 
-    using Should;
+    using Shouldly;
   
     using IPropertySelector = DbReader.Interfaces.IPropertySelector;
 

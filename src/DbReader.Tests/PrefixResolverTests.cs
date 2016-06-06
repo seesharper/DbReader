@@ -1,7 +1,7 @@
 ﻿namespace DbReader.Tests
 {
     using DbReader.Interfaces;
-    using Should;
+    using Shouldly;
 
     public class PrefixResolverTests
     {
@@ -20,7 +20,7 @@
 
             var prefix = prefixResolver.GetPrefix(property, dataRecord, string.Empty);
 
-            prefix.ShouldEqual("Orders");
+            prefix.ShouldBe("Orders");
         }
 
         public void GetPrefix_UpperCasePrefix_ReturnsPrefix(IPrefixResolver prefixResolver)
@@ -30,7 +30,7 @@
 
             var prefix = prefixResolver.GetPrefix(property, dataRecord, string.Empty);
 
-            prefix.ShouldEqual("O");
+            prefix.ShouldBe("O");
         }
 
         public void GetPrefix_ExistingPrefix_AppendsToExistingPrefix(IPrefixResolver prefixResolver)
@@ -40,7 +40,7 @@
 
             var prefix = prefixResolver.GetPrefix(property, dataRecord, "Customer");
 
-            prefix.ShouldEqual("Customer_Orders");
+            prefix.ShouldBe("Customer_Orders");
         }
 
         public void GetPrefix_UnknownPrefix_ReturnsNull(IPrefixResolver prefixResolver)

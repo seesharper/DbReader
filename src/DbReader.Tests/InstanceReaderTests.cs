@@ -4,72 +4,77 @@
     using System.Collections.Generic;    
     using System.Linq;    
     using DbReader.Interfaces;
-    using Should;
-    using Should.Core.Assertions;
-    
+    using Shouldly;
+
+
     public class InstanceReaderTests
-    {        
+    {
+        static InstanceReaderTests()
+        {
+            ValueConverter.RegisterReadDelegate((record, i) => new CustomValueType(record.GetInt32(i)));
+        }
+
         public void ShouldReadStringValue(IInstanceReader<ClassWithProperty<string>> reader)
         {
             var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual("SomeValue");
+            instance.Property.ShouldBe("SomeValue");
         }
         
         public void ShouldReadInt64Value(IInstanceReader<ClassWithProperty<long>> reader)
         {
             var dataRecord = new { Id = 42, Property = (long)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadNullableInt64Value(IInstanceReader<ClassWithProperty<long?>> reader)
         {
             var dataRecord = new { Id = 42, Property = (long?)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadInt32Value(IInstanceReader<ClassWithProperty<int>> reader)
         {
             var dataRecord = new { Id = 42, Property = 84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadNullableInt32Value(IInstanceReader<ClassWithProperty<int?>> reader)
         {
             var dataRecord = new { Id = 42, Property = 84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadInt16Value(IInstanceReader<ClassWithProperty<short>> reader)
         {
             var dataRecord = new { Id = 42, Property = (short)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual((short)84);
+            instance.Property.ShouldBe((short)84);
         }
 
         public void ShouldReadNullableInt16Value(IInstanceReader<ClassWithProperty<short?>> reader)
         {
             var dataRecord = new { Id = 42, Property = (short?)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual((short)84);
+            instance.Property.ShouldBe((short)84);
         }
 
         public void ShouldReadByteValue(IInstanceReader<ClassWithProperty<byte>> reader)
         {
             var dataRecord = new { Id = 42, Property = (byte)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual((byte)84);
+            instance.Property.ShouldBe((byte)84);
         }
 
         public void ShouldReadNullableByteValue(IInstanceReader<ClassWithProperty<byte?>> reader)
         {
             var dataRecord = new { Id = 42, Property = (byte?)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual((byte)84);
+            instance.Property.ShouldBe((byte)84);
         }
 
         public void ShouldReadByteArrayValue(IInstanceReader<ClassWithProperty<byte[]>> reader)
@@ -83,70 +88,70 @@
         {
             var dataRecord = new { Id = 42, Property = new DateTime(2014, 2, 5) }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(new DateTime(2014, 2, 5));
+            instance.Property.ShouldBe(new DateTime(2014, 2, 5));
         }
 
         public void ShouldReadDateTimeValue(IInstanceReader<ClassWithProperty<DateTime>> reader)
         {
             var dataRecord = new { Id = 42, Property = new DateTime(2014, 2, 5) }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(new DateTime(2014, 2, 5));
+            instance.Property.ShouldBe(new DateTime(2014, 2, 5));
         }
 
         public void ShouldReadDecimalValue(IInstanceReader<ClassWithProperty<decimal>> reader)
         {
             var dataRecord = new { Id = 42, Property = (decimal)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadNullableDecimalValue(IInstanceReader<ClassWithProperty<decimal?>> reader)
         {
             var dataRecord = new { Id = 42, Property = (decimal?)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
        
         public void ShouldReadDoubleValue(IInstanceReader<ClassWithProperty<double>> reader)
         {
             var dataRecord = new { Id = 42, Property = (double)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
         
         public void ShouldReadNullableDoubleValue(IInstanceReader<ClassWithProperty<double?>> reader)
         {
             var dataRecord = new { Id = 42, Property = (double?)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadFloatValue(IInstanceReader<ClassWithProperty<float>> reader)
         {
             var dataRecord = new { Id = 42, Property = (float)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadNullableFloatValue(IInstanceReader<ClassWithProperty<float?>> reader)
         {
             var dataRecord = new { Id = 42, Property = (float?)84 }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual(84);
+            instance.Property.ShouldBe(84);
         }
 
         public void ShouldReadCharValue(IInstanceReader<ClassWithProperty<char>> reader)
         {
             var dataRecord = new { Id = 42, Property = 'A' }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual('A');
+            instance.Property.ShouldBe('A');
         }
 
         public void ShouldReadNullableCharValue(IInstanceReader<ClassWithProperty<char?>> reader)
         {
             var dataRecord = new { Id = 42, Property = 'A' }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldEqual('A');
+            instance.Property.ShouldBe('A');
         }
 
         public void ShouldReadCharArrayValue(IInstanceReader<ClassWithProperty<char[]>> reader)
@@ -156,26 +161,34 @@
             instance.Property.SequenceEqual(new[] { 'A', 'B', 'C' });
         }
 
+        public void ShouldReadCustomValueType(IInstanceReader<ClassWithProperty<CustomValueType>> reader)
+        {
+            var dataRecord = new { Id = 42, Property = 42 }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.Value.ShouldBe(42);
+        }
+
+
         public void ShouldReadInstance(IInstanceReader<ClassWithNoRelations> instanceReader)
         {
             var dataRecord = new { Id = 42 }.ToDataRecord();
             var instance = instanceReader.Read(dataRecord, string.Empty);
-            instance.Id.ShouldEqual(42);
+            instance.Id.ShouldBe(42);
         }
 
         public void ShouldReadInstanceWithManyToOneRelation(IInstanceReader<ClassWithManyToOneRelation> instanceReader)
         {
             var dataRecord = new { Id = 42, ManyToOneRelation_Id = 84 }.ToDataRecord();
             var instance = instanceReader.Read(dataRecord, string.Empty);
-            instance.Id.ShouldEqual(42);
-            instance.ManyToOneRelation.Id.ShouldEqual(84);
+            instance.Id.ShouldBe(42);
+            instance.ManyToOneRelation.Id.ShouldBe(84);
         }
 
         public void ShouldReadInstanceWithOneToManyRelation(IInstanceReader<ClassWithOneToManyRelation> instanceReader)
         {
             var dataRecord = new { Id = 42, OneToManyRelation_Id = 84 }.ToDataRecord();
             var instance = instanceReader.Read(dataRecord, string.Empty);
-            instance.OneToManyRelation.Count().ShouldEqual(1);
+            instance.OneToManyRelation.Count().ShouldBe(1);
         }
 
         public void ShouldAddOneToManyRelationOnlyOnce(IInstanceReader<ClassWithOneToManyRelation> instanceReader)
@@ -183,7 +196,7 @@
             var dataRecord = new { Id = 42, OneToManyRelation_Id = 84 }.ToDataRecord();
             instanceReader.Read(dataRecord, string.Empty);
             var instance = instanceReader.Read(dataRecord, string.Empty);
-            instance.OneToManyRelation.Count().ShouldEqual(1);
+            instance.OneToManyRelation.Count().ShouldBe(1);
         }
 
         public void ShouldReadInstanceWithNestedOneToManyRelation(IInstanceReader<ClassWithNestedOnToManyRelation> instanceReader)
@@ -201,13 +214,13 @@
 
             var instances = rows.ToDataReader().Read<Master>();
 
-            instances.Count().ShouldEqual(1);
-            instances.Single().DetailList.Count().ShouldEqual(2);
+            instances.Count().ShouldBe(1);
+            instances.Single().DetailList.Count().ShouldBe(2);
 
-            //instance.TopLevelOneToManyRelation.Count().ShouldEqual(1);
-            //instance.TopLevelOneToManyRelation.First().Id.ShouldEqual(84);
-            //instance.TopLevelOneToManyRelation.First().OneToManyRelation.Count().ShouldEqual(1);
-            //instance.TopLevelOneToManyRelation.First().OneToManyRelation.First().Id.ShouldEqual(168);
+            //instance.TopLevelOneToManyRelation.Count().ShouldBe(1);
+            //instance.TopLevelOneToManyRelation.First().Id.ShouldBe(84);
+            //instance.TopLevelOneToManyRelation.First().OneToManyRelation.Count().ShouldBe(1);
+            //instance.TopLevelOneToManyRelation.First().OneToManyRelation.First().Id.ShouldBe(168);
         }
 
         //public void ShouldThrowExceptionWhenTypesAreIncompatible(IInstanceReader<ClassWithProperty<int>> reader)

@@ -20,7 +20,8 @@
             var mappings = propertyMapper.Execute(type, dataRecord, prefix);
             foreach (var mappingInfo in mappings.Where(m => m.ColumnInfo.Ordinal != -1))
             {
-                if (!mappingInfo.Property.PropertyType.GetTypeInfo().IsAssignableFrom(mappingInfo.ColumnInfo.Type.GetTypeInfo()))
+                var propertyType = mappingInfo.Property.PropertyType;
+                if (!propertyType.GetTypeInfo().IsAssignableFrom(mappingInfo.ColumnInfo.Type.GetTypeInfo()) && !ValueConverter.CanConvert(propertyType))
                 {
                     throw new InvalidOperationException(
                         ErrorMessages.IncompatibleTypes.FormatWith(

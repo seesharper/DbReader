@@ -61,10 +61,12 @@
     <Compile Include="IArgumentProvider.cs" />
     <Compile Include="ICacheKeyFactory.cs" />
     <Compile Include="ICommandFactory.cs" />
+    <Compile Include="Interfaces\IDecomposer.cs" />
     <Compile Include="Interfaces\IKeyReader.cs" />
     <Compile Include="Interfaces\IOneToManyMethodBuilder.cs" />
     <Compile Include="IParameterParser.cs" />
     <Compile Include="ErrorMessages.cs" />
+    <Compile Include="MetadataTokenComparer.cs" />
     <Compile Include="OneToManyMethodBuilder.cs" />
     <Compile Include="OneToManyPropertySelector.cs" />
     <Compile Include="OrdinalSelector.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="ManyToOnePropertySelector.cs" />
     <Compile Include="PrefixResolver.cs" />
     <Compile Include="PropertyTypeValidator.cs" />
+    <Compile Include="PropertyValue.cs" />
     <Compile Include="ReadablePropertySelector.cs" />
     <Compile Include="Readers\IKeyReader.cs" />
     <Compile Include="Readers\IReader.cs" />

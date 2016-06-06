@@ -5,7 +5,7 @@
     using System.Data.SQLite;
     using System.IO;
     using System.Linq;
-    using Should;
+    using Shouldly;
 
     public class IntegrationTests
     {
@@ -51,7 +51,7 @@
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>(SQL.Customers);
-                customers.Count().ShouldEqual(93);
+                customers.Count().ShouldBe(93);
             }
         }
 
@@ -60,8 +60,8 @@
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>(SQL.CustomersAndOrders);
-                customers.Count().ShouldEqual(89);
-                customers.SelectMany(c => c.Orders).Count().ShouldEqual(830);
+                customers.Count().ShouldBe(89);
+                customers.SelectMany(c => c.Orders).Count().ShouldBe(830);
             }
         }
 
@@ -71,17 +71,11 @@
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId", new { CustomerId = "ALFKI" });
-                customers.Count().ShouldEqual(1);
+                customers.Count().ShouldBe(1);
             }
         }
 
 
 
-    }
-
-
-    //public class Customer
-    //{
-    //    public string CustomerId { get; set; }
-    //}
+    }    
 }

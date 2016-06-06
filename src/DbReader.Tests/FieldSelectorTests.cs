@@ -5,9 +5,8 @@
     using System.Data;
 
     using DbReader.Interfaces;
+    using Shouldly;
 
-    using Should;
-    using Should.Core.Assertions;
 
     public class FieldSelectorTests
     {
@@ -22,13 +21,13 @@
         {
             IDataRecord dataRecord = new { SomeColumn = 42 }.ToDataRecord();
             IReadOnlyDictionary<string, ColumnInfo> result = fieldSelector.Execute(dataRecord);
-            result["SomeColumn"].Ordinal.ShouldEqual(0);
+            result["SomeColumn"].Ordinal.ShouldBe(0);
         }
         
         public void Execute_DuplicateFieldNames_ThrowsArgumentOutOfRangeException(IFieldSelector fieldSelector)
         {
             IDataRecord dataRecord = new { SomeColumn = 42, somecolumn = 42 }.ToDataRecord();
-            Assert.Throws<ArgumentOutOfRangeException>(() => fieldSelector.Execute(dataRecord));
+            Should.Throw<ArgumentOutOfRangeException>(() => fieldSelector.Execute(dataRecord));
         }
     }
 }

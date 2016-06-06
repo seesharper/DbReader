@@ -7,7 +7,7 @@
 
     using DbReader.Interfaces;
 
-    using Should;
+    using Shouldly;
 
     public class KeyReaderTests
     {
@@ -21,14 +21,14 @@
         {
             var dataRecord = new { KeyProperty = 42 }.ToDataRecord();
             IStructuralEquatable key = keyReader.Read(typeof(ClassWithSingleKey), dataRecord, string.Empty);
-            key.ShouldEqual(Tuple.Create(42));
+            key.ShouldBe(Tuple.Create(42));
         }
 
         public void ShouldReadCompositeKey(IKeyReader keyReader)
         {
             var dataRecord = new { FirstKeyProperty = 42, SecondKeyProperty = 84 }.ToDataRecord();
             IStructuralEquatable key = keyReader.Read(typeof(ClassWithCompositeKey), dataRecord, string.Empty);
-            key.ShouldEqual(Tuple.Create(42, 84));
+            key.ShouldBe(Tuple.Create(42, 84));
         }
     }
 

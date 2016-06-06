@@ -1,129 +1,391 @@
-# DbReader #
+## What is DbReader
 
-* Is **NOT** an ORM
-* Does **NOT** try to abstract the database.
-
-### Simple ###
-
-	public class Order
-	{		
-		public int OrderId { get; set; }
-		public DateTime OrderDate { get; set; }
-	}
-
-### Code ###
+**DbReader** is first and foremost **NOT** an **ORM**. **DbReader** simply maps rows into classes.
+These classes are nothing but representation of the rows returned by the query in the context of .Net. 
+They are not entities, not business objects, they are just rows represented as .Net objects.
+No Magic.
 
 
-	var orders = dbConnection.Read<Order>(SQL);
 
-### SQL ###
+## The grocery store philosophy
 
-	SELECT 
-		OrderId,
-		OrderDate
-	FROM 
-		Orders o 
-	WHERE 
-		o.OrderId = @OrderId
+When going to the grocery store (database), make a list (sql) of all the things you need and bring it back in one go rather than driving (quering)
+back and forth for every item on the list. Makes sense, right?
 
 
-### Many To One ###
+## Why not Dapper?
 
-	public class Order
-	{
-		public int OrderId { get; set; }
-		public DateTime OrderDate { get; set; }
-		public Customer Customer { get; set; }
-	}
+Most notably, Dapper lacks the ability to map master-detail relationships at least without relying on a third party library such as AutoMapper.
+If your needs are simple (and they usually are) with just single level objects, you should propably just stick with Dapper as it is an excellent library with great community support.
 
-	public class Customer
-	{
-		public string CustomerId { get; set; }
-		public string CompanyName { get; set; }
-	}
-
-### Code ###
-
-	var orders = dbConnection.Read<Order>(SQL);
+If you need to map master-detail relationships (eg Order -> OrderLines), you might want to check out this library.
 
 
-### SQL ###
+## Single level 
 
-	SELECT 
-		o.OrderId,
-		o.OrderDate,
-		c.CustomerId,
-		c.CompanyName
-	FROM
-		Orders o
-	INNER JOIN 
-		Customers c
-	ON 
-		o.CustomerId = c.CustomerId
+First we create a class that will represent each row returned by the query.
+
+```csharp
+public class Customer
+{
+	public string CustomerId { get; set; }
+	public string CompanyName { get; set; }
+}
+```
+
+Next we define the SQL that will produce a result set that matches the Customer class.
+
+```sql
+SELECT
+	CustomerId,
+	CompanyName
+FROM 
+	Customers	
+```
+
+| CustomerId    | CompanyName   |
+| ------------- |-------------- | 
+| ALFKI         | Alfreds Futterkiste |
+| ...           | ...      |
+| ...           | ...      |
+
+> It is important that each column in the result set matches the property name.  (Case insensitive)
+
+With both the Customer class and the SQL in place, we are ready to query the database.
+
+```
+var customers = dbConnection.Read<Customer>(sql)
+```
+
+## Parameterized Queries 
+
+A very common scenario is for a SQL statement to define a parameter for which an argument value must be passed from the client. 
+
+```sql
+SELECT
+	CustomerId,
+	CompanyName
+FROM 
+	Customers
+WHERE 
+	CustomerId = @CustomerId		
+```
+| CustomerId    | CompanyName   |
+| ------------- |-------------- | 
+| ALFKI         | Alfreds Futterkiste |
+
+DbReader makes passing an argument value very easy.
+
+```
+dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
+```
+
+## Aliasing
+
+Sometimes we want give a property a different name than the target column returned from the query. The easiest way of doing this is simply to take advantage of column aliasing in the SQL statement.
+
+```csharp
+public class Customer
+{
+	public string CustomerId { get; set; }
+	public string Name { get; set; } 
+}
+```
+
+The property "Name" no longer matches the column "CompanyName". 
+So instead of providing metadata in the client that describes the mapping between a property and a column, we can simply modify the SQL so that it matches the target property name.  It does not get much simpler than that.
+
+```sql
+SELECT
+	CustomerId,
+	CompanyName AS Name
+FROM 
+	Customers	
+```
+
+| CustomerId    | Name   |
+| ------------- |-------------- | 
+| ALFKI         | Alfreds Futterkiste |
+| ...           | ...      |
+| ...           | ...      |
 
 
-### One To Many ###
-
-	public class Order
-	{
-		public int OrderId { get; set; }
-		public DateTime OrderDate { get; set; }
-		public OrderDetail[] OrderDetails { get; set; }
-	}
-
-	public class OrderDetails 
-	{
-		[Key]		
-		public int OrderId { get ; set;}
-		[Key]		
-		public int ProductId { get; set; }
-		public int Quantity	{ get; set; }
-		public decimal UnitPrice { get; set; } 
-	}
-
-### Code ###
-
-	var orders = dbConnection.Read<Order>(SQL);
-
-### SQL ###
-
-	SELECT 
-		o.OrderId,	
-		o.OrderDate,
-		od.OrderId AS OrderDetails_OrderId,
-		od.ProductId,
-		od.Quantity,
-		od.UnitPrice
-	FROM
-		Order o
-	INNER JOIN 
-		OrderDetails od
-	ON 
-		o.OrderId = od.OrderId
-
-## Keys ##
-
-The only requirement with regards to metadata is that the .Net types expose a "key" property. The default convention is to look for a property named ***Id*** or ***[classname]Id***.
-
-	public class Order
-	{
-		public int Id { get; set; }
-	}
-
-	public class Order
-	{
-		public int OrderId { get; set; }
-	}
-
-The convention can easily be changed 
-
-	DbReaderOption.KeyConvention = (property) => property.IsDefined(typeof(KeyAttribute));
-
-The key properties can also be set per type overriding the default convention.
-
-	DbReaderOptions.KeySelector<Order>(o => o.OrderId);
 
 
-## Prefixes ##
+## Master-Detail
 
-A prefix is used to identify the target navigation property.
+Now we need to create a class that can represent the rows returned from the query as a master-detail relationship.
+
+```csharp
+public class Customer
+{
+    public string CustomerId { get; set; }
+    public string CompanyName { get; set; }			
+    public ICollection<Order> Orders { get; set; }
+}
+
+public class Order
+{
+	public int OrderId { get; set; }
+	public DateTime OrderDate { get; set; }
+} 	
+```
+
+Now we need to create a query that brings back both *Customers* and *Orders*.
+
+```sql
+SELECT
+	c.CustomerId,
+	c.CompanyName,
+	o.OrderId,
+	o.OrderDate
+FROM 
+	Customers c
+INNER JOIN 
+	Orders o
+ON
+	c.CustomerId = o.CustomerId	AND
+	c.CustomerId = @CustomerID
+```
+
+| CustomerId|CompanyName|OrderId|OrderDate
+| ----------|-----------|-------|---------
+|ALFKI|Alfreds Futterkiste|10643|1997-08-25
+|ALFKI|Alfreds Futterkiste|10692|1997-10-03
+|ALFKI|Alfreds Futterkiste|10702|1997-10-13
+|ALFKI|Alfreds Futterkiste|10835|1998-01-15
+|ALFKI|Alfreds Futterkiste|10952|1998-03-16
+|ALFKI|Alfreds Futterkiste|11011|1998-04-09
+
+As we can see from the result we now have six rows. One for each *Order* and the *Customer* columns are duplicated for each *Order*. 
+
+This is where the true power of DbReader comes into play as we don't have to do anything special to map these rows into our class representing the master-detail relationship. 
+
+```
+var customers = dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
+```	
+
+> **DbReader** makes sure that only one instance of the *Customer* class is ever instantiated even if the customer information is "duplicated" six times in the result set.
+
+There is no limitation as to the number of levels **DbReader** can handle meaning that we could create a query that represents a master-detail-subdetail query.
+
+## Many To One
+
+If we look at the query we used in the master-detail example, we have already established that there is a one-to-many relationship between the *Customers* table and the *Orders* table. Seen from the *Orders* table's "point of view", there is also a many-to-one relationship between the Orders table and the *Customers* table. 
+
+So if we wanted to get a list of orders with their related customers, we would need to create a class that models this.
+
+```
+public class Order
+{
+	public int OrderId { get; set; }
+	public DateTime OrderDate { get; set; }
+	public Customer Customer { get; set; }
+}
+```
+
+The SQL is exactly the same and the only difference is that we ask **DbReader** to map the result into a list of *Order* instances.
+
+```sql
+SELECT
+	c.CustomerId,
+	c.CompanyName,
+	o.OrderId,
+	o.OrderDate
+FROM 
+	Customers c
+INNER JOIN 
+	Orders o
+ON
+	c.CustomerId = o.CustomerId	AND
+	o.ShipCity = "London"
+```
+
+```
+var orders = dbConection.Read<Order>(sql)
+```
+
+## Keys
+
+The only requirement with regards to metadata is that a class must declare a property that uniquely identifies an instance of this class. This information is used to determine if we should create a new instance of a class or retrieve it from the query cache. The query cache makes sure that we don't eagerly create new instances of classes that has already been read. The default convention here is that each class must declare a property named *Id* or *[classname]Id*.
+For instance there might be desirable to be more explicit about the key properties and there also might be needed to define composite keys. One solution here is to take advantage of the *KeyAttribute* defined in the System.Components.DataAnnotations namespace.
+
+```
+public class OrderDetail
+{
+	[Key]
+	public int OrderId { get; set; }
+	[Key]
+	public int ProductId { get; set ; }
+	public decimal UnitPrice { get; set; }
+}
+```
+The convention can easily be changes through the DbReaderOptions class.
+```
+DbReaderOptions.KeyConvention = (property) => property.IsDefined(typeof(KeyAttribute));
+```
+
+
+## Prefixes
+
+All the previous examples assumes that column names are unique in the result set.  This might not always be the case and prefixes are used to specify the target property for a given column.
+Consider the following query.
+```sql
+SELECT
+	c.CustomerId,
+	c.CompanyName,
+	c.ModifiedBy,
+	o.OrderId,
+	o.OrderDate,
+	o.ModifiedBy
+FROM 
+	Customers c
+INNER JOIN 
+	Orders o
+ON
+	c.CustomerId = o.CustomerId	AND
+	c.CustomerId = @CustomerID
+```
+
+```csharp
+public class Customer
+{
+    public string CustomerId { get; set; }
+    public string CompanyName { get; set; }			
+    public ICollection<Order> Orders { get; set; }
+    public string ModifiedBy { get; set; }
+}
+
+public class Order
+{
+	public int OrderId { get; set; }
+	public DateTime OrderDate { get; set; }
+    public string ModifiedBy { get; set; }
+} 	
+```
+
+The *Orders* table and the *Customers* table both define the *ModifiedBy* column and we need a way to tell **DbReader** which *ModifiedBy* column goes into which *ModifiedBy* property.  
+
+The solution is really quite simple. We just need to prefix the ModifiedBy column that originates from the Orders table with the name of the navigation property.
+
+> The term *NavigationProperty* means a property that either navigates downwards (one-to-many) or navigates upwards (many-to-one). 
+
+Syntax: [NavigationPropertyName]_[propertyName] 
+
+```sql
+SELECT
+	c.CustomerId,
+	c.CompanyName,
+	c.ModifiedBy,
+	o.OrderId,
+	o.OrderDate,
+	o.ModifiedBy AS Orders_ModifiedBy
+FROM 
+	Customers c
+INNER JOIN 
+	Orders o
+ON
+	c.CustomerId = o.CustomerId	AND
+	c.CustomerId = @CustomerID
+``` 
+
+The length of the alias name might actually be a problem since we can nest these properties indefinitely.  Consider the following prefix/alias.
+```
+ol.ModifiedBy AS FirstLevelProperty_SecondLevelProperty_ThirdLevelProperty_ModifiedBy
+```
+Some database engines might not allow for such long identifiers and **DbReader** allows for CamelHumps (A ReSharper term) that basically means that we compress the property name into its capital letters.
+
+```
+ol.ModifiedBy AS FLP_SLP_TLP_ModifiedBy
+```
+
+## Stored Procedures
+
+**DbReader** makes no attempt to generalize calling stored procedures as this in most cases requires code that is specific to the database engine. **DbReader** relies on the *ICommandFactory* interface when it comes to creating commands and this represents an extension point where we can plug in support for features that are specific to the database engine. The following example shows how to add support for calling an Oracle procedure.
+
+```
+public class OracleCommandFactory : ICommandFactory
+{
+    private readonly ICommandFactory commandFactory;
+
+    public OracleCommandFactory(ICommandFactory commandFactory)
+    {
+        this.commandFactory = commandFactory;
+    }
+
+    public IDbCommand CreateCommand(IDbConnection dbConnection, string sql, object arguments)
+    {
+        if (LooksLikeAProcedure(sql))
+        {
+            return CreateOracleProcedureCommand(dbConnection, sql, arguments);
+        }
+        return commandFactory.CreateCommand(dbConnection, sql, arguments);
+    }
+
+    private static bool LooksLikeAProcedure(string sql)
+    {
+        return !sql.TrimStart().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static IDbCommand CreateOracleProcedureCommand(IDbConnection dbConnection, string sql, object arguments)
+    {
+        var command = dbConnection.CreateCommand();
+        command.CommandText = sql;
+        command.CommandType = CommandType.StoredProcedure;
+        command.Parameters.Add(new OracleParameter(string.Empty, OracleDbType.RefCursor, ParameterDirection.ReturnValue));
+
+        var decomposer = new Decomposer(new ReadablePropertySelector());
+        var propertyValues = decomposer.Decompose(arguments);
+        foreach (var propertyValue in propertyValues)
+        {
+            var parameter = new OracleParameter();
+            parameter.ParameterName = propertyValue.Key;
+            parameter.Value = propertyValue.Value;
+            parameter.Direction = ParameterDirection.Input;
+            command.Parameters.Add(parameter);
+        }
+
+        return command;
+    }
+}
+```
+
+We can now just "decorate" the existing *ICommandFactory* with our custom *OracleCommandFactory* class.
+
+```
+DbReaderOptions.CommandFactory = new OracleCommandFactory(DbReaderOptions.CommandFactory);
+```
+
+## Custom Conversions
+
+Sometimes there is a "mismatch" between the .Net type system and the types exposed by the underlying database.
+For instance, Oracle does not provide a Guid datatype and the most common way of storing a Guid is by using a byte array (raw[16]).
+
+Since we probably don't want to represent a Guid as a byte array in our classes, we need to register a custom delegate to handle the conversion from a byte array to a Guid.
+
+```
+DbReaderOptions.WhenReading<Guid>().Use((datarecord, ordinal) => new Guid(dataRecord.ReadBytes(1,16)));
+```
+
+This instructs DbReader to use our custom read delegate whenever it encounters a Guid property.
+ 
+The Guid also needs to be converted back into a byte array when passing a Guid value as a parameter to a query.
+
+```
+DbReaderOptions.WhenPassing<Guid>().ConvertTo(guid => guid.ToByteArray());
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,23 +1,23 @@
 ﻿namespace DbReader.Tests
 {
     using System;
-    using Should;
+    using Shouldly;
 
     public class TypeExtensionTests
     {
         public void GetUnderlyingType_Enum_ReturnsUnderlyingType()
         {
-            typeof(StringComparison).GetUnderlyingType().ShouldEqual(typeof(int));
+            typeof(StringComparison).GetUnderlyingType().ShouldBe(typeof(int));
         }
 
         public void GetUnderlyingType_Nullable_ReturnsUnderlyingType()
         {
-            typeof(int?).GetUnderlyingType().ShouldEqual(typeof(int));
+            typeof(int?).GetUnderlyingType().ShouldBe(typeof(int));
         }
 
         public void GetUnderlyingType_NonNullable_ReturnsType()
         {
-            typeof(int).GetUnderlyingType().ShouldEqual(typeof(int));
+            typeof(int).GetUnderlyingType().ShouldBe(typeof(int));
         }
 
         public void IsNullable_NullableType_ReturnsTrue()
@@ -47,7 +47,7 @@
 
         public void IsSimpleType_CustomType_ReturnsTrue()
         {
-            ValueConverter.Register((record, i) => new CustomValueType(42));
+            ValueConverter.RegisterReadDelegate((record, i) => new CustomValueType(42));
             typeof(CustomValueType).IsSimpleType().ShouldBeTrue();
         }
 

@@ -10,9 +10,9 @@
     /// A decorator that caches a list of <see cref="MappingInfo"/> instances per <see cref="Type"/>.
     /// </summary>
     public class CachedPropertyMapper : IPropertyMapper
-    {
-        private readonly Func<IPropertyMapper> getPropertyMapper;
+    {        
 
+        private readonly IPropertyMapper propertyMapper;
         private readonly ICacheKeyFactory cacheKeyFactory;
 
         private readonly ConcurrentDictionary<string, MappingInfo[]> cache
@@ -25,9 +25,9 @@
         /// The <see cref="IPropertyMapper"/> being decorated.
         /// </param>
         /// <param name="cacheKeyFactory"></param>
-        public CachedPropertyMapper(Func<IPropertyMapper> getPropertyMapper, ICacheKeyFactory cacheKeyFactory)
+        public CachedPropertyMapper(IPropertyMapper propertyMapper, ICacheKeyFactory cacheKeyFactory)
         {
-            this.getPropertyMapper = getPropertyMapper;
+            this.propertyMapper = propertyMapper;
             this.cacheKeyFactory = cacheKeyFactory;
         }
 
@@ -41,7 +41,7 @@
         public MappingInfo[] Execute(Type type, IDataRecord dataRecord, string prefix)
         {
             var key = cacheKeyFactory.CreateKey(type, dataRecord, prefix);
-            return cache.GetOrAdd(key, k => getPropertyMapper().Execute(type, dataRecord, prefix));
+            return cache.GetOrAdd(key, k => propertyMapper.Execute(type, dataRecord, prefix));
 
         }
     }

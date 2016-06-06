@@ -31,21 +31,31 @@ namespace DbReader
     /// <summary>
     /// Used to register a custom conversion from a <see cref="IDataRecord"/> to an instance of a given <see cref="Type"/>.
     /// </summary>
-    public static class ValueConverter
+    internal static class ValueConverter
     {
+        private static readonly ConcurrentDictionary<Type, Delegate> ReadDelegates =
+            new ConcurrentDictionary<Type, Delegate>();
+
         private static readonly ConcurrentDictionary<Type, Delegate> ConvertDelegates =
-            new ConcurrentDictionary<Type, Delegate>(); 
-        
+            new ConcurrentDictionary<Type, Delegate>();
+
+
         /// <summary>
         /// Registers a function delegate that creates a value of <typeparamref name="T"/> from an <see cref="IDataRecord"/>
         /// at the specified ordinal (column index).
         /// </summary>        
         /// <typeparam name="T">The type for which to register a convert function.</typeparam>
         /// <param name="convertFunction">The function delegate used to convert the value.</param>
-        public static void Register<T>(Func<IDataRecord, int, T> convertFunction)
+        public static void RegisterReadDelegate<T>(Func<IDataRecord, int, T> convertFunction)
         {
-            ConvertDelegates.AddOrUpdate(typeof(T), type => convertFunction, (type, del) => convertFunction);
+            ReadDelegates.AddOrUpdate(typeof(T), type => convertFunction, (type, del) => convertFunction);
         }
+
+        public static void RegisterConvertDelegate<TArgument, TParameter>(Func<TArgument, TParameter> convertFunction)
+        {
+            ConvertDelegates.AddOrUpdate(typeof(TArgument), type => convertFunction, (type, del) => convertFunction);
+        }
+
 
         /// <summary>
         /// Determines if the given <paramref name="type"/> can be converted.
@@ -54,7 +64,7 @@ namespace DbReader
         /// <returns>true, if the <paramref name="type"/> can be converted, otherwise, false.</returns>
         internal static bool CanConvert(Type type)
         {
-            return ConvertDelegates.ContainsKey(type);
+            return ReadDelegates.ContainsKey(type);
         }
 
         /// <summary>
@@ -67,7 +77,7 @@ namespace DbReader
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         internal static T Convert<T>(IDataRecord dataRecord, int ordinal)
         {
-            return ((Func<IDataRecord, int, T>)ConvertDelegates[typeof(T)])(dataRecord, ordinal);
+            return ((Func<IDataRecord, int, T>)ReadDelegates[typeof(T)])(dataRecord, ordinal);
         }
 
         /// <summary>
@@ -77,7 +87,8 @@ namespace DbReader
         /// <returns>The <see cref="MethodInfo"/> that represents the <see cref="Convert"/> method.</returns>
         internal static MethodInfo GetConvertMethod(Type type)
         {
-            return typeof(ValueConverter).GetMethod("Convert", BindingFlags.Static | BindingFlags.NonPublic);
+            var openGenericConvertMethod = typeof(ValueConverter).GetMethod("Convert", BindingFlags.Static | BindingFlags.NonPublic);
+            return openGenericConvertMethod.MakeGenericMethod(type);
         }        
     }
 }

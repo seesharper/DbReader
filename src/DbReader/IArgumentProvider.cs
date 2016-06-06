@@ -31,8 +31,7 @@
             {
                 return result;
             }
-            var parameterNames = parameterParser.GetParameters(sql);
-            var test = arguments.GetType().GetProperties();
+            var parameterNames = parameterParser.GetParameters(sql);            
             Dictionary<string, PropertyInfo> properties = readablePropertySelector.Execute(arguments.GetType()).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
             foreach (var parameterName in parameterNames)
             {

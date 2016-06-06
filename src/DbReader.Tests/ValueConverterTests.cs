@@ -1,12 +1,13 @@
 ﻿namespace DbReader.Tests
 {
-    using Should;
+    using System;
+    using Shouldly;
 
     public class ValueConverterTests
     {
         static ValueConverterTests()
         {
-            ValueConverter.Register((record, i) => new CustomValueType(record.GetInt32(i)));
+            ValueConverter.RegisterReadDelegate((record, i) => new CustomValueType(record.GetInt32(i)));
         }
 
         public void GetExecuteMethod_ReturnsMethodInfo()
@@ -28,7 +29,9 @@
         {
             var dataRecord = new { SomeColumn = 42 }.ToDataRecord();
             var convertedValue = ValueConverter.Convert<CustomValueType>(dataRecord, 0);
-            convertedValue.Value.ShouldEqual(42);
+            convertedValue.Value.ShouldBe(42);
+
+            
         }
     }
 }

@@ -67,6 +67,7 @@ local.properties
 *.nupkg
 project.lock.json
 LightInject.PreProcessor.dll
+db/
 lib/
 ## TODO: If you have NuGet Package Restore enabled, uncomment this
 packages/

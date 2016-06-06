@@ -5,10 +5,9 @@
     using DbReader.Interfaces;
 
     using Fixie;
-
-    using Should;
-    using Should.Core.Assertions;
     
+    using Shouldly;
+
     public class ConstructorSelectorTests 
     {        
         public void Execute_PublicParameterLess_ReturnsConstructor(IConstructorSelector parameterlessConstructorSelector)
@@ -18,7 +17,7 @@
         
         public void Execute_PrivateParameterLess_ThrowsException(IConstructorSelector parameterlessConstructorSelector)
         {
-            Assert.Throws<InvalidOperationException>(
+            Should.Throw<InvalidOperationException>(
                 () => parameterlessConstructorSelector.Execute(typeof(ClassWithPrivateParameterlessConstructor)));
         }
        

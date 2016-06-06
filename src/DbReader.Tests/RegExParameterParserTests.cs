@@ -1,6 +1,6 @@
 ﻿namespace DbReader.Tests
 {
-    using Should;
+    using Shouldly;
 
     public class RegExParameterParserTests
     {
@@ -22,7 +22,7 @@
         {
             string source = "Id = @Parameter, AnotherId = @AnotherParameter";
             var parameters = parameterParser.GetParameters(source);
-            parameters.Length.ShouldEqual(2);
+            parameters.Length.ShouldBe(2);
             parameters.ShouldContain("Parameter");
             parameters.ShouldContain("AnotherParameter");
         }
