@@ -15,12 +15,20 @@
         private class MetadataTokenComparer : IComparer<PropertyInfo>
         {
             public int Compare(PropertyInfo x, PropertyInfo y)
-            {                
-                if (x.MetadataToken < y.MetadataToken)
+            {
+
+#if NETSTANDARD15
+                var xToken = x.GetMetadataToken();
+                var ytoken = y.GetMetadataToken();
+#else
+                var xToken = x.MetadataToken;
+                var ytoken = y.MetadataToken;
+#endif
+                if (xToken < ytoken)
                 {
                     return -1;
                 }
-                if (x.MetadataToken > y.MetadataToken)
+                if (xToken > ytoken)
                 {
                     return 1;
                 }

@@ -41,7 +41,7 @@ private void CopyBinaryFilesToNuGetLibDirectory()
 {
 	CopyBinaryFile("NET45", "net45");
 	CopyBinaryFile("NET46", "net46");		
-	CopyBinaryFile("NETSTANDARD13", "netstandard1.3");       		
+	CopyBinaryFile("NETSTANDARD15", "netstandard1.5");       		
 }
 
 
@@ -96,8 +96,8 @@ private void Build(string frameworkMoniker)
 
 private void BuildDotNet()
 {		
-	string pathToProjectFile = Path.Combine(pathToBuildDirectory, @"netstandard13/Binary/DbReader/project.json");
-	DotNet.Build(pathToProjectFile, "netstandard13");
+	string pathToProjectFile = Path.Combine(pathToBuildDirectory, @"netstandard15/Binary/DbReader/project.json");
+	DotNet.Build(pathToProjectFile, "netstandard15");
 }
 
 private void RestoreNuGetPackages()
@@ -149,7 +149,7 @@ private void InitializBuildDirectories()
 	DirectoryUtils.Delete(pathToBuildDirectory);	
 	Execute(() => InitializeNugetBuildDirectory("NET45"), "Preparing Net45");
 	Execute(() => InitializeNugetBuildDirectory("NET46"), "Preparing Net46");	
-	Execute(() => InitializeNugetBuildDirectory("NETSTANDARD13"), "Preparing NetStandard1.3");	    						
+	Execute(() => InitializeNugetBuildDirectory("NETSTANDARD15"), "Preparing NetStandard1.5");	    						
 }
 
 private void InitializeNugetBuildDirectory(string frameworkMoniker)
@@ -179,14 +179,14 @@ private void RenameSolutionFiles()
 {	
 	RenameSolutionFile("NET45");
 	RenameSolutionFile("NET46");	
-	RenameSolutionFile("NETSTANDARD13");	    
+	RenameSolutionFile("NETSTANDARD15");	    
 }
 
 private void PatchAssemblyInfo()
 {
 	Execute(() => PatchAssemblyInfo("Net45"), "Patching AssemblyInfo (Net45)");
 	Execute(() => PatchAssemblyInfo("Net46"), "Patching AssemblyInfo (Net46)");	
-	Execute(() => PatchAssemblyInfo("NETSTANDARD13"), "Patching AssemblyInfo (NetStandard1.3)");	    
+	Execute(() => PatchAssemblyInfo("NETSTANDARD15"), "Patching AssemblyInfo (NetStandard1.5)");	    
 }
 
 private void PatchAssemblyInfo(string framework)

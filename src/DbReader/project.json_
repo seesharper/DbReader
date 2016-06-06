@@ -2,10 +2,11 @@
     "version": "3.0.0.10",
     "dependencies": {},
     "frameworks": {       
-        "netstandard1.3": {
+        "netstandard1.5": {
             "buildOptions": {
                 "define": [
-                    "NETSTANDARD13"
+                    "NETSTANDARD13",
+                    "NETSTANDARD15"
                 ],
                 "xmlDoc" : true
             },
