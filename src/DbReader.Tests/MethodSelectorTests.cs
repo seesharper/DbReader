@@ -3,6 +3,7 @@
     using System;
     using System.Data;
     using DbReader.Interfaces;
+    using Selectors;
     using Shouldly;
     
     public class MethodSelectorTests

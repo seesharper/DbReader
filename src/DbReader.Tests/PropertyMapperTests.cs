@@ -2,7 +2,7 @@
 {
     using System;
     using DbReader.Interfaces;
-
+    using Mapping;
     using Shouldly;
 
     public class PropertyMapperTests

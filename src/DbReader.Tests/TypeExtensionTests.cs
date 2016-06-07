@@ -1,6 +1,7 @@
 ﻿namespace DbReader.Tests
 {
     using System;
+    using Extensions;
     using Shouldly;
 
     public class TypeExtensionTests

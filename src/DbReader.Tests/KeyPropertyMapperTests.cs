@@ -3,6 +3,7 @@
     using System;
 
     using DbReader.Interfaces;
+    using Mapping;
     using Shouldly;
 
 

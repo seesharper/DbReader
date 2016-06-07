@@ -4,7 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Data;
-
+    using Construction;
     using DbReader.Interfaces;
 
     /// <summary>

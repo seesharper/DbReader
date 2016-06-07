@@ -6,6 +6,7 @@
     using System.Reflection;
 
     using DbReader.Interfaces;
+    using Selectors;
 
     public interface IArgumentProvider
     {

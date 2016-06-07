@@ -1,7 +1,7 @@
 ﻿namespace DbReader
 {
     using System;
-
+    using Construction;
     using DbReader.Interfaces;
 
     public class MethodSkeletonFactory : IMethodSkeletonFactory

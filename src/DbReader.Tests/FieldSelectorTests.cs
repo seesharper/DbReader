@@ -5,6 +5,7 @@
     using System.Data;
 
     using DbReader.Interfaces;
+    using Selectors;
     using Shouldly;
 
 

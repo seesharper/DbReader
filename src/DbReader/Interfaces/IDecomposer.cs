@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Selectors;
+
     public interface IDecomposer
     {
         IReadOnlyDictionary<string, object> Decompose(object value);

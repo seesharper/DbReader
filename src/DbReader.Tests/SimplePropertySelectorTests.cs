@@ -8,7 +8,7 @@
 
     using Shouldly;
   
-    using IPropertySelector = DbReader.Interfaces.IPropertySelector;
+    
 
     public class SimplePropertySelectorTests
     {

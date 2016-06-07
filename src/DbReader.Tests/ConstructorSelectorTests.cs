@@ -5,7 +5,7 @@
     using DbReader.Interfaces;
 
     using Fixie;
-    
+    using Selectors;
     using Shouldly;
 
     public class ConstructorSelectorTests 

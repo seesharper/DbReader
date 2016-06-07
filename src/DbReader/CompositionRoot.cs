@@ -3,17 +3,18 @@
     using System;
     using System.Collections;
     using System.Reflection;
-
+    using Construction;
     using DbReader.Caching;
     using DbReader.Interfaces;
     using DbReader.LightInject;
     using DbReader.Readers;
+    using Mapping;
+    using Selectors;
+    using IConstructorSelector = Selectors.IConstructorSelector;
+    using IMethodSkeleton = Construction.IMethodSkeleton;
+    using IPropertySelector = Selectors.IPropertySelector;
 
-    using IConstructorSelector = DbReader.Interfaces.IConstructorSelector;
-    using IMethodSkeleton = DbReader.Interfaces.IMethodSkeleton;
-    using IPropertySelector = DbReader.Interfaces.IPropertySelector;
-
-    public class CompositionRoot : ICompositionRoot
+    internal class CompositionRoot : ICompositionRoot
     {
         void ICompositionRoot.Compose(IServiceRegistry serviceRegistry)
         {
@@ -79,7 +80,7 @@
 
             serviceRegistry.Register(factory => DbReaderOptions.ParameterParser, new PerContainerLifetime());
 
-            serviceRegistry.Register<ICommandFactory, CommandFactory>(new PerContainerLifetime());
+            serviceRegistry.Register<IDbCommandFactory, DbCommandFactory>(new PerContainerLifetime());
 
             serviceRegistry.Register<IArgumentProvider, ArgumentProvider>(new PerContainerLifetime());
 

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data;
+    using Construction;
 
     public class CachedReaderMethodBuilder<T> : IReaderMethodBuilder<T>
     {

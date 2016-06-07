@@ -1,6 +1,6 @@
 ﻿namespace DbReader
 {
-    public class ErrorMessages
+    internal class ErrorMessages
     {
         public const string ConstructorNotFound = "The type ({0}) does not contain a public parameterless constructor.";
         public const string DuplicateFieldName = "The data record contains a duplicate field name ({0}). Make sure that every column/field name in the data record is unique.";
