@@ -6,7 +6,9 @@
 
     using DbReader.Interfaces;
     using DbReader.LightInject;
-    
+    using Extensions;
+    using Readers;
+
     public static class DataReaderExtensions
     {
         private static readonly IServiceContainer Container = new ServiceContainer();

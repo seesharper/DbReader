@@ -5,7 +5,7 @@ namespace DbReader.Extensions
     /// <summary>
     /// Extends the <see cref="PropertyInfo"/> class.
     /// </summary>
-    public static class PropertyInfoExtensions
+    public static class PropertyReflectionExtensions
     {
         /// <summary>
         /// Determines if the <paramref name="property"/> is writeable.

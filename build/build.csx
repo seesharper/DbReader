@@ -8,7 +8,7 @@ private const string csharpProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79E
 
 
 string pathToBuildDirectory = @"tmp/";
-private string version = "1.0.1-alpha-5";
+private string version = "1.0.1-alpha-6";
 
 private string fileVersion = Regex.Match(version, @"(^[\d\.]+)-?").Groups[1].Captures[0].Value;
 
@@ -20,7 +20,7 @@ Execute(() => PatchAssemblyInfo(), "Patching assembly information");
 Execute(() => PatchProjectFiles(), "Patching project files");
 Execute(() => RestoreNuGetPackages(), "NuGet");
 Execute(() => BuildAllFrameworks(), "Building all frameworks");
-//Execute(() => RunAllUnitTests(), "Running unit tests");
+Execute(() => RunAllUnitTests(), "Running unit tests");
 //Execute(() => AnalyzeTestCoverage(), "Analyzing test coverage");
 Execute(() => CreateNugetPackages(), "Creating NuGet packages");
 
@@ -126,7 +126,7 @@ private void RunUnitTests(string frameworkMoniker)
 {
 	string pathToTestAssembly = Path.Combine(pathToBuildDirectory, frameworkMoniker + @"/Binary/DbReader.Tests/bin/Release/DbReader.Tests.dll");
 	string testAdapterSearchDirectory = Path.Combine(pathToBuildDirectory, frameworkMoniker, @"Binary/packages/");
-    string pathToTestAdapterDirectory = ResolveDirectory(testAdapterSearchDirectory, "xunit.runner.visualstudio.testadapter.dll");
+    string pathToTestAdapterDirectory = ResolveDirectory(testAdapterSearchDirectory, "Fixie.VisualStudio.TestAdapter.dll");
 	MsTest.Run(pathToTestAssembly, pathToTestAdapterDirectory);	
 }
 

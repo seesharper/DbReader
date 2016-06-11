@@ -6,6 +6,7 @@
     using System.Data;
     using Construction;
     using DbReader.Interfaces;
+    using Readers;
 
     /// <summary>
     /// An <see cref="IInstanceReader{T}"/> decorator that caches instances 

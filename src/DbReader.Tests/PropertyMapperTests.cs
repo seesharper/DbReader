@@ -13,7 +13,7 @@
             ValueConverter.RegisterReadDelegate((record, i) => new CustomValueType(record.GetInt32(i)));
         }
 
-        public void Execute_MatchingField_ReturnsPositiveOrdinal(IPropertyMapper propertyMapper)
+        public void ShouldMapMatchingField(IPropertyMapper propertyMapper)
         {
             var dataRecord = new { Int32Property = 42 }.ToDataRecord();
 
@@ -22,7 +22,7 @@
             result[0].ColumnInfo.Ordinal.ShouldBe(0);
         }
 
-        public void Execute_NonMatchingField_ReturnsNegativeOrdinal(IPropertyMapper propertyMapper)
+        public void ShouldNotMapUnknownField(IPropertyMapper propertyMapper)
         {
             var dataRecord = new { UnknownProperty = 42 }.ToDataRecord();
 
@@ -31,7 +31,7 @@
             result[0].ColumnInfo.Ordinal.ShouldBe(-1);
         }
 
-        public void Execute_MatchingFieldWithPrefix_ReturnsPositiveOrdinal(IPropertyMapper propertyMapper)
+        public void ShouldMapFieldWithPrefix(IPropertyMapper propertyMapper)
         {
             var dataRecord = new { SomePrefix_Int32Property = 42 }.ToDataRecord();
 
@@ -40,26 +40,26 @@
             result[0].ColumnInfo.Ordinal.ShouldBe(0);
         }
 
-        public void Execute_Twice_ReturnsNegativeOrdinal(IPropertyMapper propertyMapper)
-        {
-            var dataRecord = new { Int32Property = 42 }.ToDataRecord();
+        public void ShouldNotMapAlreadyMappedProperty(IPropertyMapper propertyMapper)
+        {           
+            var dataRecord = new { Id = 42 }.ToDataRecord();
 
-            propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
-            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
+            propertyMapper.Execute(typeof(ClassWithId), dataRecord, string.Empty);
+            var result = propertyMapper.Execute(typeof(AnotherClassWithId), dataRecord, string.Empty);
 
             result[0].ColumnInfo.Ordinal.ShouldBe(-1);
         }
 
-        public void Execute_NonMatchingTypes_ThrowsException(IPropertyMapper propertyMapper)
+        public void ShouldThrowExceptionWhenTypesDoesNotMatch(IPropertyMapper propertyMapper)
         {
-            var dataRecord = new { CustomValueTypeProperty = "SomeValue" }.ToDataRecord();
-            Should.Throw<InvalidOperationException>(() => propertyMapper.Execute(typeof (ClassWithCustomValueType), dataRecord, string.Empty));            
+            var dataRecord = new { Property = "SomeValue" }.ToDataRecord();
+            Should.Throw<InvalidOperationException>(() => propertyMapper.Execute(typeof (ClassWithProperty<int>), dataRecord, string.Empty));            
         }
 
-        public void Execute_NonMatchingTypesWithCustomConversion_ReturnsOrdinal(IPropertyMapper propertyMapper)
+        public void ShouldMapPropertiesWithCustomConversion(IPropertyMapper propertyMapper)
         {
-            var dataRecord = new { CustomValueTypeProperty = 42 }.ToDataRecord();
-            var result = propertyMapper.Execute(typeof (ClassWithCustomValueType), dataRecord, string.Empty);
+            var dataRecord = new { Property = 42 }.ToDataRecord();
+            var result = propertyMapper.Execute(typeof (ClassWithProperty<CustomValueType>), dataRecord, string.Empty);
             result[0].ColumnInfo.Ordinal.ShouldBe(0);
         }
 

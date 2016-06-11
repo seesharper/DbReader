@@ -1,4 +1,4 @@
-﻿namespace DbReader
+namespace DbReader.Extensions
 {
     using System;
     using System.Collections.Concurrent;
@@ -10,14 +10,14 @@
     /// </summary>
     public static class CollectionExtensions
     {
-        private static MethodInfo openGenericTryAddMethod;
+        private static readonly MethodInfo OpenGenericTryAddMethod;
 
-        private static ConcurrentDictionary<Type, MethodInfo> tryAddMethods =
+        private static readonly ConcurrentDictionary<Type, MethodInfo> TryAddMethods =
             new ConcurrentDictionary<Type, MethodInfo>();
 
         static CollectionExtensions()
         {
-            openGenericTryAddMethod = typeof(CollectionExtensions).GetMethod(
+            OpenGenericTryAddMethod = typeof(CollectionExtensions).GetMethod(
                 "TryAdd",
                 BindingFlags.Static | BindingFlags.Public);
         }
@@ -43,14 +43,14 @@
         /// </summary>
         /// <param name="elementType">The element type used to create the method.</param>
         /// <returns>A closed generic <see cref="TryAdd{T}"/> method.</returns>
-        public static MethodInfo GetTryAddMethod(Type elementType)
+        internal static MethodInfo GetTryAddMethod(Type elementType)
         {
-            return tryAddMethods.GetOrAdd(elementType, CreateClosedGenericTryAddMethod);
+            return TryAddMethods.GetOrAdd(elementType, CreateClosedGenericTryAddMethod);
         }
 
         private static MethodInfo CreateClosedGenericTryAddMethod(Type elementType)
         {
-            return openGenericTryAddMethod.MakeGenericMethod(elementType);
+            return OpenGenericTryAddMethod.MakeGenericMethod(elementType);
         }
 
     }

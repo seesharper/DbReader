@@ -47,7 +47,7 @@
 
             serviceRegistry.Register(typeof(IInstanceReader<>), typeof(InstanceReader<>), new PerScopeLifetime());
             serviceRegistry.Decorate(typeof(IInstanceReader<>), typeof(CachedInstanceReader<>));
-            serviceRegistry.Register(typeof(IInstanceReaderMethodBuilder<>), typeof(InstanceReaderMethodBuilder<>), new PerContainerLifetime());
+            serviceRegistry.Register(typeof(IInstanceReaderMethodBuilder<>), typeof(InstanceReaderMethodBuilder<>), new PerScopeLifetime());
             serviceRegistry.Decorate(typeof(IInstanceReaderMethodBuilder<>), typeof(CachedInstanceReaderMethodBuilder<>));
 
             serviceRegistry.Register<Func<Type, object>>(factory => type => factory.GetInstance(type));
@@ -65,13 +65,13 @@
 
 
             serviceRegistry.Register<IKeyReader, KeyReader>(new PerScopeLifetime());
-            serviceRegistry.Register<IKeyReaderMethodBuilder, KeyReaderMethodBuilder>(new PerContainerLifetime());
+            serviceRegistry.Register<IKeyReaderMethodBuilder, KeyReaderMethodBuilder>(new PerScopeLifetime());
             serviceRegistry.Decorate<IKeyReaderMethodBuilder, CachedKeyReaderMethodBuilder>();
 
 
             serviceRegistry.Register(typeof(IManyToOneMethodBuilder<>), typeof(ManyToOneMethodBuilder<>), new PerScopeLifetime());
 
-            serviceRegistry.Register(typeof(IOneToManyMethodBuilder<>), typeof(OneToManyMethodBuilder<>), new PerContainerLifetime());
+            serviceRegistry.Register(typeof(IOneToManyMethodBuilder<>), typeof(OneToManyMethodBuilder<>), new PerScopeLifetime());
             serviceRegistry.Decorate(typeof(IOneToManyMethodBuilder<>), typeof(CachedOneToManyMethodBuilder<>));
 
 
@@ -86,7 +86,7 @@
 
             serviceRegistry.Register<IPropertySelector, ReadablePropertySelector>("ReadablePropertySelector", new PerContainerLifetime());
 
-            serviceRegistry.Register<ICacheKeyFactory, CacheKeyFactory>(new PerContainerLifetime());
+            serviceRegistry.Register<ICacheKeyFactory, CacheKeyFactory>(new PerContainerLifetime());            
         }
 
         private static Func<PropertyInfo, bool> IsKeyProperty()

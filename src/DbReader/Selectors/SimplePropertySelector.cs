@@ -19,7 +19,7 @@
         public PropertyInfo[] Execute(Type type)
         {
             PropertyInfo[] properties = type.GetProperties();
-            return properties.Where(p => TypeExtensions.IsSimpleType(p.PropertyType) && PropertyInfoExtensions.IsWriteable(p)).ToArray();
+            return properties.Where(p => TypeReflectionExtensions.IsSimpleType(p.PropertyType) && PropertyReflectionExtensions.IsWriteable(p)).ToArray();
         }
     }
 }

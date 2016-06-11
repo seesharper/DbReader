@@ -9,7 +9,7 @@ namespace DbReader.Extensions
     /// <summary>
     /// Extends the <see cref="Type"/> class.
     /// </summary>
-    public static class TypeExtensions
+    public static class TypeReflectionExtensions
     {
         private static readonly Type[] SimpleTypes = new Type[6];
 
@@ -22,7 +22,7 @@ namespace DbReader.Extensions
                 typeof(Tuple<,,,,,,,>)
             };
 
-        static TypeExtensions()
+        static TypeReflectionExtensions()
         {
             SimpleTypes[0] = typeof(string);
             SimpleTypes[1] = typeof(Guid);

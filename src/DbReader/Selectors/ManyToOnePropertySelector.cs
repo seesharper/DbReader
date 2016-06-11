@@ -20,7 +20,7 @@ namespace DbReader.Selectors
         {
             return
                 type.GetProperties()
-                    .Where(p => !TypeExtensions.IsSimpleType(p.PropertyType) && !TypeExtensions.IsEnumerable(p.PropertyType) && PropertyInfoExtensions.IsWriteable(p))
+                    .Where(p => !TypeReflectionExtensions.IsSimpleType(p.PropertyType) && !TypeReflectionExtensions.IsEnumerable(p.PropertyType) && PropertyReflectionExtensions.IsWriteable(p))
                     .ToArray();
         }
     }

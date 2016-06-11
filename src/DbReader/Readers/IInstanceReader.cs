@@ -1,4 +1,4 @@
-﻿namespace DbReader.Interfaces
+namespace DbReader.Readers
 {
     using System.Data;
 

@@ -6,7 +6,7 @@
     using System.Reflection;
 
     using DbReader.Interfaces;
-
+    using Readers;
     using Shouldly;
 
     public class KeyReaderTests

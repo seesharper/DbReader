@@ -7,6 +7,7 @@ namespace DbReader.Construction
     using System.Reflection.Emit;
     using Extensions;
     using Interfaces;
+    using Readers;
     using Selectors;
 
     /// <summary>

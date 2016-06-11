@@ -3,12 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Text;
-
-    using DbReader.LightInject;
-
+    using LightInject;
     using Shouldly;
-  
-    
+    using IPropertySelector = Selectors.IPropertySelector;
+
 
     public class SimplePropertySelectorTests
     {
@@ -90,6 +88,10 @@
         public int Id { get; set; }
     }
 
+    public class AnotherClassWithId
+    {
+        public int Id { get; set; }
+    }
 
 
     public class ClassWithProperty<T> : ClassWithId

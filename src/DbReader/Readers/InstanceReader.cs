@@ -1,8 +1,7 @@
-﻿namespace DbReader
+﻿namespace DbReader.Readers
 {
     using System.Data;
-
-    using DbReader.Interfaces;
+    using Interfaces;
 
     /// <summary>
     /// A class that is capable of transforming an <see cref="IDataRecord"/> into an instance of <typeparamref name="T"/>.
