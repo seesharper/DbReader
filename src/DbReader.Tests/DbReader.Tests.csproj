@@ -55,16 +55,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyAssert.cs" />
     <Compile Include="ConstructorSelectorTests.cs" />
     <Compile Include="CustomValueType.cs" />
     <Compile Include="DataReaderMockExtensions.cs" />
     <Compile Include="FieldSelectorTests.cs" />
     <Compile Include="InlineDataConvention.cs" />
     <Compile Include="InstanceReaderTests.cs" />
+    <Compile Include="InstanceReaderVerificationTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="KeyPropertyMapperTests.cs" />
     <Compile Include="KeyReaderTests.cs" />
     <Compile Include="ManyToOnePropertySelectorTests.cs" />
+    <Compile Include="MethodBuilderMethodSkeleton.cs" />
     <Compile Include="MethodSelectorTests.cs" />
     <Compile Include="PrefixResolverTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

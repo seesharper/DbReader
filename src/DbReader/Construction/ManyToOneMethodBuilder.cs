@@ -51,7 +51,7 @@
                 return null;
             }
             var instanceReaders = new List<object>(properties.Length);
-            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton(typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
+            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("ManyToOneDynamicMethod",typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
             var generator = methodSkeleton.GetGenerator();
 
             bool shouldCreateMethod = false;
@@ -87,12 +87,11 @@
                     //Call the read method.
                     generator.Emit(OpCodes.Callvirt, readMethod);
                     generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
-                }
-
-                generator.Emit(OpCodes.Ret);
+                }                
             }
             if (shouldCreateMethod)
             {
+                generator.Emit(OpCodes.Ret);
                 var method = (Action<T, IDataRecord, object[]>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, object[]>));
 
                 return (record, instance) => method(instance, record, instanceReaders.ToArray());    

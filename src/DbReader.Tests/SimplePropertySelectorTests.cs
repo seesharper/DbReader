@@ -99,6 +99,13 @@
         public T Property { get; set; }
     }
 
+    public class ClassWithTwoProperties<T1, T2> : ClassWithId
+    {
+        public T1 FirstProperty { get; set; }
+
+        public T2 SecondProperty { get; set; }
+    }
+
     public class ClassWithDateTimeProperty : ClassWithId
     {
         public DateTime Property { get; set; }

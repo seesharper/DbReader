@@ -19,7 +19,7 @@
         void ICompositionRoot.Compose(IServiceRegistry serviceRegistry)
         {
             serviceRegistry.Register<IMethodSkeletonFactory, MethodSkeletonFactory>(new PerContainerLifetime());
-            serviceRegistry.Register<Type, Type[], IMethodSkeleton>((factory, returnType, parameterTypes) => new DynamicMethodSkeleton(returnType, parameterTypes));
+            serviceRegistry.Register<string, Type, Type[], IMethodSkeleton>((factory, name, returnType, parameterTypes) => new DynamicMethodSkeleton(name, returnType, parameterTypes));
 
             serviceRegistry.Register(typeof(IReaderMethodBuilder<>), typeof(PropertyReaderMethodBuilder<>), "PropertyReaderMethodBuilder", new PerContainerLifetime());
             serviceRegistry.Register(typeof(IReaderMethodBuilder<>), typeof(ConstructorReaderMethodBuilder<>), "ConstructorReaderMethodBuilder", new PerContainerLifetime());

@@ -13,6 +13,6 @@
         /// <param name="returnType">The return type of the dynamic method.</param>
         /// <param name="parameterTypes">The parameter types of the dynamic method.</param>
         /// <returns>An <see cref="IMethodSkeleton"/> instance.</returns>
-        IMethodSkeleton GetMethodSkeleton(Type returnType, Type[] parameterTypes);
+        IMethodSkeleton GetMethodSkeleton(string name, Type returnType, Type[] parameterTypes);
     }
 }

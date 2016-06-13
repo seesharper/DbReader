@@ -186,6 +186,7 @@ namespace DbReader.Construction
         private IMethodSkeleton GetMethodSkeleton()
         {
             var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton(
+                "ReaderDynamicMethod",
                 typeof(T),
                 new[] { typeof(IDataRecord), typeof(int[]) });
             return methodSkeleton;

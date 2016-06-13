@@ -51,7 +51,7 @@ namespace DbReader.Construction
                 return null;
             }
             var instanceReaders = new List<object>(properties.Length);
-            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton(typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
+            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("OneToManyDynamicMethod",typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
             var generator = methodSkeleton.GetGenerator();
             bool shouldCreateMethod = false;
             foreach (var property in properties)
@@ -76,7 +76,7 @@ namespace DbReader.Construction
                                                        
                     // Call the property getter and push the result onto the stack.
                     generator.Emit(OpCodes.Callvirt, getMethod);
-
+                    
                     // Push the object reader.
                     generator.Emit(OpCodes.Ldarg_2);
                     generator.EmitFastInt(instanceReaderIndex);

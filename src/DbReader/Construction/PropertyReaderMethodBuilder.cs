@@ -76,7 +76,7 @@
                 var collectionType = typeof(Collection<>).MakeGenericType(projectionType);
                 var collectionConstructor = collectionType.GetConstructor(Type.EmptyTypes);
                 var setMethod = property.GetSetMethod();
-                LoadInstance(il, instanceVariable);
+                LoadInstance(il, instanceVariable);                
                 il.Emit(OpCodes.Newobj, collectionConstructor);
                 il.Emit(OpCodes.Callvirt, setMethod);
             }

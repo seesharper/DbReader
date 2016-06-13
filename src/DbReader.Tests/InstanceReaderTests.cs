@@ -200,6 +200,16 @@
             instance.OneToManyRelation.Count().ShouldBe(1);
         }
 
+        public void ShouldReadInstanceWithTwoManyToOneRelationsOfSameType(
+            IInstanceReader<ClassWithTwoProperties<ClassWithId, ClassWithId>> instanceReader)
+        {
+            var dataRecord = new { Id = 1, FirstProperty_Id = 2, SecondProperty_Id = 3 }.ToDataRecord();
+            var instance = instanceReader.Read(dataRecord, string.Empty);
+            instance.Id.ShouldBe(1);
+            instance.FirstProperty.Id.ShouldBe(2);
+            instance.SecondProperty.Id.ShouldBe(3);
+        }
+
         public void ShouldReadInstanceWithNestedOneToManyRelation(IInstanceReader<ClassWithNestedOnToManyRelation> instanceReader)
         {
             var rows = new[]
@@ -248,14 +258,14 @@
     {
         public int Id { get; set; }
 
-        public IEnumerable<ClassWithNoRelations> OneToManyRelation { get; set; }
+        public ICollection<ClassWithNoRelations> OneToManyRelation { get; set; }
     }
 
     public class ClassWithNestedOnToManyRelation
     {
         public int Id { get; set; }
 
-        public IEnumerable<ClassWithOneToManyRelation> TopLevelOneToManyRelation { get; set; }
+        public ICollection<ClassWithOneToManyRelation> TopLevelOneToManyRelation { get; set; }
     }
 
     public class Master

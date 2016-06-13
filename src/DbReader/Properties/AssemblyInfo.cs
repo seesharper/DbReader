@@ -32,3 +32,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.0.0.2")]
 [assembly: AssemblyFileVersion("1.0.0.2")]
 [assembly: InternalsVisibleTo("DbReader.Tests")]
+[assembly: InternalsVisibleTo("OneToManyDynamicMethod")]
+[assembly: InternalsVisibleTo("ManyToOneDynamicMethod")]
+[assembly: InternalsVisibleTo("ReaderDynamicMethod")]

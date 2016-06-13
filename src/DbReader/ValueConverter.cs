@@ -75,7 +75,7 @@ namespace DbReader
         /// <param name="dataRecord">The current <see cref="IDataRecord"/>.</param>
         /// <param name="ordinal">The current ordinal (column index).</param>
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
-        internal static T Convert<T>(IDataRecord dataRecord, int ordinal)
+        public static T Convert<T>(IDataRecord dataRecord, int ordinal)
         {
             return ((Func<IDataRecord, int, T>)ReadDelegates[typeof(T)])(dataRecord, ordinal);
         }
@@ -87,7 +87,7 @@ namespace DbReader
         /// <returns>The <see cref="MethodInfo"/> that represents the <see cref="Convert"/> method.</returns>
         internal static MethodInfo GetConvertMethod(Type type)
         {
-            var openGenericConvertMethod = typeof(ValueConverter).GetMethod("Convert", BindingFlags.Static | BindingFlags.NonPublic);
+            var openGenericConvertMethod = typeof(ValueConverter).GetMethod("Convert", BindingFlags.Static | BindingFlags.Public);
             return openGenericConvertMethod.MakeGenericMethod(type);
         }        
     }
