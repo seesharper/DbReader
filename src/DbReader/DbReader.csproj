@@ -49,6 +49,7 @@
     <Compile Include="Caching\CachedInstanceReaderMethodBuilder.cs" />
     <Compile Include="Caching\CachedOneToManyMethodBuilder.cs" />
     <Compile Include="Caching\CachedReaderMethodBuilder.cs" />
+    <Compile Include="Caching\DelegateCacheKey.cs" />
     <Compile Include="Construction\CachedKeyReaderMethodBuilder.cs" />
     <Compile Include="Construction\CacheKeyFactory.cs" />
     <Compile Include="Construction\ConstructorReaderMethodBuilder.cs" />

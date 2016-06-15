@@ -14,8 +14,7 @@ namespace DbReader.Mapping
     public class PropertyMapper : IPropertyMapper
     {
         private readonly IPropertySelector simplePropertySelector;
-        private readonly IFieldSelector fieldSelector;
-        private readonly List<int> mappedOrdinals = new List<int>(); 
+        private readonly IFieldSelector fieldSelector;        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMapper"/> class.
@@ -74,13 +73,7 @@ namespace DbReader.Mapping
             string prefix,
             IReadOnlyDictionary<string, ColumnInfo> fields)
         {
-            ColumnInfo columnInfo = GetColumnInfo(property, fields, prefix);
-            if (mappedOrdinals.Contains(columnInfo.Ordinal))
-            {
-                return new ColumnInfo(-1, null, null);
-            }
-            mappedOrdinals.Add(columnInfo.Ordinal);
-
+            ColumnInfo columnInfo = GetColumnInfo(property, fields, prefix);           
             return columnInfo;
         }      
     }

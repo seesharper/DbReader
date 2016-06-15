@@ -58,7 +58,7 @@
             serviceRegistry.Register<IPropertyMapper, KeyPropertyMapper>("KeyPropertyMapper", new PerScopeLifetime());
             serviceRegistry.Decorate<IPropertyMapper, PropertyTypeValidator>();
             serviceRegistry.Register<IPropertyMapper, PropertyMapper>("PropertyMapper", new PerScopeLifetime());
-            serviceRegistry.Decorate<IPropertyMapper, CachedPropertyMapper>();
+            //serviceRegistry.Decorate<IPropertyMapper, CachedPropertyMapper>();
             serviceRegistry.Decorate(typeof(IPropertyMapper), typeof(KeyPropertyMapperValidator), sr => sr.ImplementingType == typeof(KeyPropertyMapper));
 
 

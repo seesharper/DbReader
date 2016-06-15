@@ -3,31 +3,24 @@
     using System;
     using System.Collections.Concurrent;
     using System.Data;
-    using Construction;
+    using Caching;    
 
     /// <summary>
     /// A decorator that caches a list of <see cref="MappingInfo"/> instances per <see cref="Type"/>.
     /// </summary>
     public class CachedPropertyMapper : IPropertyMapper
     {        
-
-        private readonly IPropertyMapper propertyMapper;
-        private readonly ICacheKeyFactory cacheKeyFactory;
-
-        private readonly ConcurrentDictionary<string, MappingInfo[]> cache
-            = new ConcurrentDictionary<string, MappingInfo[]>();
-
+        private readonly IPropertyMapper propertyMapper;        
+       
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedPropertyMapper"/> class.
         /// </summary>
         /// <param name="propertyMapper">
         /// The <see cref="IPropertyMapper"/> being decorated.
-        /// </param>
-        /// <param name="cacheKeyFactory"></param>
-        public CachedPropertyMapper(IPropertyMapper propertyMapper, ICacheKeyFactory cacheKeyFactory)
+        /// </param>        
+        public CachedPropertyMapper(IPropertyMapper propertyMapper)
         {
-            this.propertyMapper = propertyMapper;
-            this.cacheKeyFactory = cacheKeyFactory;
+            this.propertyMapper = propertyMapper;           
         }
 
         /// <summary>
@@ -39,9 +32,8 @@
         /// <returns>A list of <see cref="MappingInfo"/> instances that represents the mapping between a field and a property.</returns>
         public MappingInfo[] Execute(Type type, IDataRecord dataRecord, string prefix)
         {
-            var key = cacheKeyFactory.CreateKey(type, dataRecord, prefix);
-            return cache.GetOrAdd(key, k => propertyMapper.Execute(type, dataRecord, prefix));
-
+            return SimpleCache<MappingInfo[]>.GetOrAdd(type, prefix,
+                () => propertyMapper.Execute(type, dataRecord, prefix));
         }
     }
 }

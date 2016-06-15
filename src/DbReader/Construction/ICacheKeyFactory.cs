@@ -16,6 +16,6 @@ namespace DbReader.Construction
         /// <param name="dataRecord">The current <see cref="IDataRecord"/></param>
         /// <param name="prefix">The current prefix.</param>
         /// <returns>A cache key used to cache dynamically created methods.</returns>
-        string CreateKey(Type type, IDataRecord dataRecord, string prefix);
+        Tuple<Type, int, string> CreateKey(Type type, IDataRecord dataRecord, string prefix);
     }
 }

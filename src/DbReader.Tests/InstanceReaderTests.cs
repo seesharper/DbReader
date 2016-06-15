@@ -214,11 +214,11 @@
         {
             var rows = new[]
  {
-                new { MasterId = 1 ,DetailId = 1 ,SubdetailId = 1 },
-                new { MasterId = 1, DetailId = 1 ,SubdetailId = 2 },
-                new { MasterId = 1 ,DetailId = 2 ,SubdetailId = 3 },
-                new { MasterId = 1 ,DetailId = 2 ,SubdetailId = 4 },
-                new { MasterId = 1 ,DetailId = 2 ,SubdetailId = 5 }
+                new { MasterId = 1 ,Details_DetailId = 1 ,SubDetails_SubdetailId = 1 },
+                new { MasterId = 1, Details_DetailId = 1 ,SubDetails_SubdetailId = 2 },
+                new { MasterId = 1 ,Details_DetailId = 2 ,SubDetails_SubdetailId = 3 },
+                new { MasterId = 1 ,Details_DetailId = 2 ,SubDetails_SubdetailId = 4 },
+                new { MasterId = 1 ,Details_DetailId = 2 ,SubDetails_SubdetailId = 5 }
             };
 
 
@@ -226,7 +226,7 @@
             var instances = rows.ToDataReader().Read<Master>();
 
             instances.Count().ShouldBe(1);
-            instances.Single().DetailList.Count().ShouldBe(2);
+            instances.Single().Details.Count().ShouldBe(2);
 
             //instance.TopLevelOneToManyRelation.Count().ShouldBe(1);
             //instance.TopLevelOneToManyRelation.First().Id.ShouldBe(84);
@@ -272,23 +272,23 @@
     {
         public Master()
         {
-            DetailList = new List<Detail>();
+            Details = new List<Detail>();
         }
         
         public int MasterId { get; set; }
         public string MasterName { get; set; }
-        public List<Detail> DetailList { get; set; }
+        public List<Detail> Details { get; set; }
     }
     public class Detail
     {
         public Detail()
         {
-            SubDetailList = new List<SubDetail>();
+            SubDetails = new List<SubDetail>();
         }
         
         public int DetailId { get; set; }
         public string DetailName { get; set; }
-        public List<SubDetail> SubDetailList { get; set; }
+        public List<SubDetail> SubDetails { get; set; }
 
     }
     public class SubDetail

@@ -40,14 +40,14 @@
             result[0].ColumnInfo.Ordinal.ShouldBe(0);
         }
 
-        public void ShouldNotMapAlreadyMappedProperty(IPropertyMapper propertyMapper)
+        public void ShouldMapAlreadyMappedProperty(IPropertyMapper propertyMapper)
         {           
             var dataRecord = new { Id = 42 }.ToDataRecord();
 
             propertyMapper.Execute(typeof(ClassWithId), dataRecord, string.Empty);
             var result = propertyMapper.Execute(typeof(AnotherClassWithId), dataRecord, string.Empty);
 
-            result[0].ColumnInfo.Ordinal.ShouldBe(-1);
+            result[0].ColumnInfo.Ordinal.ShouldBe(0);
         }
 
         public void ShouldThrowExceptionWhenTypesDoesNotMatch(IPropertyMapper propertyMapper)

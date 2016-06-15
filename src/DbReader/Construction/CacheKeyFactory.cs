@@ -17,12 +17,10 @@
         /// <param name="dataRecord">The current <see cref="IDataRecord"/></param>
         /// <param name="prefix">The current prefix.</param>
         /// <returns>A cache key used to cache dynamically created methods.</returns>
-        public string CreateKey(Type type, IDataRecord dataRecord, string prefix)
-        {                        
-            var sb = new StringBuilder(type.FullName);
-            sb.Append(prefix);
-            sb.Append(dataRecord.FieldCount);              
-            return sb.ToString();
+        public Tuple<Type, int, string> CreateKey(Type type, IDataRecord dataRecord, string prefix)
+        {
+            return Tuple.Create(type, dataRecord.FieldCount, prefix);
+
         }
     }   
 }
