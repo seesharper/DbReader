@@ -86,8 +86,7 @@
             serviceRegistry.Register<IArgumentMapper, ArgumentMapper>(new PerContainerLifetime());
 
             serviceRegistry.Register<IPropertySelector, ReadablePropertySelector>("ReadablePropertySelector", new PerContainerLifetime());
-
-            serviceRegistry.Register<ICacheKeyFactory, CacheKeyFactory>(new PerContainerLifetime());            
+            
         }
 
         private static Func<PropertyInfo, bool> IsKeyProperty()

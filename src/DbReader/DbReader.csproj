@@ -51,10 +51,8 @@
     <Compile Include="Caching\CachedReaderMethodBuilder.cs" />
     <Compile Include="Caching\DelegateCacheKey.cs" />
     <Compile Include="Construction\CachedKeyReaderMethodBuilder.cs" />
-    <Compile Include="Construction\CacheKeyFactory.cs" />
     <Compile Include="Construction\ConstructorReaderMethodBuilder.cs" />
     <Compile Include="Construction\DynamicMethodSkeleton.cs" />
-    <Compile Include="Construction\ICacheKeyFactory.cs" />
     <Compile Include="Construction\IKeyReaderMethodBuilder.cs" />
     <Compile Include="Construction\IManyToOneMethodBuilder.cs" />
     <Compile Include="Construction\IMethodSkeleton.cs" />
