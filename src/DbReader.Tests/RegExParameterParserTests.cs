@@ -1,5 +1,6 @@
 ﻿namespace DbReader.Tests
 {
+    using Database;
     using Shouldly;
 
     public class RegExParameterParserTests

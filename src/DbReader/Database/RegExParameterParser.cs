@@ -1,4 +1,4 @@
-﻿namespace DbReader
+﻿namespace DbReader.Database
 {
     using System.Collections.ObjectModel;
     using System.Linq;

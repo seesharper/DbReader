@@ -5,28 +5,28 @@
     using System.Linq;
     using Selectors;
 
-    public interface IDecomposer
+    public interface IArgumentParser
     {
-        IReadOnlyDictionary<string, object> Decompose(object value);
+        IReadOnlyDictionary<string, object> Parse(object value);
     }
 
-    public class Decomposer : IDecomposer
+    public class ArgumentParser : IArgumentParser
     {
         private readonly IPropertySelector readablePropertySelector;
 
-        public Decomposer(IPropertySelector readablePropertySelector)
+        public ArgumentParser(IPropertySelector readablePropertySelector)
         {
             this.readablePropertySelector = readablePropertySelector;
         }
 
-        public IReadOnlyDictionary<string, object> Decompose(object value)
+        public IReadOnlyDictionary<string, object> Parse(object value)
         {
             if (value == null)
             {
                 return new Dictionary<string, object>();
             }
             var properties = readablePropertySelector.Execute(value.GetType());
-            return properties.ToDictionary(prop => prop.Name, prop => prop.GetValue(value) ?? DBNull.Value);
+            return properties.ToDictionary(prop => prop.Name, prop => prop.GetValue(value) ?? DBNull.Value, StringComparer.OrdinalIgnoreCase);
         }
     }
 }

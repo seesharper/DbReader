@@ -1,4 +1,4 @@
-﻿namespace DbReader
+﻿namespace DbReader.Database
 {
     /// <summary>
     /// Represents a class that is capable of parsing a SQL statement 

@@ -1,10 +1,9 @@
-﻿namespace DbReader
+namespace DbReader.Database
 {
-    
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    
+
     public static class PropertyInfoEnumerableExtensions
     {
         public static IEnumerable<PropertyInfo> OrderByDeclaration(this IEnumerable<PropertyInfo> properties)

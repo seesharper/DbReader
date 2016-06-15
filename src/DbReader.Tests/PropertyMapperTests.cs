@@ -63,6 +63,14 @@
             result[0].ColumnInfo.Ordinal.ShouldBe(0);
         }
 
+        public void ShouldProvideMeaningfulStringRepresentation(IPropertyMapper propertyMapper)
+        {
+            var dataRecord = new { Int32Property = 42 }.ToDataRecord();
+
+            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
+
+            result[0].ToString().ShouldBe("[DbReader.Tests.SampleClass] Property: Int32 Int32Property, Ordinal: 0");
+        }
     }
 
     public class ClassWithCustomValueType

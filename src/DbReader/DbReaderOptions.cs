@@ -7,6 +7,8 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Database;
+    using Interfaces;
     using Selectors;
 
     public static class DbReaderOptions
@@ -23,7 +25,7 @@
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase);
             ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");
 
-            CommandFactory = new DbCommandFactory(new ArgumentProvider(ParameterParser,new ReadablePropertySelector()));
+            CommandFactory = new DbCommandFactory(new ArgumentMapper(ParameterParser,new ArgumentParser(new ReadablePropertySelector())));
         }
 
         public static ReadDelegate<TProperty> WhenReading<TProperty>()
@@ -34,9 +36,7 @@
         public static PassDelegate<TArgument> WhenPassing<TArgument>()
         {
             return new PassDelegate<TArgument>();
-        }
-        
-
+        }        
 
         public static Func<PropertyInfo, bool> KeyConvention
         {
@@ -61,8 +61,6 @@
         public static IParameterParser ParameterParser { get; set; }
         
         public static IDbCommandFactory CommandFactory  { get; set; }
-
-        internal static Dictionary<Type, Type> Services { get; set; } 
 
         public static void KeySelector<T>(params Expression<Func<T, object>>[] keyExpressions)
         {

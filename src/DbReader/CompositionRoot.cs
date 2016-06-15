@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Reflection;
     using Construction;
+    using Database;
     using DbReader.Caching;
     using DbReader.Interfaces;
     using DbReader.LightInject;
@@ -82,7 +83,7 @@
 
             serviceRegistry.Register<IDbCommandFactory, DbCommandFactory>(new PerContainerLifetime());
 
-            serviceRegistry.Register<IArgumentProvider, ArgumentProvider>(new PerContainerLifetime());
+            serviceRegistry.Register<IArgumentMapper, ArgumentMapper>(new PerContainerLifetime());
 
             serviceRegistry.Register<IPropertySelector, ReadablePropertySelector>("ReadablePropertySelector", new PerContainerLifetime());
 

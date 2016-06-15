@@ -26,31 +26,16 @@
             {
                 return typeof(IDataRecord).GetMethod("GetBoolean");
             }
-
-            if (type == typeof(bool?))
-            {
-                return typeof(DataRecordExtensions).GetMethod("GetNullableBoolean");
-            }
-
+           
             if (type == typeof(byte))
             {
                 return typeof(IDataRecord).GetMethod("GetByte");
             }
 
-            if (type == typeof(byte?))
-            {
-                return typeof(DataRecordExtensions).GetMethod("GetNullableByte");
-            }
-
             if (type == typeof(char))
             {
                 return typeof(IDataRecord).GetMethod("GetChar");
-            }
-
-            if (type == typeof(char?))
-            {
-                return typeof(DataRecordExtensions).GetMethod("GetNullableChar");
-            }
+            }           
 
             if (type == typeof(char[]))
             {
@@ -62,19 +47,9 @@
                 return typeof(IDataRecord).GetMethod("GetDateTime");
             }
 
-            if (type == typeof(DateTime?))
-            {
-                return typeof(DataRecordExtensions).GetMethod("GetNullableDateTime");
-            }
-
             if (type == typeof(decimal))
             {
                 return typeof(IDataRecord).GetMethod("GetDecimal");
-            }
-
-            if (type == typeof(decimal?))
-            {
-                return typeof(DataRecordExtensions).GetMethod("GetNullableDecimal");
             }
 
             if (type == typeof(double))
@@ -82,19 +57,9 @@
                 return typeof(IDataRecord).GetMethod("GetDouble");
             }
 
-            if (type == typeof(double?))
-            {
-                return typeof(DataRecordExtensions).GetMethod("GetNullableDouble");
-            }
-
             if (type == typeof(float))
             {
                 return typeof(IDataRecord).GetMethod("GetFloat");
-            }
-
-            if (type == typeof(float?))
-            {
-                return typeof(DataRecordExtensions).GetMethod("GetNullableFloat");
             }
 
             if (type == typeof(byte[]))
