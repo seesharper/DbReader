@@ -20,6 +20,19 @@ If your needs are simple (and they usually are) with just single level objects, 
 
 If you need to map master-detail relationships (eg Order -> OrderLines), you might want to check out this library.
 
+## Do you speak Northwindian?
+
+All the following samples are based on the good old Northwind database since
+
+* It's simple
+* It has been around for ages (literally)
+* Everybody understands the domain 
+
+![Schema](https://github.com/seesharper/Presentations/blob/gh-pages/SqlPerformance/Northwind.png)
+
+## Database agnostic
+
+DbReader relies only on the most basic interfaces such as *IDbConnection*, *IDbCommand* and *IDataReader*.
 
 ## Single level 
 
@@ -57,6 +70,15 @@ With both the Customer class and the SQL in place, we are ready to query the dat
 var customers = dbConnection.Read<Customer>(sql)
 ```
 
+## Async
+**DbReader** provides the *ReadAsync* method that uses the DbCommand.ExecuteReaderAsync method to fetch the result set. 
+
+```
+var result =  await dbConnection.ReadAsync<Customer>(sql)
+```
+
+> The code will run synchronously or asynchronously depending on the support for async in the underlying database driver. For instance, Oracle does not implement async properly and hence the query will run synchronously.
+
 ## Parameterized Queries 
 
 A very common scenario is for a SQL statement to define a parameter for which an argument value must be passed from the client. 
@@ -79,7 +101,7 @@ DbReader makes passing an argument value very easy.
 ```
 dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
 ```
-
+		
 ## Aliasing
 
 Sometimes we want give a property a different name than the target column returned from the query. The easiest way of doing this is simply to take advantage of column aliasing in the SQL statement.
@@ -204,6 +226,86 @@ ON
 ```
 var orders = dbConection.Read<Order>(sql)
 ```
+
+
+
+## Multiple "parallell" collections
+
+If we look at the *Employees* table we see that there is a "one-to-many" relationship between the *Employees* table and the *Orders* table. There is also another "one-to-many" relationship between the Employees table and the EmployeeTerritories which in turn has a "many-to-one" relationship to the Territories table. 
+
+```
+Employees -< Orders
+Employees -< EmployeeTerritories >- Territories
+```
+
+> Tables such as the *EmployeeTerritories* table, are often referred to as junction tables. Their main purpose is to allow for "many-to-many" relationships, in this case between *Employees* and *Territories*.
+
+```
+public class Employee
+{
+    public int EmployeeID { get; set; }
+    public string LastName { get; set; }
+    public string FirstName { get; set; }
+    public ICollection<Order> Orders { get; set; }
+    public ICollection<Territory> Territories { get; set; }
+}
+
+public class Territory
+{
+    public string TerritoryId { get; set; }
+    public string TerritoryDescription { get; set; }
+}
+
+public class Order
+{   
+    public long OrderId { get; set; }    
+    public DateTime OrderDate { get; set; }            
+}
+```
+
+The following SQL uses the UNION keyword that basically allows to separate result sets to be merged together before being returned to the client.
+
+```sql
+SELECT 
+    e.EmployeeId,
+	e.LastName,
+	e.FirstName,
+    o.OrderId AS Orders_OrderId,
+	o.OrderDate as Orders_OrderDate,
+	NULL as Territories_TerritoryId,
+	NULL as Territories_TerritoryDescription
+FROM 
+    Employees e
+INNER JOIN 
+    Orders o 
+ON 
+    e.EmployeeId = o.employeeId AND
+    e.EmployeeId = 7 
+UNION
+SELECT 
+	e.EmployeeId,
+	e.LastName,
+	e.FirstName,
+	NULL AS Orders_OrderId,
+	NULL AS Orders_OrderDate,
+	t.TerritoryId as Territories_TerritoryId,
+	t.TerritoryDescription as Territories_TerritoryDescription
+FROM 
+    Employees e
+INNER JOIN 
+    EmployeeTerritories et 
+ON 
+    e.employeeid = et.employeeid AND
+    e.employeeid = 7 
+INNER JOIN 
+    Territories t   
+ON 
+    et.TerritoryId = t.TerritoryId
+```
+
+> Most databases implement some form of TDS (Tabular Data Stream) that is highly optimized with regards to duplicate column values and null values.   
+
+
 
 ## Keys
 
@@ -374,6 +476,7 @@ The Guid also needs to be converted back into a byte array when passing a Guid v
 ```
 DbReaderOptions.WhenPassing<Guid>().ConvertTo(guid => guid.ToByteArray());
 ```
+
 
 
 

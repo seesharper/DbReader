@@ -24,5 +24,23 @@
         public ICollection<Order> Orders { get; set; }
     }
 
-    
+
+    public class Territory
+    {
+        public string TerritoryId { get; set; }
+        public string TerritoryDescription { get; set; }
+    }
+
+
+    public class Employee
+    {
+        public int EmployeeID { get; set; }
+
+        public string LastName { get; set; }
+
+        public string FirstName { get; set; }
+
+        public ICollection<Order> Orders { get; set; }        
+    }
+
 }
