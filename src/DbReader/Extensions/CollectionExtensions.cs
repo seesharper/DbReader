@@ -31,6 +31,10 @@ namespace DbReader.Extensions
         /// <param name="value">The value to be added to the collection.</param>
         public static void TryAdd<T>(this ICollection<T> collection, T value)
         {
+            if (value == null)
+            {
+                return;
+            }
             if (!collection.Contains(value))
             {
                 collection.Add(value);

@@ -89,5 +89,37 @@ namespace DbReader.Tests {
                 return ResourceManager.GetString("CustomersAndOrders", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT 
+        ///    e.EmployeeId,
+        ///	e.LastName,
+        ///	e.FirstName,
+        ///    o.OrderId AS Orders_OrderId,
+        ///	o.OrderDate as Orders_OrderDate,
+        ///	NULL as Territories_TerritoryId,
+        ///	NULL as Territories_TerritoryDescription
+        ///FROM 
+        ///    Employees e
+        ///INNER JOIN 
+        ///    Orders o 
+        ///ON 
+        ///    e.EmployeeId = o.employeeId AND
+        ///    e.EmployeeId = 7 
+        ///UNION
+        ///SELECT 
+        ///	e.EmployeeId,
+        ///	e.LastName,
+        ///	e.FirstName,
+        ///	NULL AS Orders_OrderId,
+        ///	NULL AS Orders_OrderDate,
+        ///	t.TerritoryId as Territories_TerritoryId,
+        ///	t.TerritoryDescription as Terri [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EmployeesWithOrdersAndTerritories {
+            get {
+                return ResourceManager.GetString("EmployeesWithOrdersAndTerritories", resourceCulture);
+            }
+        }
     }
 }

@@ -116,4 +116,8 @@
         public byte[] ByteArrayProperty { get; set; }
     }
 
+
+    public class GuruMeditationException : Exception
+    {                
+    }
 }

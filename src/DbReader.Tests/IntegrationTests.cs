@@ -75,7 +75,14 @@
             }
         }
 
-
+        public void ShouldReadEmployeesWithOrdersAndTerritories()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Employee>(SQL.EmployeesWithOrdersAndTerritories, new {EmployeeId = 7});
+                customers.Count().ShouldBe(1);
+            }
+        }
 
     }    
 }

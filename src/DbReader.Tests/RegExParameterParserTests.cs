@@ -27,5 +27,13 @@
             parameters.ShouldContain("Parameter");
             parameters.ShouldContain("AnotherParameter");
         }
+
+        public void ShouldParseDuplicateParametersOnlyOnce(IParameterParser parameterParser)
+        {
+            string source = "Id = @Parameter, AnotherId = @Parameter";
+            var parameters = parameterParser.GetParameters(source);
+            parameters.Length.ShouldBe(1);
+            parameters.ShouldContain("Parameter");
+        }
     }
 }

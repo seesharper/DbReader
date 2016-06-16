@@ -61,7 +61,10 @@
         {
             //return instanceReader.Read(dataRecord, currentPrefix);
             var key = keyReader.Read(typeof(T), dataRecord, currentPrefix);
-
+            if (key == null)
+            {
+                return default(T);
+            }
             T instance;
             if (!queryCache2.TryGetValue(key, out instance))
             {
