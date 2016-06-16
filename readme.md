@@ -32,7 +32,8 @@ All the following samples are based on the good old Northwind database since
 
 ## Database agnostic
 
-DbReader relies only on the most basic interfaces such as *IDbConnection*, *IDbCommand* and *IDataReader*.
+Most of the functionality in DbReader is implemented on top of the IDataReader/IDataRecord interface. In fact, DbReader can actually be used without any database at all since there is nothing that states that an IDataReader needs to get its data from a relational database. 
+
 
 ## Single level 
 
@@ -263,7 +264,7 @@ public class Order
 }
 ```
 
-The following SQL uses the UNION keyword that basically allows to separate result sets to be merged together before being returned to the client.
+The following SQL uses the *UNION* keyword that basically allows separate result sets to be merged together before being returned to the client.
 
 ```sql
 SELECT 
