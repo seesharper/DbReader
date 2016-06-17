@@ -1,12 +1,10 @@
-﻿namespace DbReader.Caching
+namespace DbReader.Readers
 {
     using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Data;
     using Construction;
-    using DbReader.Interfaces;
-    using Readers;
 
     /// <summary>
     /// An <see cref="IInstanceReader{T}"/> decorator that caches instances 

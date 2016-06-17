@@ -1,10 +1,8 @@
-﻿namespace DbReader.Caching
+﻿namespace DbReader.Construction
 {
     using System;
-    using System.Collections.Generic;
     using System.Data;
-    using Construction;
-    using DbReader.Interfaces;
+    using Interfaces;
 
     public class CachedInstanceReaderMethodBuilder<T> : IInstanceReaderMethodBuilder<T>
     {
@@ -18,7 +16,7 @@
 
         public Func<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
         {            
-            return SimpleCache<Func<IDataRecord, T>>.GetOrAdd(typeof (T), prefix,
+            return Cache<Func<IDataRecord, T>>.GetOrAdd(typeof (T), prefix,
                 () => instanceReaderMethodBuilder.CreateMethod(dataRecord, prefix));            
         }
     }

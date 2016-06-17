@@ -4,7 +4,6 @@
     using System.Collections;
     using System.Collections.Concurrent;
     using System.Data;
-    using Caching;
 
     /// <summary>
     /// A class that is capable of creating a method that reads the fields from an <see cref="IDataRecord"/>
@@ -33,7 +32,7 @@
         /// <returns>A method that reads the key fields from the given <paramref name="dataRecord"/>.</returns>
         public Func<IDataRecord, IStructuralEquatable> CreateMethod(Type type, IDataRecord dataRecord, string prefix)
         {
-            return SimpleCache<Func<IDataRecord, IStructuralEquatable>>.GetOrAdd(type, prefix,
+            return Cache<Func<IDataRecord, IStructuralEquatable>>.GetOrAdd(type, prefix,
                 () => keyReaderMethodBuilder.CreateMethod(type, dataRecord, prefix));               
         }
     }

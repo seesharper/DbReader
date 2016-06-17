@@ -4,7 +4,7 @@
     using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
-    using Caching;
+    using Database;
 
     public static class DbConnectionExtensions
     {                

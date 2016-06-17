@@ -1,5 +1,6 @@
 ﻿namespace DbReader.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
@@ -11,7 +12,9 @@
     public class Order
     {
         [Key]
-        public long OrderId { get; set; }        
+        public long OrderId { get; set; }   
+        
+        public DateTime? OrderDate { get; set; }     
     }
 
 

@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Data;
-    using Caching;    
+    using Construction;
 
     /// <summary>
     /// A decorator that caches a list of <see cref="MappingInfo"/> instances per <see cref="Type"/>.
@@ -32,7 +32,7 @@
         /// <returns>A list of <see cref="MappingInfo"/> instances that represents the mapping between a field and a property.</returns>
         public MappingInfo[] Execute(Type type, IDataRecord dataRecord, string prefix)
         {
-            return SimpleCache<MappingInfo[]>.GetOrAdd(type, prefix,
+            return Cache<MappingInfo[]>.GetOrAdd(type, prefix,
                 () => propertyMapper.Execute(type, dataRecord, prefix));
         }
     }

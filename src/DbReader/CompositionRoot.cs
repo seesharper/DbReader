@@ -5,7 +5,6 @@
     using System.Reflection;
     using Construction;
     using Database;
-    using DbReader.Caching;
     using DbReader.Interfaces;
     using DbReader.LightInject;
     using DbReader.Readers;
