@@ -6,18 +6,18 @@
 
     public class CachedInstanceReaderMethodBuilder<T> : IInstanceReaderMethodBuilder<T>
     {
-        private readonly IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder;
+        private readonly Func<IInstanceReaderMethodBuilder<T>> instanceReaderMethodBuilderFactory;
 
                        
-        public CachedInstanceReaderMethodBuilder(IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder)
+        public CachedInstanceReaderMethodBuilder(Func<IInstanceReaderMethodBuilder<T>> instanceReaderMethodBuilderFactory)
         {
-            this.instanceReaderMethodBuilder = instanceReaderMethodBuilder;        
+            this.instanceReaderMethodBuilderFactory = instanceReaderMethodBuilderFactory;        
         }
 
         public Func<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
         {            
             return Cache<Func<IDataRecord, T>>.GetOrAdd(typeof (T), prefix,
-                () => instanceReaderMethodBuilder.CreateMethod(dataRecord, prefix));            
+                () => instanceReaderMethodBuilderFactory().CreateMethod(dataRecord, prefix));            
         }
     }
 }

@@ -35,11 +35,7 @@ namespace DbReader
     {
         private static readonly ConcurrentDictionary<Type, Delegate> ReadDelegates =
             new ConcurrentDictionary<Type, Delegate>();
-
-        private static readonly ConcurrentDictionary<Type, Delegate> ConvertDelegates =
-            new ConcurrentDictionary<Type, Delegate>();
-
-
+       
         /// <summary>
         /// Registers a function delegate that creates a value of <typeparamref name="T"/> from an <see cref="IDataRecord"/>
         /// at the specified ordinal (column index).
@@ -50,13 +46,7 @@ namespace DbReader
         {
             ReadDelegates.AddOrUpdate(typeof(T), type => convertFunction, (type, del) => convertFunction);
         }
-
-        public static void RegisterConvertDelegate<TArgument, TParameter>(Func<TArgument, TParameter> convertFunction)
-        {
-            ConvertDelegates.AddOrUpdate(typeof(TArgument), type => convertFunction, (type, del) => convertFunction);
-        }
-
-
+       
         /// <summary>
         /// Determines if the given <paramref name="type"/> can be converted.
         /// </summary>        

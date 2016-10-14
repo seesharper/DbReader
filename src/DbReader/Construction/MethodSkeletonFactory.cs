@@ -1,11 +1,12 @@
 ﻿namespace DbReader.Construction
 {
     using System;
+    using System.Reflection;
 
     /// <summary>
     /// A class that is capable of providing an <see cref="IMethodSkeleton"/> instance.
     /// </summary>
-    public class MethodSkeletonFactory : IMethodSkeletonFactory
+    public class DynamicMethodSkeletonFactory : IMethodSkeletonFactory
     {
         private readonly Func<string, Type, Type[], IMethodSkeleton> factoryDelegate;
 
@@ -13,9 +14,9 @@
         /// Initializes a new instance of the <see cref="MethodSkeletonFactory"/> class.
         /// </summary>
         /// <param name="factoryDelegate">A factory delegate used to create an <see cref="IMethodSkeleton"/> instance</param>
-        public MethodSkeletonFactory(Func<string, Type, Type[], IMethodSkeleton> factoryDelegate)
+        public DynamicMethodSkeletonFactory()
         {
-            this.factoryDelegate = factoryDelegate;
+            
         }
 
         /// <summary>
@@ -26,7 +27,12 @@
         /// <returns>An <see cref="IMethodSkeleton"/> instance.</returns>
         public IMethodSkeleton GetMethodSkeleton(string name, Type returnType, Type[] parameterTypes)
         {
-            return factoryDelegate(name, returnType, parameterTypes);
+            return new DynamicMethodSkeleton(name, returnType, parameterTypes, typeof(IMethodSkeletonFactory).GetTypeInfo().Module);
+        }
+
+        public IMethodSkeleton GetMethodSkeleton(string name, Type returnType, Type[] parameterTypes, Type owner)
+        {
+            return new DynamicMethodSkeleton(name, returnType, parameterTypes, owner);
         }
     }
 }

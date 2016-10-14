@@ -1,7 +1,7 @@
 /*********************************************************************************
     The MIT License (MIT)
 
-    Copyright (c) 2015 bernhard.richter@gmail.com
+    Copyright (c) 2016 bernhard.richter@gmail.com
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject version 4.0.10-rc2-2
+    LightInject version 5.0.0-RC1 (NET46)
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
@@ -41,6 +41,7 @@ namespace DbReader.LightInject
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
 #if NET45 || NETSTANDARD11 || NETSTANDARD13 || NET46
     using System.IO;
 #endif
@@ -66,9 +67,25 @@ namespace DbReader.LightInject
     internal delegate object GetInstanceDelegate(object[] args);
 
     /// <summary>
+    /// Describes the logging level/severity.
+    /// </summary>
+    public enum LogLevel
+    {
+        /// <summary>
+        /// Indicates the <see cref="LogEntry"/> represents an information message.
+        /// </summary>
+        Info,
+
+        /// <summary>
+        /// Indicates the <see cref="LogEntry"/> represents a warning message.
+        /// </summary>
+        Warning
+    }
+
+    /// <summary>
     /// Defines a set of methods used to register services into the service container.
     /// </summary>
-    public interface IServiceRegistry
+    internal interface IServiceRegistry
     {
         /// <summary>
         /// Gets a list of <see cref="ServiceRegistration"/> instances that represents the
@@ -81,7 +98,8 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="implementingType">The implementing type.</param>
-        void Register(Type serviceType, Type implementingType);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register(Type serviceType, Type implementingType);
 
         /// <summary>
         /// Registers the <paramref name="serviceType"/> with the <paramref name="implementingType"/>.
@@ -89,7 +107,8 @@ namespace DbReader.LightInject
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="implementingType">The implementing type.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register(Type serviceType, Type implementingType, ILifetime lifetime);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register(Type serviceType, Type implementingType, ILifetime lifetime);
 
         /// <summary>
         /// Registers the <paramref name="serviceType"/> with the <paramref name="implementingType"/>.
@@ -97,7 +116,8 @@ namespace DbReader.LightInject
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="implementingType">The implementing type.</param>
         /// <param name="serviceName">The name of the service.</param>
-        void Register(Type serviceType, Type implementingType, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register(Type serviceType, Type implementingType, string serviceName);
 
         /// <summary>
         /// Registers the <paramref name="serviceType"/> with the <paramref name="implementingType"/>.
@@ -106,14 +126,16 @@ namespace DbReader.LightInject
         /// <param name="implementingType">The implementing type.</param>
         /// <param name="serviceName">The name of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register(Type serviceType, Type implementingType, string serviceName, ILifetime lifetime);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register(Type serviceType, Type implementingType, string serviceName, ILifetime lifetime);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <typeparamref name="TImplementation"/>.
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
-        void Register<TService, TImplementation>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService, TImplementation>()
             where TImplementation : TService;
 
         /// <summary>
@@ -122,7 +144,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register<TService, TImplementation>(ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService, TImplementation>(ILifetime lifetime)
             where TImplementation : TService;
 
         /// <summary>
@@ -131,7 +154,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
         /// <param name="serviceName">The name of the service.</param>
-        void Register<TService, TImplementation>(string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService, TImplementation>(string serviceName)
             where TImplementation : TService;
 
         /// <summary>
@@ -141,7 +165,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
         /// <param name="serviceName">The name of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register<TService, TImplementation>(string serviceName, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService, TImplementation>(string serviceName, ILifetime lifetime)
             where TImplementation : TService;
 
         /// <summary>
@@ -149,7 +174,8 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="instance">The instance returned when this service is requested.</param>
-        void RegisterInstance<TService>(TService instance);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterInstance<TService>(TService instance);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the given <paramref name="instance"/>.
@@ -157,14 +183,16 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="instance">The instance returned when this service is requested.</param>
         /// <param name="serviceName">The name of the service.</param>
-        void RegisterInstance<TService>(TService instance, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterInstance<TService>(TService instance, string serviceName);
 
         /// <summary>
         /// Registers the <paramref name="serviceType"/> with the given <paramref name="instance"/>.
         /// </summary>
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="instance">The instance returned when this service is requested.</param>
-        void RegisterInstance(Type serviceType, object instance);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterInstance(Type serviceType, object instance);
 
         /// <summary>
         /// Registers the <paramref name="serviceType"/> with the given <paramref name="instance"/>.
@@ -172,33 +200,38 @@ namespace DbReader.LightInject
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="instance">The instance returned when this service is requested.</param>
         /// <param name="serviceName">The name of the service.</param>
-        void RegisterInstance(Type serviceType, object instance, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterInstance(Type serviceType, object instance, string serviceName);
 
         /// <summary>
         /// Registers a concrete type as a service.
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
-        void Register<TService>();
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService>();
 
         /// <summary>
         /// Registers a concrete type as a service.
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register<TService>(ILifetime lifetime);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService>(ILifetime lifetime);
 
         /// <summary>
         /// Registers a concrete type as a service.
         /// </summary>
         /// <param name="serviceType">The concrete type to register.</param>
-        void Register(Type serviceType);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register(Type serviceType);
 
         /// <summary>
         /// Registers a concrete type as a service.
         /// </summary>
         /// <param name="serviceType">The concrete type to register.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register(Type serviceType, ILifetime lifetime);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register(Type serviceType, ILifetime lifetime);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -206,7 +239,8 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        void Register<TService>(Func<IServiceFactory, TService> factory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -215,7 +249,8 @@ namespace DbReader.LightInject
         /// <typeparam name="T">The parameter type.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        void Register<T, TService>(Func<IServiceFactory, T, TService> factory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T, TService>(Func<IServiceFactory, T, TService> factory);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -225,7 +260,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        void Register<T, TService>(Func<IServiceFactory, T, TService> factory, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T, TService>(Func<IServiceFactory, T, TService> factory, string serviceName);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -235,7 +271,8 @@ namespace DbReader.LightInject
         /// <typeparam name="T2">The type of the second parameter.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        void Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -246,7 +283,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        void Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory, string serviceName);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -257,7 +295,8 @@ namespace DbReader.LightInject
         /// <typeparam name="T3">The type of the third parameter.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        void Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -269,7 +308,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        void Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory, string serviceName);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -281,7 +321,8 @@ namespace DbReader.LightInject
         /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        void Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -294,7 +335,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        void Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory, string serviceName);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -303,16 +345,8 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register<TService>(Func<IServiceFactory, TService> factory, ILifetime lifetime);
-
-        /// <summary>
-        /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
-        /// describes the dependencies of the service.
-        /// </summary>
-        /// <typeparam name="TService">The service type to register.</typeparam>
-        /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
-        /// <param name="serviceName">The name of the service.</param>
-        void Register<TService>(Func<IServiceFactory, TService> factory, string serviceName);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory, ILifetime lifetime);
 
         /// <summary>
         /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
@@ -321,15 +355,27 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
         /// <param name="serviceName">The name of the service.</param>
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory, string serviceName);
+
+        /// <summary>
+        /// Registers the <typeparamref name="TService"/> with the <paramref name="factory"/> that
+        /// describes the dependencies of the service.
+        /// </summary>
+        /// <typeparam name="TService">The service type to register.</typeparam>
+        /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
+        /// <param name="serviceName">The name of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void Register<TService>(Func<IServiceFactory, TService> factory, string serviceName, ILifetime lifetime);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory, string serviceName, ILifetime lifetime);
 
         /// <summary>
         /// Registers a custom factory delegate used to create services that is otherwise unknown to the service container.
         /// </summary>
         /// <param name="predicate">Determines if the service can be created by the <paramref name="factory"/> delegate.</param>
         /// <param name="factory">Creates a service instance according to the <paramref name="predicate"/> predicate.</param>
-        void RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory);
 
         /// <summary>
         /// Registers a custom factory delegate used to create services that is otherwise unknown to the service container.
@@ -337,13 +383,15 @@ namespace DbReader.LightInject
         /// <param name="predicate">Determines if the service can be created by the <paramref name="factory"/> delegate.</param>
         /// <param name="factory">Creates a service instance according to the <paramref name="predicate"/> predicate.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        void RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory, ILifetime lifetime);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory, ILifetime lifetime);
 
         /// <summary>
         /// Registers a service based on a <see cref="ServiceRegistration"/> instance.
         /// </summary>
         /// <param name="serviceRegistration">The <see cref="ServiceRegistration"/> instance that contains service metadata.</param>
-        void Register(ServiceRegistration serviceRegistration);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Register(ServiceRegistration serviceRegistration);
 
         /// <summary>
         /// Registers composition roots from the given <paramref name="assembly"/>.
@@ -353,7 +401,8 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        void RegisterAssembly(Assembly assembly);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterAssembly(Assembly assembly);
 
         /// <summary>
         /// Registers services from the given <paramref name="assembly"/>.
@@ -364,7 +413,8 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        void RegisterAssembly(Assembly assembly, Func<Type, Type, bool> shouldRegister);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterAssembly(Assembly assembly, Func<Type, Type, bool> shouldRegister);
 
         /// <summary>
         /// Registers services from the given <paramref name="assembly"/>.
@@ -375,7 +425,8 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        void RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory);
 
         /// <summary>
         /// Registers services from the given <paramref name="assembly"/>.
@@ -387,13 +438,15 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        void RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory, Func<Type, Type, bool> shouldRegister);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory, Func<Type, Type, bool> shouldRegister);
 
         /// <summary>
         /// Registers services from the given <typeparamref name="TCompositionRoot"/> type.
         /// </summary>
         /// <typeparam name="TCompositionRoot">The type of <see cref="ICompositionRoot"/> to register from.</typeparam>
-        void RegisterFrom<TCompositionRoot>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterFrom<TCompositionRoot>()
             where TCompositionRoot : ICompositionRoot, new();
 
         /// <summary>
@@ -402,7 +455,8 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
-        void RegisterConstructorDependency<TDependency>(
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterConstructorDependency<TDependency>(
             Func<IServiceFactory, ParameterInfo, TDependency> factory);
 
         /// <summary>
@@ -411,7 +465,8 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
-        void RegisterConstructorDependency<TDependency>(
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterConstructorDependency<TDependency>(
             Func<IServiceFactory, ParameterInfo, object[], TDependency> factory);
 
         /// <summary>
@@ -420,7 +475,8 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
-        void RegisterPropertyDependency<TDependency>(
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterPropertyDependency<TDependency>(
             Func<IServiceFactory, PropertyInfo, TDependency> factory);
 
 #if NET45 || NET46 || NETSTANDARD11
@@ -428,7 +484,8 @@ namespace DbReader.LightInject
         /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
         /// </summary>
         /// <param name="searchPattern">The search pattern used to filter the assembly files.</param>
-        void RegisterAssembly(string searchPattern);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry RegisterAssembly(string searchPattern);
 #endif
 
         /// <summary>
@@ -438,21 +495,24 @@ namespace DbReader.LightInject
         /// <param name="decoratorType">The decorator type used to decorate the <paramref name="serviceType"/>.</param>
         /// <param name="predicate">A function delegate that determines if the <paramref name="decoratorType"/>
         /// should be applied to the target <paramref name="serviceType"/>.</param>
-        void Decorate(Type serviceType, Type decoratorType, Func<ServiceRegistration, bool> predicate);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Decorate(Type serviceType, Type decoratorType, Func<ServiceRegistration, bool> predicate);
 
         /// <summary>
         /// Decorates the <paramref name="serviceType"/> with the given <paramref name="decoratorType"/>.
         /// </summary>
         /// <param name="serviceType">The target service type.</param>
         /// <param name="decoratorType">The decorator type used to decorate the <paramref name="serviceType"/>.</param>
-        void Decorate(Type serviceType, Type decoratorType);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Decorate(Type serviceType, Type decoratorType);
 
         /// <summary>
         /// Decorates the <typeparamref name="TService"/> with the given <typeparamref name="TDecorator"/>.
         /// </summary>
         /// <typeparam name="TService">The target service type.</typeparam>
         /// <typeparam name="TDecorator">The decorator type used to decorate the <typeparamref name="TService"/>.</typeparam>
-        void Decorate<TService, TDecorator>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Decorate<TService, TDecorator>()
             where TDecorator : TService;
 
         /// <summary>
@@ -460,13 +520,15 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The target service type.</typeparam>
         /// <param name="factory">A factory delegate used to create a decorator instance.</param>
-        void Decorate<TService>(Func<IServiceFactory, TService, TService> factory);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Decorate<TService>(Func<IServiceFactory, TService, TService> factory);
 
         /// <summary>
         /// Registers a decorator based on a <see cref="DecoratorRegistration"/> instance.
         /// </summary>
         /// <param name="decoratorRegistration">The <see cref="DecoratorRegistration"/> instance that contains the decorator metadata.</param>
-        void Decorate(DecoratorRegistration decoratorRegistration);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Decorate(DecoratorRegistration decoratorRegistration);
 
         /// <summary>
         /// Allows a registered service to be overridden by another <see cref="ServiceRegistration"/>.
@@ -475,7 +537,8 @@ namespace DbReader.LightInject
         /// overridden using the <see cref="ServiceRegistration"/> returned from the <paramref name="serviceRegistrationFactory"/>.</param>
         /// <param name="serviceRegistrationFactory">The factory delegate used to create a <see cref="ServiceRegistration"/> that overrides
         /// the incoming <see cref="ServiceRegistration"/>.</param>
-        void Override(
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Override(
             Func<ServiceRegistration, bool> serviceSelector,
             Func<IServiceFactory, ServiceRegistration, ServiceRegistration> serviceRegistrationFactory);
 
@@ -484,32 +547,29 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="predicate">A function delegate that determines if the given service can be post-processed.</param>
         /// <param name="processor">An action delegate that exposes the created service instance.</param>
-        void Initialize(Func<ServiceRegistration, bool> predicate, Action<IServiceFactory, object> processor);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry Initialize(Func<ServiceRegistration, bool> predicate, Action<IServiceFactory, object> processor);
 
         /// <summary>
         /// Sets the default lifetime for types registered without an explicit lifetime. Will only affect new registrations (after this call).
         /// </summary>
         /// <typeparam name="T">The default lifetime type</typeparam>
-        void SetDefaultLifetime<T>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        IServiceRegistry SetDefaultLifetime<T>()
             where T : ILifetime, new();
     }
 
     /// <summary>
     /// Defines a set of methods used to retrieve service instances.
     /// </summary>
-    public interface IServiceFactory
+    internal interface IServiceFactory
     {
         /// <summary>
         /// Starts a new <see cref="Scope"/>.
         /// </summary>
         /// <returns><see cref="Scope"/></returns>
         Scope BeginScope();
-
-        /// <summary>
-        /// Ends the current <see cref="Scope"/>.
-        /// </summary>
-        void EndCurrentScope();
-
+       
         /// <summary>
         /// Gets an instance of the given <paramref name="serviceType"/>.
         /// </summary>
@@ -543,121 +603,6 @@ namespace DbReader.LightInject
         object GetInstance(Type serviceType, string serviceName);
 
         /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/> type.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<TService>();
-
-        /// <summary>
-        /// Gets a named instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<TService>(string serviceName);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the argument.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="value">The argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T, TService>(T value);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="value">The argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T, TService>(T value, string serviceName);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T1, T2, TService>(T1 arg1, T2 arg2);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T1, T2, TService>(T1 arg1, T2 arg2, string serviceName);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T1, T2, T3, TService>(T1 arg1, T2 arg2, T3 arg3);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T1, T2, T3, TService>(T1 arg1, T2 arg2, T3 arg3, string serviceName);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <param name="arg4">The fourth argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T1, T2, T3, T4, TService>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <param name="arg4">The fourth argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        TService GetInstance<T1, T2, T3, T4, TService>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, string serviceName);
-
-        /// <summary>
         /// Gets an instance of the given <paramref name="serviceType"/>.
         /// </summary>
         /// <param name="serviceType">The type of the requested service.</param>
@@ -673,42 +618,11 @@ namespace DbReader.LightInject
         object TryGetInstance(Type serviceType, string serviceName);
 
         /// <summary>
-        /// Tries to get an instance of the given <typeparamref name="TService"/> type.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <returns>The requested service instance if available, otherwise default(T).</returns>
-        TService TryGetInstance<TService>();
-
-        /// <summary>
-        /// Tries to get an instance of the given <typeparamref name="TService"/> type.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance if available, otherwise default(T).</returns>
-        TService TryGetInstance<TService>(string serviceName);
-
-        /// <summary>
         /// Gets all instances of the given <paramref name="serviceType"/>.
         /// </summary>
         /// <param name="serviceType">The type of services to resolve.</param>
         /// <returns>A list that contains all implementations of the <paramref name="serviceType"/>.</returns>
         IEnumerable<object> GetAllInstances(Type serviceType);
-
-        /// <summary>
-        /// Gets all instances of type <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="TService">The type of services to resolve.</typeparam>
-        /// <returns>A list that contains all implementations of the <typeparamref name="TService"/> type.</returns>
-        IEnumerable<TService> GetAllInstances<TService>();
-
-        /// <summary>
-        /// Creates an instance of a concrete class.
-        /// </summary>
-        /// <typeparam name="TService">The type of class for which to create an instance.</typeparam>
-        /// <returns>An instance of <typeparamref name="TService"/>.</returns>
-        /// <remarks>The concrete type will be registered if not already registered with the container.</remarks>
-        TService Create<TService>()
-            where TService : class;
 
         /// <summary>
         /// Creates an instance of a concrete class.
@@ -721,11 +635,11 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents an inversion of control container.
     /// </summary>
-    public interface IServiceContainer : IServiceRegistry, IServiceFactory, IDisposable
+    internal interface IServiceContainer : IServiceRegistry, IServiceFactory, IDisposable
     {
         /// <summary>
         /// Gets or sets the <see cref="IScopeManagerProvider"/> that is responsible
-        /// for providing the <see cref="ScopeManager"/> used to manage scopes.
+        /// for providing the <see cref="IScopeManager"/> used to manage scopes.
         /// </summary>
         IScopeManagerProvider ScopeManagerProvider { get; set; }
 
@@ -754,7 +668,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that manages the lifetime of a service instance.
     /// </summary>
-    public interface ILifetime
+    internal interface ILifetime
     {
         /// <summary>
         /// Returns a service instance according to the specific lifetime characteristics.
@@ -768,7 +682,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that acts as a composition root for an <see cref="IServiceRegistry"/> instance.
     /// </summary>
-    public interface ICompositionRoot
+    internal interface ICompositionRoot
     {
         /// <summary>
         /// Composes services by adding services to the <paramref name="serviceRegistry"/>.
@@ -780,7 +694,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that extracts a set of types from an <see cref="Assembly"/>.
     /// </summary>
-    public interface ITypeExtractor
+    internal interface ITypeExtractor
     {
         /// <summary>
         /// Extracts types found in the given <paramref name="assembly"/>.
@@ -794,7 +708,7 @@ namespace DbReader.LightInject
     /// Represents a class that is capable of extracting
     /// attributes of type <see cref="CompositionRootTypeAttribute"/> from an <see cref="Assembly"/>.
     /// </summary>
-    public interface ICompositionRootAttributeExtractor
+    internal interface ICompositionRootAttributeExtractor
     {
         /// <summary>
         /// Gets a list of attributes of type <see cref="CompositionRootTypeAttribute"/> from
@@ -809,7 +723,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that is responsible for selecting injectable properties.
     /// </summary>
-    public interface IPropertySelector
+    internal interface IPropertySelector
     {
         /// <summary>
         /// Selects properties that represents a dependency from the given <paramref name="type"/>.
@@ -822,7 +736,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that is responsible for selecting the property dependencies for a given <see cref="Type"/>.
     /// </summary>
-    public interface IPropertyDependencySelector
+    internal interface IPropertyDependencySelector
     {
         /// <summary>
         /// Selects the property dependencies for the given <paramref name="type"/>.
@@ -836,7 +750,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that is responsible for selecting the constructor dependencies for a given <see cref="ConstructorInfo"/>.
     /// </summary>
-    public interface IConstructorDependencySelector
+    internal interface IConstructorDependencySelector
     {
         /// <summary>
         /// Selects the constructor dependencies for the given <paramref name="constructor"/>.
@@ -851,7 +765,7 @@ namespace DbReader.LightInject
     /// Represents a class that is capable of building a <see cref="ConstructorInfo"/> instance
     /// based on a <see cref="Registration"/>.
     /// </summary>
-    public interface IConstructionInfoBuilder
+    internal interface IConstructionInfoBuilder
     {
         /// <summary>
         /// Returns a <see cref="ConstructionInfo"/> instance based on the given <see cref="Registration"/>.
@@ -864,7 +778,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that keeps track of a <see cref="ConstructionInfo"/> instance for each <see cref="Registration"/>.
     /// </summary>
-    public interface IConstructionInfoProvider
+    internal interface IConstructionInfoProvider
     {
         /// <summary>
         /// Gets a <see cref="ConstructionInfo"/> instance for the given <paramref name="registration"/>.
@@ -872,18 +786,12 @@ namespace DbReader.LightInject
         /// <param name="registration">The <see cref="Registration"/> for which to get a <see cref="ConstructionInfo"/> instance.</param>
         /// <returns>The <see cref="ConstructionInfo"/> instance that describes how to create an instance of the given <paramref name="registration"/>.</returns>
         ConstructionInfo GetConstructionInfo(Registration registration);
-
-        /// <summary>
-        /// Invalidates the <see cref="IConstructionInfoProvider"/> and causes new <see cref="ConstructionInfo"/> instances
-        /// to be created when the <see cref="GetConstructionInfo"/> method is called.
-        /// </summary>
-        void Invalidate();
     }
 
     /// <summary>
     /// Represents a class that builds a <see cref="ConstructionInfo"/> instance based on the implementing <see cref="Type"/>.
     /// </summary>
-    public interface ITypeConstructionInfoBuilder
+    internal interface ITypeConstructionInfoBuilder
     {
         /// <summary>
         /// Analyzes the <paramref name="registration"/> and returns a <see cref="ConstructionInfo"/> instance.
@@ -896,7 +804,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that selects the constructor to be used for creating a new service instance.
     /// </summary>
-    public interface IConstructorSelector
+    internal interface IConstructorSelector
     {
         /// <summary>
         /// Selects the constructor to be used when creating a new instance of the <paramref name="implementingType"/>.
@@ -906,12 +814,41 @@ namespace DbReader.LightInject
         /// when creating a new instance of the <paramref name="implementingType"/>.</returns>
         ConstructorInfo Execute(Type implementingType);
     }
+
+    /// <summary>
+    /// Represents a class that manages <see cref="Scope"/> instances.
+    /// </summary>
+    internal interface IScopeManager
+    {
+        /// <summary>
+        /// Gets or sets the current <see cref="Scope"/>.
+        /// </summary>
+        Scope CurrentScope { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="IServiceFactory"/> that is associated with this <see cref="IScopeManager"/>.
+        /// </summary>
+        IServiceFactory ServiceFactory { get; }
+
+        /// <summary>
+        /// Starts a new <see cref="Scope"/>.
+        /// </summary>
+        /// <returns>A new <see cref="Scope"/>.</returns>
+        Scope BeginScope();
+
+        /// <summary>
+        /// Ends the given <paramref name="scope"/>.
+        /// </summary>
+        /// <param name="scope">The scope to be ended.</param>
+        void EndScope(Scope scope);
+    }
+
 #if NET45 || NET46 || NETSTANDARD11
 
     /// <summary>
     /// Represents a class that is responsible loading a set of assemblies based on the given search pattern.
     /// </summary>
-    public interface IAssemblyLoader
+    internal interface IAssemblyLoader
     {
         /// <summary>
         /// Loads a set of assemblies based on the given <paramref name="searchPattern"/>.
@@ -925,7 +862,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that is capable of scanning an assembly and register services into an <see cref="IServiceContainer"/> instance.
     /// </summary>
-    public interface IAssemblyScanner
+    internal interface IAssemblyScanner
     {
         /// <summary>
         /// Scans the target <paramref name="assembly"/> and registers services found within the assembly.
@@ -947,7 +884,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class that is responsible for instantiating and executing an <see cref="ICompositionRoot"/>.
     /// </summary>
-    public interface ICompositionRootExecutor
+    internal interface ICompositionRootExecutor
     {
         /// <summary>
         /// Creates an instance of the <paramref name="compositionRootType"/> and executes the <see cref="ICompositionRoot.Compose"/> method.
@@ -960,7 +897,7 @@ namespace DbReader.LightInject
     /// Represents an abstraction of the <see cref="ILGenerator"/> class that provides information
     /// about the <see cref="Type"/> currently on the stack.
     /// </summary>
-    public interface IEmitter
+    internal interface IEmitter
     {
         /// <summary>
         /// Gets the <see cref="Type"/> currently on the stack.
@@ -1038,7 +975,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a dynamic method skeleton for emitting the code needed to resolve a service instance.
     /// </summary>
-    public interface IMethodSkeleton
+    internal interface IMethodSkeleton
     {
         /// <summary>
         /// Gets the <see cref="IEmitter"/> for the this dynamic method.
@@ -1055,22 +992,24 @@ namespace DbReader.LightInject
     }
 
     /// <summary>
-    /// Represents a class that is capable of providing the current <see cref="ScopeManager"/>.
+    /// Represents a class that is capable of providing a <see cref="IScopeManager"/>.
     /// </summary>
-    public interface IScopeManagerProvider
+    internal interface IScopeManagerProvider
     {
         /// <summary>
-        /// Returns the <see cref="ScopeManager"/> that is responsible for managing scopes.
+        /// Returns the <see cref="IScopeManager"/> that is responsible for managing scopes.
         /// </summary>
-        /// <returns>The <see cref="ScopeManager"/> that is responsible for managing scopes.</returns>
-        ScopeManager GetScopeManager();
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with this <see cref="ScopeManager"/>.</param> 
+        /// <returns>The <see cref="IScopeManager"/> that is responsible for managing scopes.</returns>
+        IScopeManager GetScopeManager(IServiceFactory serviceFactory);
     }
 
     /// <summary>
     /// This class is not for public use and is used internally
     /// to load runtime arguments onto the evaluation stack.
     /// </summary>
-    public static class RuntimeArgumentsLoader
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class RuntimeArgumentsLoader
     {
         /// <summary>
         /// Loads the runtime arguments onto the evaluation stack.
@@ -1078,12 +1017,7 @@ namespace DbReader.LightInject
         /// <param name="constants">A object array representing the dynamic method context.</param>
         /// <returns>An array containing the runtime arguments supplied when resolving the service.</returns>
         public static object[] Load(object[] constants)
-        {
-            if (constants.Length == 0)
-            {
-                return new object[] { };
-            }
-
+        {            
             object[] arguments = constants[constants.Length - 1] as object[];
             if (arguments == null)
             {
@@ -1098,7 +1032,8 @@ namespace DbReader.LightInject
     /// Contains a set of helper method related to validating
     /// user input.
     /// </summary>
-    public static class Ensure
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class Ensure
     {
         /// <summary>
         /// Ensures that the given <paramref name="value"/> is not null.
@@ -1116,9 +1051,246 @@ namespace DbReader.LightInject
     }
 
     /// <summary>
+    /// Extends the <see cref="IServiceFactory"/> interface.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class ServiceFactoryExtensions
+    {
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/> type.
+        /// </summary>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>   
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<TService>(this IServiceFactory factory)
+        {
+            return (TService)factory.GetInstance(typeof(TService));
+        }
+
+        /// <summary>
+        /// Gets a named instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<TService>(this IServiceFactory factory, string serviceName)
+        {
+            return (TService)factory.GetInstance(typeof(TService), serviceName);
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the argument.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>             
+        /// <param name="value">The argument value.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T, TService>(this IServiceFactory factory, T value)
+        {
+            return (TService)factory.GetInstance(typeof(TService), new object[] { value });
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the parameter.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="value">The argument value.</param>
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T, TService>(this IServiceFactory factory, T value, string serviceName)
+        {
+            return (TService)factory.GetInstance(typeof(TService), serviceName, new object[] { value });
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first parameter.</typeparam>
+        /// <typeparam name="T2">The type of the second parameter.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="arg1">The first argument value.</param>
+        /// <param name="arg2">The second argument value.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T1, T2, TService>(this IServiceFactory factory, T1 arg1, T2 arg2)
+        {
+            return (TService)factory.GetInstance(typeof(TService), new object[] { arg1, arg2 });
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first parameter.</typeparam>
+        /// <typeparam name="T2">The type of the second parameter.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="arg1">The first argument value.</param>
+        /// <param name="arg2">The second argument value.</param>
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T1, T2, TService>(this IServiceFactory factory, T1 arg1, T2 arg2, string serviceName)
+        {
+            return (TService)factory.GetInstance(typeof(TService), serviceName, new object[] { arg1, arg2 });
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first parameter.</typeparam>
+        /// <typeparam name="T2">The type of the second parameter.</typeparam>
+        /// <typeparam name="T3">The type of the third parameter.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="arg1">The first argument value.</param>
+        /// <param name="arg2">The second argument value.</param>
+        /// <param name="arg3">The third argument value.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T1, T2, T3, TService>(this IServiceFactory factory, T1 arg1, T2 arg2, T3 arg3)
+        {
+            return (TService)factory.GetInstance(typeof(TService), new object[] { arg1, arg2, arg3 });
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first parameter.</typeparam>
+        /// <typeparam name="T2">The type of the second parameter.</typeparam>
+        /// <typeparam name="T3">The type of the third parameter.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="arg1">The first argument value.</param>
+        /// <param name="arg2">The second argument value.</param>
+        /// <param name="arg3">The third argument value.</param>
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T1, T2, T3, TService>(this IServiceFactory factory, T1 arg1, T2 arg2, T3 arg3, string serviceName)
+        {
+            return (TService)factory.GetInstance(typeof(TService), serviceName, new object[] { arg1, arg2, arg3 });
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first parameter.</typeparam>
+        /// <typeparam name="T2">The type of the second parameter.</typeparam>
+        /// <typeparam name="T3">The type of the third parameter.</typeparam>
+        /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="arg1">The first argument value.</param>
+        /// <param name="arg2">The second argument value.</param>
+        /// <param name="arg3">The third argument value.</param>
+        /// <param name="arg4">The fourth argument value.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T1, T2, T3, T4, TService>(this IServiceFactory factory, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            return (TService)factory.GetInstance(typeof(TService), new object[] { arg1, arg2, arg3, arg4 });
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first parameter.</typeparam>
+        /// <typeparam name="T2">The type of the second parameter.</typeparam>
+        /// <typeparam name="T3">The type of the third parameter.</typeparam>
+        /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="arg1">The first argument value.</param>
+        /// <param name="arg2">The second argument value.</param>
+        /// <param name="arg3">The third argument value.</param>
+        /// <param name="arg4">The fourth argument value.</param>
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance.</returns>
+        public static TService GetInstance<T1, T2, T3, T4, TService>(this IServiceFactory factory, T1 arg1, T2 arg2, T3 arg3, T4 arg4, string serviceName)
+        {
+            return (TService)factory.GetInstance(typeof(TService), serviceName, new object[] { arg1, arg2, arg3, arg4 });
+        }
+
+        /// <summary>
+        /// Tries to get an instance of the given <typeparamref name="TService"/> type.
+        /// </summary>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <returns>The requested service instance if available, otherwise default(T).</returns>
+        public static TService TryGetInstance<TService>(this IServiceFactory factory)
+        {
+            return (TService)factory.TryGetInstance(typeof(TService));
+        }
+
+        /// <summary>
+        /// Tries to get an instance of the given <typeparamref name="TService"/> type.
+        /// </summary>
+        /// <typeparam name="TService">The type of the requested service.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance if available, otherwise default(T).</returns>
+        public static TService TryGetInstance<TService>(this IServiceFactory factory, string serviceName)
+        {
+            return (TService)factory.TryGetInstance(typeof(TService), serviceName);
+        }
+
+        /// <summary>
+        /// Gets all instances of type <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="TService">The type of services to resolve.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <returns>A list that contains all implementations of the <typeparamref name="TService"/> type.</returns>
+        public static IEnumerable<TService> GetAllInstances<TService>(this IServiceFactory factory)
+        {
+            return factory.GetInstance<IEnumerable<TService>>();
+        }
+
+        /// <summary>
+        /// Creates an instance of a concrete class.
+        /// </summary>
+        /// <typeparam name="TService">The type of class for which to create an instance.</typeparam>
+        /// <param name="factory">The target <see cref="IServiceFactory"/>.</param>     
+        /// <returns>An instance of <typeparamref name="TService"/>.</returns>
+        /// <remarks>The concrete type will be registered if not already registered with the container.</remarks>
+        public static TService Create<TService>(this IServiceFactory factory)
+            where TService : class
+        {
+            return (TService)factory.Create(typeof(TService));
+        }
+    }
+
+    /// <summary>
+    /// Extends the log delegate to simplify creating log entries.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class LogExtensions
+    {
+        /// <summary>
+        /// Logs a new entry with the <see cref="LogLevel.Info"/> level.
+        /// </summary>
+        /// <param name="logAction">The log delegate.</param>
+        /// <param name="message">The message to be logged.</param>
+        public static void Info(this Action<LogEntry> logAction, string message)
+        {
+            logAction(new LogEntry(LogLevel.Info, message));
+        }
+
+        /// <summary>
+        /// Logs a new entry with the <see cref="LogLevel.Warning"/> level.
+        /// </summary>
+        /// <param name="logAction">The log delegate.</param>
+        /// <param name="message">The message to be logged.</param>
+        public static void Warning(this Action<LogEntry> logAction, string message)
+        {
+            logAction(new LogEntry(LogLevel.Warning, message));
+        }
+    }
+
+    /// <summary>
     /// Extends the <see cref="ImmutableHashTable{TKey,TValue}"/> class.
     /// </summary>
-    public static class ImmutableHashTableExtensions
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class ImmutableHashTableExtensions
     {
         /// <summary>
         /// Searches for a value using the given <paramref name="key"/>.
@@ -1171,7 +1343,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extends the <see cref="ImmutableHashTree{TKey,TValue}"/> class.
     /// </summary>
-    public static class ImmutableHashTreeExtensions
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class ImmutableHashTreeExtensions
     {
         /// <summary>
         /// Searches for a <typeparamref name="TValue"/> using the given <paramref name="key"/>.
@@ -1287,7 +1460,8 @@ namespace DbReader.LightInject
     /// Extends the <see cref="IEmitter"/> interface with a set of methods
     /// that optimizes and simplifies emitting MSIL instructions.
     /// </summary>
-    public static class EmitterExtensions
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class EmitterExtensions
     {
         /// <summary>
         /// Performs a cast or unbox operation if the current <see cref="IEmitter.StackType"/> is
@@ -1570,21 +1744,25 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a set of configurable options when creating a new instance of the container.
     /// </summary>
-    public class ContainerOptions
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ContainerOptions
     {
         private static readonly Lazy<ContainerOptions> DefaultOptions =
             new Lazy<ContainerOptions>(CreateDefaultContainerOptions);
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ContainerOptions"/> class.
+        /// </summary>
+        public ContainerOptions()
+        {
+            EnableVariance = true;
+            LogFactory = t => message => { };
+        }
+
+        /// <summary>
         /// Gets the default <see cref="ContainerOptions"/> used across all <see cref="ServiceContainer"/> instances.
         /// </summary>
-        public static ContainerOptions Default
-        {
-            get
-            {
-                return DefaultOptions.Value;
-            }
-        }
+        public static ContainerOptions Default => DefaultOptions.Value;
 
         /// <summary>
         /// Gets or sets a value indicating whether variance is applied when resolving an <see cref="IEnumerable{T}"/>.
@@ -1594,18 +1772,53 @@ namespace DbReader.LightInject
         /// </remarks>
         public bool EnableVariance { get; set; }
 
+        /// <summary>
+        /// Gets or sets the log factory that crates the delegate used for logging.
+        /// </summary>
+        public Func<Type, Action<LogEntry>> LogFactory { get; set; }
+        
         private static ContainerOptions CreateDefaultContainerOptions()
         {
-            return new ContainerOptions { EnableVariance = true };
+            return new ContainerOptions();
         }
+    }
+
+    /// <summary>
+    /// Represents a log entry.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class LogEntry
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogEntry"/> class.
+        /// </summary>
+        /// <param name="level">The <see cref="System.LogLevel"/> of this entry.</param>
+        /// <param name="message">The log message.</param>
+        public LogEntry(LogLevel level, string message)
+        {
+            Level = level;
+            Message = message;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="LogLevel"/> for this entry.
+        /// </summary>
+        public LogLevel Level { get; private set; }
+
+        /// <summary>
+        /// Gets the log message for this entry.
+        /// </summary>
+        public string Message { get; private set; }
     }
 
     /// <summary>
     /// An ultra lightweight service container.
     /// </summary>
-    public class ServiceContainer : IServiceContainer
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ServiceContainer : IServiceContainer
     {
         private const string UnresolvedDependencyError = "Unresolved dependency {0}";
+        private readonly Action<LogEntry> log;
         private readonly Func<Type, Type[], IMethodSkeleton> methodSkeletonFactory;
         private readonly ServiceRegistry<Action<IEmitter>> emitters = new ServiceRegistry<Action<IEmitter>>();
         private readonly ServiceRegistry<Delegate> constructorDependencyFactories = new ServiceRegistry<Delegate>();
@@ -1640,8 +1853,18 @@ namespace DbReader.LightInject
         /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
         /// </summary>
         public ServiceContainer()
+            : this(ContainerOptions.Default)
         {
-            options = ContainerOptions.Default;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
+        /// </summary>
+        /// <param name="options">The <see cref="ContainerOptions"/> instances that represents the configurable options.</param>
+        public ServiceContainer(ContainerOptions options)
+        {
+            this.options = options;
+            log = options.LogFactory(typeof(ServiceContainer));
             var concreteTypeExtractor = new CachedTypeExtractor(new ConcreteTypeExtractor());
             CompositionRootTypeExtractor = new CachedTypeExtractor(new CompositionRootTypeExtractor(new CompositionRootAttributeExtractor()));
             CompositionRootExecutor = new CompositionRootExecutor(this, type => (ICompositionRoot)Activator.CreateInstance(type));
@@ -1655,16 +1878,6 @@ namespace DbReader.LightInject
 #if NET45 || NET46
             AssemblyLoader = new AssemblyLoader();
 #endif
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
-        /// </summary>
-        /// <param name="options">The <see cref="ContainerOptions"/> instances that represents the configurable options.</param>
-        public ServiceContainer(ContainerOptions options)
-            : this()
-        {
-            this.options = options;
         }
 
         private ServiceContainer(
@@ -1693,7 +1906,7 @@ namespace DbReader.LightInject
 
         /// <summary>
         /// Gets or sets the <see cref="IScopeManagerProvider"/> that is responsible
-        /// for providing the <see cref="ScopeManager"/> used to manage scopes.
+        /// for providing the <see cref="IScopeManager"/> used to manage scopes.
         /// </summary>
         public IScopeManagerProvider ScopeManagerProvider { get; set; }
 
@@ -1769,18 +1982,9 @@ namespace DbReader.LightInject
         /// <returns><see cref="Scope"/></returns>
         public Scope BeginScope()
         {
-            return ScopeManagerProvider.GetScopeManager().BeginScope();
+            return ScopeManagerProvider.GetScopeManager(this).BeginScope();
         }
-
-        /// <summary>
-        /// Ends the current <see cref="Scope"/>.
-        /// </summary>
-        public void EndCurrentScope()
-        {
-            Scope currentScope = ScopeManagerProvider.GetScopeManager().CurrentScope;
-            currentScope.Dispose();
-        }
-
+        
         /// <summary>
         /// Injects the property dependencies for a given <paramref name="instance"/>.
         /// </summary>
@@ -1809,9 +2013,11 @@ namespace DbReader.LightInject
         /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
         /// <param name="serviceName">The name of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register<TService>(Func<IServiceFactory, TService> factory, string serviceName, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory, string serviceName, ILifetime lifetime)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, lifetime, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -1819,9 +2025,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="predicate">Determines if the service can be created by the <paramref name="factory"/> delegate.</param>
         /// <param name="factory">Creates a service instance according to the <paramref name="predicate"/> predicate.</param>
-        public void RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory)
         {
             factoryRules.Add(new FactoryRule { CanCreateInstance = predicate, Factory = factory });
+            return this;
         }
 
         /// <summary>
@@ -1830,16 +2038,19 @@ namespace DbReader.LightInject
         /// <param name="predicate">Determines if the service can be created by the <paramref name="factory"/> delegate.</param>
         /// <param name="factory">Creates a service instance according to the <paramref name="predicate"/> predicate.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory, ILifetime lifetime)
         {
             factoryRules.Add(new FactoryRule { CanCreateInstance = predicate, Factory = factory, LifeTime = lifetime });
+            return this;
         }
 
         /// <summary>
         /// Registers a service based on a <see cref="ServiceRegistration"/> instance.
         /// </summary>
         /// <param name="serviceRegistration">The <see cref="ServiceRegistration"/> instance that contains service metadata.</param>
-        public void Register(ServiceRegistration serviceRegistration)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register(ServiceRegistration serviceRegistration)
         {
             var services = GetAvailableServices(serviceRegistration.ServiceType);
             var sr = serviceRegistration;
@@ -1847,6 +2058,7 @@ namespace DbReader.LightInject
                 serviceRegistration.ServiceName,
                 s => AddServiceRegistration(sr),
                 (k, existing) => UpdateServiceRegistration(existing, sr));
+            return this;
         }
 
         /// <summary>
@@ -1857,7 +2069,8 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        public void RegisterAssembly(Assembly assembly)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterAssembly(Assembly assembly)
         {
             Type[] compositionRootTypes = CompositionRootTypeExtractor.Execute(assembly);
             if (compositionRootTypes.Length == 0)
@@ -1868,6 +2081,8 @@ namespace DbReader.LightInject
             {
                 AssemblyScanner.Scan(assembly, this);
             }
+
+            return this;
         }
 
         /// <summary>
@@ -1879,9 +2094,11 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        public void RegisterAssembly(Assembly assembly, Func<Type, Type, bool> shouldRegister)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterAssembly(Assembly assembly, Func<Type, Type, bool> shouldRegister)
         {
             AssemblyScanner.Scan(assembly, this, () => DefaultLifetime, shouldRegister);
+            return this;
         }
 
         /// <summary>
@@ -1893,9 +2110,11 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        public void RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory)
         {
             AssemblyScanner.Scan(assembly, this, lifetimeFactory, (serviceType, implementingType) => true);
+            return this;
         }
 
         /// <summary>
@@ -1908,19 +2127,23 @@ namespace DbReader.LightInject
         /// If the target <paramref name="assembly"/> contains an implementation of the <see cref="ICompositionRoot"/> interface, this
         /// will be used to configure the container.
         /// </remarks>
-        public void RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory, Func<Type, Type, bool> shouldRegister)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterAssembly(Assembly assembly, Func<ILifetime> lifetimeFactory, Func<Type, Type, bool> shouldRegister)
         {
             AssemblyScanner.Scan(assembly, this, lifetimeFactory, shouldRegister);
+            return this;
         }
 
         /// <summary>
         /// Registers services from the given <typeparamref name="TCompositionRoot"/> type.
         /// </summary>
         /// <typeparam name="TCompositionRoot">The type of <see cref="ICompositionRoot"/> to register from.</typeparam>
-        public void RegisterFrom<TCompositionRoot>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterFrom<TCompositionRoot>()
             where TCompositionRoot : ICompositionRoot, new()
         {
             CompositionRootExecutor.Execute(typeof(TCompositionRoot));
+            return this;
         }
 
         /// <summary>
@@ -1929,40 +2152,73 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
-        public void RegisterConstructorDependency<TDependency>(Func<IServiceFactory, ParameterInfo, TDependency> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterConstructorDependency<TDependency>(Func<IServiceFactory, ParameterInfo, TDependency> factory)
         {
+            if (isLocked)
+            {
+                var message =
+                    $"Attempt to register a constructor dependency {typeof(TDependency)} after the first call to GetInstance." +
+                    $"This might lead to incorrect behaviour if a service with a {typeof(TDependency)} dependency has already been resolved";                              
+
+                log.Warning(message);
+            }
+
             GetConstructorDependencyFactories(typeof(TDependency)).AddOrUpdate(
                 string.Empty,
                 s => factory,
                 (s, e) => isLocked ? e : factory);
+            return this;
         }
-
+      
         /// <summary>
         /// Registers a factory delegate to be used when resolving a constructor dependency for
         /// a implicitly registered service.
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
-        public void RegisterConstructorDependency<TDependency>(Func<IServiceFactory, ParameterInfo, object[], TDependency> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterConstructorDependency<TDependency>(Func<IServiceFactory, ParameterInfo, object[], TDependency> factory)
         {
+            if (isLocked)
+            {
+                var message =
+                    $"Attempt to register a constructor dependency {typeof(TDependency)} after the first call to GetInstance." +
+                    $"This might lead to incorrect behaviour if a service with a {typeof(TDependency)} dependency has already been resolved";
+
+                log.Warning(message);
+            }
+
             GetConstructorDependencyFactories(typeof(TDependency)).AddOrUpdate(
                 string.Empty,
                 s => factory,
                 (s, e) => isLocked ? e : factory);
+            return this;
         }
-
+       
         /// <summary>
         /// Registers a factory delegate to be used when resolving a constructor dependency for
         /// a implicitly registered service.
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
-        public void RegisterPropertyDependency<TDependency>(Func<IServiceFactory, PropertyInfo, TDependency> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterPropertyDependency<TDependency>(Func<IServiceFactory, PropertyInfo, TDependency> factory)
         {
+            if (isLocked)
+            {
+                var message =
+                    $"Attempt to register a property dependency {typeof(TDependency)} after the first call to GetInstance." +
+                   $"This might lead to incorrect behaviour if a service with a {typeof(TDependency)} dependency has already been resolved";
+
+                log.Warning(message);
+            }
+
             GetPropertyDependencyFactories(typeof(TDependency)).AddOrUpdate(
                 string.Empty,
                 s => factory,
                 (s, e) => isLocked ? e : factory);
+            return this;
         }
 
 #if NET45 || NETSTANDARD11 || NET46
@@ -1970,12 +2226,15 @@ namespace DbReader.LightInject
         /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
         /// </summary>
         /// <param name="searchPattern">The search pattern used to filter the assembly files.</param>
-        public void RegisterAssembly(string searchPattern)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterAssembly(string searchPattern)
         {
             foreach (Assembly assembly in AssemblyLoader.Load(searchPattern))
             {
                 RegisterAssembly(assembly);
             }
+
+            return this;
         }
 #endif
 
@@ -1986,10 +2245,12 @@ namespace DbReader.LightInject
         /// <param name="decoratorType">The decorator type used to decorate the <paramref name="serviceType"/>.</param>
         /// <param name="predicate">A function delegate that determines if the <paramref name="decoratorType"/>
         /// should be applied to the target <paramref name="serviceType"/>.</param>
-        public void Decorate(Type serviceType, Type decoratorType, Func<ServiceRegistration, bool> predicate)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Decorate(Type serviceType, Type decoratorType, Func<ServiceRegistration, bool> predicate)
         {
             var decoratorRegistration = new DecoratorRegistration { ServiceType = serviceType, ImplementingType = decoratorType, CanDecorate = predicate };
             Decorate(decoratorRegistration);
+            return this;
         }
 
         /// <summary>
@@ -1997,9 +2258,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="serviceType">The target service type.</param>
         /// <param name="decoratorType">The decorator type used to decorate the <paramref name="serviceType"/>.</param>
-        public void Decorate(Type serviceType, Type decoratorType)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Decorate(Type serviceType, Type decoratorType)
         {
             Decorate(serviceType, decoratorType, si => true);
+            return this;
         }
 
         /// <summary>
@@ -2007,10 +2270,12 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The target service type.</typeparam>
         /// <typeparam name="TDecorator">The decorator type used to decorate the <typeparamref name="TService"/>.</typeparam>
-        public void Decorate<TService, TDecorator>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Decorate<TService, TDecorator>()
             where TDecorator : TService
         {
             Decorate(typeof(TService), typeof(TDecorator));
+            return this;
         }
 
         /// <summary>
@@ -2018,20 +2283,24 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The target service type.</typeparam>
         /// <param name="factory">A factory delegate used to create a decorator instance.</param>
-        public void Decorate<TService>(Func<IServiceFactory, TService, TService> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Decorate<TService>(Func<IServiceFactory, TService, TService> factory)
         {
             var decoratorRegistration = new DecoratorRegistration { FactoryExpression = factory, ServiceType = typeof(TService), CanDecorate = si => true };
             Decorate(decoratorRegistration);
+            return this;
         }
 
         /// <summary>
         /// Registers a decorator based on a <see cref="DecoratorRegistration"/> instance.
         /// </summary>
         /// <param name="decoratorRegistration">The <see cref="DecoratorRegistration"/> instance that contains the decorator metadata.</param>
-        public void Decorate(DecoratorRegistration decoratorRegistration)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Decorate(DecoratorRegistration decoratorRegistration)
         {
             int index = decorators.Add(decoratorRegistration);
             decoratorRegistration.Index = index;
+            return this;
         }
 
         /// <summary>
@@ -2041,7 +2310,8 @@ namespace DbReader.LightInject
         /// overridden using the <see cref="ServiceRegistration"/> returned from the <paramref name="serviceRegistrationFactory"/>.</param>
         /// <param name="serviceRegistrationFactory">The factory delegate used to create a <see cref="ServiceRegistration"/> that overrides
         /// the incoming <see cref="ServiceRegistration"/>.</param>
-        public void Override(Func<ServiceRegistration, bool> serviceSelector, Func<IServiceFactory, ServiceRegistration, ServiceRegistration> serviceRegistrationFactory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Override(Func<ServiceRegistration, bool> serviceSelector, Func<IServiceFactory, ServiceRegistration, ServiceRegistration> serviceRegistrationFactory)
         {
             var serviceOverride = new ServiceOverride
                                       {
@@ -2049,6 +2319,7 @@ namespace DbReader.LightInject
                                           ServiceRegistrationFactory = serviceRegistrationFactory
                                       };
             overrides.Add(serviceOverride);
+            return this;
         }
 
         /// <summary>
@@ -2056,9 +2327,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="predicate">A function delegate that determines if the given service can be post-processed.</param>
         /// <param name="processor">An action delegate that exposes the created service instance.</param>
-        public void Initialize(Func<ServiceRegistration, bool> predicate, Action<IServiceFactory, object> processor)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Initialize(Func<ServiceRegistration, bool> predicate, Action<IServiceFactory, object> processor)
         {
             initializers.Add(new Initializer { Predicate = predicate, Initialize = processor });
+            return this;
         }
 
         /// <summary>
@@ -2067,9 +2340,11 @@ namespace DbReader.LightInject
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="implementingType">The implementing type.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register(Type serviceType, Type implementingType, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register(Type serviceType, Type implementingType, ILifetime lifetime)
         {
             Register(serviceType, implementingType, string.Empty, lifetime);
+            return this;
         }
 
         /// <summary>
@@ -2079,9 +2354,11 @@ namespace DbReader.LightInject
         /// <param name="implementingType">The implementing type.</param>
         /// <param name="serviceName">The name of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register(Type serviceType, Type implementingType, string serviceName, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register(Type serviceType, Type implementingType, string serviceName, ILifetime lifetime)
         {
             RegisterService(serviceType, implementingType, lifetime, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2089,10 +2366,12 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
-        public void Register<TService, TImplementation>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService, TImplementation>()
             where TImplementation : TService
         {
             Register(typeof(TService), typeof(TImplementation));
+            return this;
         }
 
         /// <summary>
@@ -2101,10 +2380,12 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register<TService, TImplementation>(ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService, TImplementation>(ILifetime lifetime)
             where TImplementation : TService
         {
             Register(typeof(TService), typeof(TImplementation), lifetime);
+            return this;
         }
 
         /// <summary>
@@ -2113,10 +2394,12 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
         /// <param name="serviceName">The name of the service.</param>
-        public void Register<TService, TImplementation>(string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService, TImplementation>(string serviceName)
             where TImplementation : TService
         {
             Register<TService, TImplementation>(serviceName, lifetime: null);
+            return this;
         }
 
         /// <summary>
@@ -2126,10 +2409,12 @@ namespace DbReader.LightInject
         /// <typeparam name="TImplementation">The implementing type.</typeparam>
         /// <param name="serviceName">The name of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register<TService, TImplementation>(string serviceName, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService, TImplementation>(string serviceName, ILifetime lifetime)
             where TImplementation : TService
         {
             Register(typeof(TService), typeof(TImplementation), serviceName, lifetime);
+            return this;
         }
 
         /// <summary>
@@ -2139,9 +2424,11 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register<TService>(Func<IServiceFactory, TService> factory, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory, ILifetime lifetime)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, lifetime, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2151,27 +2438,33 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void Register<TService>(Func<IServiceFactory, TService> factory, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory, string serviceName)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, serviceName);
+            return this;
         }
 
         /// <summary>
         /// Registers a concrete type as a service.
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
-        public void Register<TService>()
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService>()
         {
             Register<TService, TService>();
+            return this;
         }
 
         /// <summary>
         /// Registers a concrete type as a service.
         /// </summary>
         /// <param name="serviceType">The concrete type to register.</param>
-        public void Register(Type serviceType)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register(Type serviceType)
         {
             Register(serviceType, serviceType);
+            return this;
         }
 
         /// <summary>
@@ -2179,9 +2472,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="serviceType">The concrete type to register.</param>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register(Type serviceType, ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register(Type serviceType, ILifetime lifetime)
         {
             Register(serviceType, serviceType, lifetime);
+            return this;
         }
 
         /// <summary>
@@ -2189,9 +2484,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="lifetime">The <see cref="ILifetime"/> instance that controls the lifetime of the registered service.</param>
-        public void Register<TService>(ILifetime lifetime)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService>(ILifetime lifetime)
         {
             Register<TService, TService>(lifetime);
+            return this;
         }
 
         /// <summary>
@@ -2200,9 +2497,11 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="instance">The instance returned when this service is requested.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void RegisterInstance<TService>(TService instance, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterInstance<TService>(TService instance, string serviceName)
         {
             RegisterInstance(typeof(TService), instance, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2210,9 +2509,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="instance">The instance returned when this service is requested.</param>
-        public void RegisterInstance<TService>(TService instance)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterInstance<TService>(TService instance)
         {
             RegisterInstance(typeof(TService), instance);
+            return this;
         }
 
         /// <summary>
@@ -2220,9 +2521,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="instance">The instance returned when this service is requested.</param>
-        public void RegisterInstance(Type serviceType, object instance)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterInstance(Type serviceType, object instance)
         {
             RegisterInstance(serviceType, instance, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2231,12 +2534,14 @@ namespace DbReader.LightInject
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="instance">The instance returned when this service is requested.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void RegisterInstance(Type serviceType, object instance, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry RegisterInstance(Type serviceType, object instance, string serviceName)
         {
             Ensure.IsNotNull(instance, "instance");
             Ensure.IsNotNull(serviceType, "type");
             Ensure.IsNotNull(serviceName, "serviceName");
             RegisterValue(serviceType, instance, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2245,9 +2550,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">The lambdaExpression that describes the dependencies of the service.</param>
-        public void Register<TService>(Func<IServiceFactory, TService> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<TService>(Func<IServiceFactory, TService> factory)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2257,9 +2564,11 @@ namespace DbReader.LightInject
         /// <typeparam name="T">The parameter type.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        public void Register<T, TService>(Func<IServiceFactory, T, TService> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T, TService>(Func<IServiceFactory, T, TService> factory)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2270,9 +2579,11 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void Register<T, TService>(Func<IServiceFactory, T, TService> factory, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T, TService>(Func<IServiceFactory, T, TService> factory, string serviceName)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2283,9 +2594,11 @@ namespace DbReader.LightInject
         /// <typeparam name="T2">The type of the second parameter.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        public void Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2297,9 +2610,11 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T1, T2, TService>(Func<IServiceFactory, T1, T2, TService> factory, string serviceName)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2311,9 +2626,11 @@ namespace DbReader.LightInject
         /// <typeparam name="T3">The type of the third parameter.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        public void Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2326,9 +2643,11 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T1, T2, T3, TService>(Func<IServiceFactory, T1, T2, T3, TService> factory, string serviceName)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2341,9 +2660,11 @@ namespace DbReader.LightInject
         /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
-        public void Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2357,9 +2678,11 @@ namespace DbReader.LightInject
         /// <typeparam name="TService">The service type to register.</typeparam>
         /// <param name="factory">A factory delegate used to create the <typeparamref name="TService"/> instance.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register<T1, T2, T3, T4, TService>(Func<IServiceFactory, T1, T2, T3, T4, TService> factory, string serviceName)
         {
             RegisterServiceFromLambdaExpression<TService>(factory, null, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2368,9 +2691,11 @@ namespace DbReader.LightInject
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="implementingType">The implementing type.</param>
         /// <param name="serviceName">The name of the service.</param>
-        public void Register(Type serviceType, Type implementingType, string serviceName)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register(Type serviceType, Type implementingType, string serviceName)
         {
             RegisterService(serviceType, implementingType, null, serviceName);
+            return this;
         }
 
         /// <summary>
@@ -2378,9 +2703,11 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="serviceType">The service type to register.</param>
         /// <param name="implementingType">The implementing type.</param>
-        public void Register(Type serviceType, Type implementingType)
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry Register(Type serviceType, Type implementingType)
         {
             RegisterService(serviceType, implementingType, null, string.Empty);
+            return this;
         }
 
         /// <summary>
@@ -2440,151 +2767,6 @@ namespace DbReader.LightInject
         }
 
         /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/> type.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<TService>()
-        {
-            return (TService)GetInstance(typeof(TService));
-        }
-
-        /// <summary>
-        /// Gets a named instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<TService>(string serviceName)
-        {
-            return (TService)GetInstance(typeof(TService), serviceName);
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the argument.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="value">The argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T, TService>(T value)
-        {
-            return (TService)GetInstance(typeof(TService), new object[] { value });
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="value">The argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T, TService>(T value, string serviceName)
-        {
-            return (TService)GetInstance(typeof(TService), serviceName, new object[] { value });
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T1, T2, TService>(T1 arg1, T2 arg2)
-        {
-            return (TService)GetInstance(typeof(TService), new object[] { arg1, arg2 });
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T1, T2, TService>(T1 arg1, T2 arg2, string serviceName)
-        {
-            return (TService)GetInstance(typeof(TService), serviceName, new object[] { arg1, arg2 });
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T1, T2, T3, TService>(T1 arg1, T2 arg2, T3 arg3)
-        {
-            return (TService)GetInstance(typeof(TService), new object[] { arg1, arg2, arg3 });
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T1, T2, T3, TService>(T1 arg1, T2 arg2, T3 arg3, string serviceName)
-        {
-            return (TService)GetInstance(typeof(TService), serviceName, new object[] { arg1, arg2, arg3 });
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <param name="arg4">The fourth argument value.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T1, T2, T3, T4, TService>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            return (TService)GetInstance(typeof(TService), new object[] { arg1, arg2, arg3, arg4 });
-        }
-
-        /// <summary>
-        /// Gets an instance of the given <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="T1">The type of the first parameter.</typeparam>
-        /// <typeparam name="T2">The type of the second parameter.</typeparam>
-        /// <typeparam name="T3">The type of the third parameter.</typeparam>
-        /// <typeparam name="T4">The type of the fourth parameter.</typeparam>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="arg1">The first argument value.</param>
-        /// <param name="arg2">The second argument value.</param>
-        /// <param name="arg3">The third argument value.</param>
-        /// <param name="arg4">The fourth argument value.</param>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance.</returns>
-        public TService GetInstance<T1, T2, T3, T4, TService>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, string serviceName)
-        {
-            return (TService)GetInstance(typeof(TService), serviceName, new object[] { arg1, arg2, arg3, arg4 });
-        }
-
-        /// <summary>
         /// Gets an instance of the given <paramref name="serviceType"/>.
         /// </summary>
         /// <param name="serviceType">The type of the requested service.</param>
@@ -2619,27 +2801,6 @@ namespace DbReader.LightInject
         }
 
         /// <summary>
-        /// Tries to get an instance of the given <typeparamref name="TService"/> type.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <returns>The requested service instance if available, otherwise default(T).</returns>
-        public TService TryGetInstance<TService>()
-        {
-            return (TService)TryGetInstance(typeof(TService));
-        }
-
-        /// <summary>
-        /// Tries to get an instance of the given <typeparamref name="TService"/> type.
-        /// </summary>
-        /// <typeparam name="TService">The type of the requested service.</typeparam>
-        /// <param name="serviceName">The name of the requested service.</param>
-        /// <returns>The requested service instance if available, otherwise default(T).</returns>
-        public TService TryGetInstance<TService>(string serviceName)
-        {
-            return (TService)TryGetInstance(typeof(TService), serviceName);
-        }
-
-        /// <summary>
         /// Gets a named instance of the given <paramref name="serviceType"/>.
         /// </summary>
         /// <param name="serviceType">The type of the requested service.</param>
@@ -2668,29 +2829,6 @@ namespace DbReader.LightInject
         }
 
         /// <summary>
-        /// Gets all instances of type <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="TService">The type of services to resolve.</typeparam>
-        /// <returns>A list that contains all implementations of the <typeparamref name="TService"/> type.</returns>
-        public IEnumerable<TService> GetAllInstances<TService>()
-        {
-            return GetInstance<IEnumerable<TService>>();
-        }
-
-        /// <summary>
-        /// Creates an instance of a concrete class.
-        /// </summary>
-        /// <typeparam name="TService">The type of class for which to create an instance.</typeparam>
-        /// <returns>An instance of <typeparamref name="TService"/>.</returns>
-        /// <remarks>The concrete type will be registered if not already registered with the container.</remarks>
-        public TService Create<TService>()
-            where TService : class
-        {
-            Register(typeof(TService));
-            return GetInstance<TService>();
-        }
-
-        /// <summary>
         /// Creates an instance of a concrete class.
         /// </summary>
         /// <param name="serviceType">The type of class for which to create an instance.</param>
@@ -2705,8 +2843,13 @@ namespace DbReader.LightInject
         /// Sets the default lifetime for types registered without an explicit lifetime. Will only affect new registrations (after this call).
         /// </summary>
         /// <typeparam name="T">The default lifetime type</typeparam>
-        public void SetDefaultLifetime<T>()
-            where T : ILifetime, new() => defaultLifetimeType = typeof(T);
+        /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
+        public IServiceRegistry SetDefaultLifetime<T>()
+            where T : ILifetime, new()
+        {
+            defaultLifetimeType = typeof(T);
+            return this;
+        }
 
         /// <summary>
         /// Disposes any services registered using the <see cref="PerContainerLifetime"/>.
@@ -2738,19 +2881,6 @@ namespace DbReader.LightInject
                 overrides,
                 factoryRules,
                 initializers);
-        }
-
-        /// <summary>
-        /// Invalidates the container and causes the compiler to "recompile".
-        /// </summary>
-        public void Invalidate()
-        {
-            Interlocked.Exchange(ref delegates, ImmutableHashTable<Type, GetInstanceDelegate>.Empty);
-            Interlocked.Exchange(ref namedDelegates, ImmutableHashTable<Tuple<Type, string>, GetInstanceDelegate>.Empty);
-            Interlocked.Exchange(ref propertyInjectionDelegates, ImmutableHashTree<Type, Func<object[], object, object>>.Empty);
-            constants.Clear();
-            constructionInfoProvider.Value.Invalidate();
-            isLocked = false;
         }
 
         private static void EmitNewArray(IList<Action<IEmitter>> emitMethods, Type elementType, IEmitter emitter)
@@ -2949,7 +3079,8 @@ namespace DbReader.LightInject
             if (rule != null)
             {
                 emitMethod = CreateServiceEmitterBasedOnFactoryRule(rule, serviceType, serviceName);
-                UpdateEmitMethod(serviceType, serviceName, emitMethod);
+                
+                RegisterEmitMethod(serviceType, serviceName, emitMethod);
             }
 
             return emitMethod;
@@ -2998,31 +3129,29 @@ namespace DbReader.LightInject
             return emitMethod ?? CreateEmitMethodForUnknownService(serviceType, serviceName);
         }
 
-        private void UpdateEmitMethod(Type serviceType, string serviceName, Action<IEmitter> emitMethod)
-        {
-            if (emitMethod != null)
-            {
-                GetEmitMethods(serviceType).AddOrUpdate(serviceName, s => emitMethod, (s, m) => emitMethod);
-            }
-        }
-
         private ServiceRegistration AddServiceRegistration(ServiceRegistration serviceRegistration)
         {
-            var emitDelegate = ResolveEmitMethod(serviceRegistration);
-            GetEmitMethods(serviceRegistration.ServiceType).TryAdd(serviceRegistration.ServiceName, emitDelegate);
+            var emitMethod = ResolveEmitMethod(serviceRegistration);
+            RegisterEmitMethod(serviceRegistration.ServiceType, serviceRegistration.ServiceName, emitMethod);
+            
             return serviceRegistration;
+        }
+
+        private void RegisterEmitMethod(Type serviceType, string serviceName, Action<IEmitter> emitMethod)
+        {
+            GetEmitMethods(serviceType).TryAdd(serviceName, emitMethod);
         }
 
         private ServiceRegistration UpdateServiceRegistration(ServiceRegistration existingRegistration, ServiceRegistration newRegistration)
         {
-            if (existingRegistration.IsReadOnly || isLocked)
+            if (isLocked)
             {
+                var message = $"Cannot overwrite existing serviceregistration {existingRegistration} after the first call to GetInstance.";
+                log.Warning(message);                                    
                 return existingRegistration;
             }
 
-            Invalidate();
             Action<IEmitter> emitMethod = ResolveEmitMethod(newRegistration);
-
             var serviceEmitters = GetEmitMethods(newRegistration.ServiceType);
             serviceEmitters[newRegistration.ServiceName] = emitMethod;
             return newRegistration;
@@ -3686,7 +3815,7 @@ namespace DbReader.LightInject
             if (serviceRegistration.Lifetime is PerContainerLifetime)
             {
                 Func<object> instanceDelegate =
-                    WrapAsFuncDelegate(CreateDynamicMethodDelegate(emitMethod));
+                    () => WrapAsFuncDelegate(CreateDynamicMethodDelegate(emitMethod))();
                 var instance = serviceRegistration.Lifetime.GetInstance(instanceDelegate, null);
                 var instanceIndex = constants.Add(instance);
                 emitter.PushConstant(instanceIndex, instance.GetType());
@@ -3695,20 +3824,19 @@ namespace DbReader.LightInject
             {
                 int instanceDelegateIndex = CreateInstanceDelegateIndex(emitMethod);
                 int lifetimeIndex = CreateLifetimeIndex(serviceRegistration.Lifetime);
-                int scopeManagerProviderIndex = CreateScopeManagerProviderIndex();
+                int scopeManagerIndex = CreateScopeManagerIndex();
                 var getInstanceMethod = LifetimeHelper.GetInstanceMethod;
                 emitter.PushConstant(lifetimeIndex, typeof(ILifetime));
                 emitter.PushConstant(instanceDelegateIndex, typeof(Func<object>));
-                emitter.PushConstant(scopeManagerProviderIndex, typeof(IScopeManagerProvider));
-                emitter.Call(LifetimeHelper.GetScopeManagerMethod);
+                emitter.PushConstant(scopeManagerIndex, typeof(IScopeManager));
                 emitter.Call(LifetimeHelper.GetCurrentScopeMethod);
                 emitter.Call(getInstanceMethod);
             }
         }
-
-        private int CreateScopeManagerProviderIndex()
+      
+        private int CreateScopeManagerIndex()
         {
-            return constants.Add(ScopeManagerProvider);
+            return constants.Add(ScopeManagerProvider.GetScopeManager(this));
         }
 
         private int CreateInstanceDelegateIndex(Action<IEmitter> emitMethod)
@@ -3816,14 +3944,6 @@ namespace DbReader.LightInject
                 return index;
             }
 
-            public void Clear()
-            {
-                lock (lockObject)
-                {
-                    Items = new T[0];
-                }
-            }
-
             private int TryAddValue(T value)
             {
                 lock (lockObject)
@@ -3929,43 +4049,108 @@ namespace DbReader.LightInject
     }
 
     /// <summary>
-    /// A <see cref="IScopeManagerProvider"/> that provides a <see cref="ScopeManager"/> per thread.
+    /// A base class for implementing <see cref="IScopeManagerProvider"/>
+    /// that ensures that only one <see cref="IScopeManager"/> is created.
     /// </summary>
-    public class PerThreadScopeManagerProvider : IScopeManagerProvider
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal abstract class ScopeManagerProvider : IScopeManagerProvider
     {
-        private readonly ThreadLocal<ScopeManager> scopeManagers =
-            new ThreadLocal<ScopeManager>(() => new ScopeManager());
+        private readonly object lockObject = new object();
+
+        private IScopeManager scopeManager;
 
         /// <summary>
-        /// Returns the <see cref="ScopeManager"/> that is responsible for managing scopes.
+        /// Returns the <see cref="IScopeManager"/> that is responsible for managing scopes.
         /// </summary>
-        /// <returns>The <see cref="ScopeManager"/> that is responsible for managing scopes.</returns>
-        public ScopeManager GetScopeManager()
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with this <see cref="ScopeManager"/>.</param> 
+        /// <returns>The <see cref="IScopeManager"/> that is responsible for managing scopes.</returns>
+        public IScopeManager GetScopeManager(IServiceFactory serviceFactory)
         {
-            return scopeManagers.Value;
+            if (scopeManager == null)
+            {
+                lock (lockObject)
+                {
+                    if (scopeManager == null)
+                    {
+                        scopeManager = CreateScopeManager(serviceFactory);
+                    }
+                }
+            }
+
+            return scopeManager;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="IScopeManager"/> instance.
+        /// </summary>
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with the <see cref="IScopeManager"/>.</param> 
+        /// <returns><see cref="IScopeManager"/>.</returns>
+        protected abstract IScopeManager CreateScopeManager(IServiceFactory serviceFactory);
+    }
+
+    /// <summary>
+    /// A <see cref="IScopeManagerProvider"/> that provides a <see cref="PerThreadScopeManager"/> per thread.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PerThreadScopeManagerProvider : ScopeManagerProvider
+    {
+        /// <summary>
+        /// Creates a new <see cref="IScopeManager"/> instance.
+        /// </summary>
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with the <see cref="IScopeManager"/>.</param> 
+        /// <returns><see cref="IScopeManager"/>.</returns>
+        protected override IScopeManager CreateScopeManager(IServiceFactory serviceFactory)
+        {
+            return new PerThreadScopeManager(serviceFactory);
         }
     }
 
 #if NET45 || NETSTANDARD13 || NET46
+
     /// <summary>
-    /// A <see cref="IScopeManagerProvider"/> that provides a <see cref="ScopeManager"/> across
-    /// async points.
+    /// Manages a set of <see cref="Scope"/> instances.
     /// </summary>
-    public class PerLogicalCallContextScopeManagerProvider : IScopeManagerProvider
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PerLogicalCallContextScopeManager : ScopeManager
     {
-        private readonly LogicalThreadStorage<ScopeManager> scopeManagers =
-            new LogicalThreadStorage<ScopeManager>(() => new ScopeManager());
+        private readonly LogicalThreadStorage<Scope> currentScope = new LogicalThreadStorage<Scope>();
 
         /// <summary>
-        /// Returns the <see cref="ScopeManager"/> that is responsible for managing scopes.
+        /// Initializes a new instance of the <see cref="PerLogicalCallContextScopeManager"/> class.        
         /// </summary>
-        /// <returns>The <see cref="ScopeManager"/> that is responsible for managing scopes.</returns>
-        public ScopeManager GetScopeManager()
-        {
-            return scopeManagers.Value;
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with this <see cref="ScopeManager"/>.</param>
+        public PerLogicalCallContextScopeManager(IServiceFactory serviceFactory) 
+            : base(serviceFactory)
+        {            
         }
+
+        /// <summary>
+        /// Gets or sets the current <see cref="Scope"/>.
+        /// </summary>
+        public override Scope CurrentScope
+        {
+            get { return currentScope.Value; }
+            set { currentScope.Value = value; }
+        }               
     }
 
+    /// <summary>
+    /// A <see cref="IScopeManagerProvider"/> that creates an <see cref="IScopeManager"/>
+    /// that is capable of managing scopes across async points.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PerLogicalCallContextScopeManagerProvider : ScopeManagerProvider
+    {
+        /// <summary>
+        /// Creates a new <see cref="IScopeManager"/> instance.
+        /// </summary>
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with the <see cref="IScopeManager"/>.</param> 
+        /// <returns><see cref="IScopeManager"/>.</returns>
+        protected override IScopeManager CreateScopeManager(IServiceFactory serviceFactory)
+        {
+            return new PerLogicalCallContextScopeManager(serviceFactory);
+        }
+    }
 #endif
 
     /// <summary>
@@ -3973,7 +4158,8 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
-    public class ThreadSafeDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ThreadSafeDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadSafeDictionary{TKey,TValue}"/> class.
@@ -4225,7 +4411,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Provides field representations of the Microsoft Intermediate Language (MSIL) instructions.
     /// </summary>
-    public static class OpCodes
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal static class OpCodes
 	{
         /// <summary>
         /// Adds two values and pushes the result onto the evaluation stack.
@@ -4235,7 +4422,8 @@ namespace DbReader.LightInject
         /// <summary>
         /// Attempts to cast an object passed by reference to the specified class.
         /// </summary>
-        public static OpCode Castclass = OpCode.Castclass;
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        internal static OpCode Castclass = OpCode.Castclass;
 
         /// <summary>
         /// Converts the boxed representation of a type specified in the instruction to its unboxed form.
@@ -4454,7 +4642,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Defines and represents a dynamic method that can be compiled and executed.
     /// </summary>
-    public class DynamicMethod
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class DynamicMethod
     {
         private readonly Type returnType;
 
@@ -4521,7 +4710,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// A generator that transforms <see cref="OpCodes"/> into an expression tree.
     /// </summary>
-    public class ILGenerator
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ILGenerator
     {
         private readonly ParameterExpression[] parameters;
         private readonly Stack<Expression> stack = new Stack<Expression>();
@@ -4923,7 +5113,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a local variable within a method or constructor.
     /// </summary>
-    public class LocalBuilder
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class LocalBuilder
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalBuilder"/> class.
@@ -4957,7 +5148,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Selects the <see cref="ConstructionInfo"/> from a given type that represents the most resolvable constructor.
     /// </summary>
-    public class MostResolvableConstructorSelector : IConstructorSelector
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class MostResolvableConstructorSelector : IConstructorSelector
     {
         private readonly Func<Type, string, bool> canGetInstance;
 
@@ -5025,7 +5217,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Selects the constructor dependencies for a given <see cref="ConstructorInfo"/>.
     /// </summary>
-    public class ConstructorDependencySelector : IConstructorDependencySelector
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ConstructorDependencySelector : IConstructorDependencySelector
     {
         /// <summary>
         /// Selects the constructor dependencies for the given <paramref name="constructor"/>.
@@ -5053,7 +5246,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Selects the property dependencies for a given <see cref="Type"/>.
     /// </summary>
-    public class PropertyDependencySelector : IPropertyDependencySelector
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PropertyDependencySelector : IPropertyDependencySelector
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyDependencySelector"/> class.
@@ -5087,7 +5281,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Builds a <see cref="ConstructionInfo"/> instance based on the implementing <see cref="Type"/>.
     /// </summary>
-    public class TypeConstructionInfoBuilder : IConstructionInfoBuilder
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class TypeConstructionInfoBuilder : IConstructionInfoBuilder
     {
         private readonly IConstructorSelector constructorSelector;
         private readonly IConstructorDependencySelector constructorDependencySelector;
@@ -5175,7 +5370,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Keeps track of a <see cref="ConstructionInfo"/> instance for each <see cref="Registration"/>.
     /// </summary>
-    public class ConstructionInfoProvider : IConstructionInfoProvider
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ConstructionInfoProvider : IConstructionInfoProvider
     {
         private readonly IConstructionInfoBuilder constructionInfoBuilder;
         private readonly ThreadSafeDictionary<Registration, ConstructionInfo> cache = new ThreadSafeDictionary<Registration, ConstructionInfo>();
@@ -5199,21 +5395,13 @@ namespace DbReader.LightInject
         {
             return cache.GetOrAdd(registration, constructionInfoBuilder.Execute);
         }
-
-        /// <summary>
-        /// Invalidates the <see cref="IConstructionInfoProvider"/> and causes new <see cref="ConstructionInfo"/> instances
-        /// to be created when the <see cref="IConstructionInfoProvider.GetConstructionInfo"/> method is called.
-        /// </summary>
-        public void Invalidate()
-        {
-            cache.Clear();
-        }
     }
 
     /// <summary>
     /// Contains information about a service request that originates from a rule based service registration.
     /// </summary>
-    public class ServiceRequest
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ServiceRequest
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceRequest"/> class.
@@ -5247,7 +5435,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Base class for concrete registrations within the service container.
     /// </summary>
-    public abstract class Registration
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal abstract class Registration
     {
         /// <summary>
         /// Gets or sets the service <see cref="Type"/>.
@@ -5268,7 +5457,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Contains information about a registered decorator.
     /// </summary>
-    public class DecoratorRegistration : Registration
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class DecoratorRegistration : Registration
     {
         /// <summary>
         /// Gets or sets a function delegate that determines if the decorator can decorate the service
@@ -5301,7 +5491,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Contains information about a registered service.
     /// </summary>
-    public class ServiceRegistration : Registration
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ServiceRegistration : Registration
     {
         /// <summary>
         /// Gets or sets the name of the service.
@@ -5317,12 +5508,6 @@ namespace DbReader.LightInject
         /// Gets or sets the value that represents the instance of the service.
         /// </summary>
         public object Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="ServiceRegistration"/> can be overridden
-        /// by another registration.
-        /// </summary>
-        public bool IsReadOnly { get; set; }
 
         /// <summary>
         /// Serves as a hash function for a particular type.
@@ -5354,12 +5539,23 @@ namespace DbReader.LightInject
             var result = ServiceName == other.ServiceName && ServiceType == other.ServiceType;
             return result;
         }
+
+        /// <summary>
+        /// Returns a string representation of the <see cref="ServiceRegistration"/>.
+        /// </summary>
+        /// <returns>A string representation of the <see cref="ServiceRegistration"/>.</returns>
+        public override string ToString()
+        {
+            var lifeTime = Lifetime?.ToString() ?? "Transient";
+            return $"ServiceType: '{ServiceType}', ServiceName: '{ServiceName}', ImplementingType: '{ImplementingType}', Lifetime: '{lifeTime}'";
+        }
     }
 
     /// <summary>
     /// Contains information about how to create a service instance.
     /// </summary>
-    public class ConstructionInfo
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ConstructionInfo
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstructionInfo"/> class.
@@ -5401,7 +5597,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class dependency.
     /// </summary>
-    public abstract class Dependency
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal abstract class Dependency
     {
         /// <summary>
         /// Gets or sets the service <see cref="Type"/> of the <see cref="Dependency"/>.
@@ -5442,7 +5639,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a property dependency.
     /// </summary>
-    public class PropertyDependency : Dependency
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PropertyDependency : Dependency
     {
         /// <summary>
         /// Gets or sets the <see cref="MethodInfo"/> that is used to set the property value.
@@ -5473,7 +5671,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a constructor dependency.
     /// </summary>
-    public class ConstructorDependency : Dependency
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ConstructorDependency : Dependency
     {
         /// <summary>
         /// Gets or sets the <see cref="ParameterInfo"/> for this <see cref="ConstructorDependency"/>.
@@ -5510,7 +5709,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Ensures that only one instance of a given service can exist within the current <see cref="IServiceContainer"/>.
     /// </summary>
-    public class PerContainerLifetime : ILifetime, IDisposable
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PerContainerLifetime : ILifetime, IDisposable
     {
         private readonly object syncRoot = new object();
         private volatile object singleton;
@@ -5555,7 +5755,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Ensures that a new instance is created for each request in addition to tracking disposable instances.
     /// </summary>
-    public class PerRequestLifeTime : ILifetime
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PerRequestLifeTime : ILifetime
     {
         /// <summary>
         /// Returns a service instance according to the specific lifetime characteristics.
@@ -5593,7 +5794,8 @@ namespace DbReader.LightInject
     /// If the service instance implements <see cref="IDisposable"/>,
     /// it will be disposed when the <see cref="Scope"/> ends.
     /// </remarks>
-    public class PerScopeLifetime : ILifetime
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PerScopeLifetime : ILifetime
     {
         private readonly ThreadSafeDictionary<Scope, object> instances = new ThreadSafeDictionary<Scope, object>();
 
@@ -5642,27 +5844,29 @@ namespace DbReader.LightInject
     }
 
     /// <summary>
-    /// Manages a set of <see cref="Scope"/> instances.
+    /// A base class for implementing <see cref="IScopeManager"/>.
     /// </summary>
-    public class ScopeManager
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal abstract class ScopeManager : IScopeManager
     {
-        private readonly object syncRoot = new object();
-
-        private Scope currentScope;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScopeManager"/> class.        
+        /// </summary>
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with this <see cref="ScopeManager"/>.</param>
+        protected ScopeManager(IServiceFactory serviceFactory)
+        {
+            ServiceFactory = serviceFactory;
+        }
+        
+        /// <summary>
+        /// Gets or sets the current <see cref="Scope"/>.
+        /// </summary>
+        public abstract Scope CurrentScope { get; set; }
 
         /// <summary>
-        /// Gets the current <see cref="Scope"/>.
+        /// Gets the <see cref="IServiceFactory"/> that is associated with this <see cref="IScopeManager"/>.
         /// </summary>
-        public Scope CurrentScope
-        {
-            get
-            {
-                lock (syncRoot)
-                {
-                    return currentScope;
-                }
-            }
-        }
+        public IServiceFactory ServiceFactory { get; }
 
         /// <summary>
         /// Starts a new <see cref="Scope"/>.
@@ -5670,58 +5874,90 @@ namespace DbReader.LightInject
         /// <returns>A new <see cref="Scope"/>.</returns>
         public Scope BeginScope()
         {
-            lock (syncRoot)
+            var currentScope = CurrentScope;
+            var scope = new Scope(this, currentScope);
+            if (currentScope != null)
             {
-                var scope = new Scope(this, currentScope);
-                if (currentScope != null)
-                {
-                    currentScope.ChildScope = scope;
-                }
-
-                currentScope = scope;
-                return scope;
+                currentScope.ChildScope = scope;
             }
+
+            CurrentScope = scope;
+            return scope;
         }
 
         /// <summary>
-        /// Ends the given <paramref name="scope"/> and updates the <see cref="CurrentScope"/> property.
+        /// Ends the given <paramref name="scope"/>.
         /// </summary>
-        /// <param name="scope">The scope that is completed.</param>
+        /// <param name="scope">The scope to be ended.</param>
         public void EndScope(Scope scope)
         {
-            lock (syncRoot)
+            if (scope.ChildScope != null)
             {
-                if (scope.ChildScope != null)
-                {
-                    throw new InvalidOperationException("Attempt to end a scope before all child scopes are completed.");
-                }
-
-                currentScope = scope.ParentScope;
-                if (currentScope != null)
-                {
-                    currentScope.ChildScope = null;
-                }
+                throw new InvalidOperationException("Attempt to end a scope before all child scopes are completed.");
             }
+
+            if (!ReferenceEquals(CurrentScope, scope))
+            {
+                throw new InvalidOperationException("Attempt to end a scope that is currently not the current scope.");
+            }
+
+            var currentScope = scope.ParentScope;
+            if (currentScope != null)
+            {
+                currentScope.ChildScope = null;
+            }
+
+            CurrentScope = currentScope;
+        }
+    }
+
+    /// <summary>
+    /// A <see cref="IScopeManager"/> that manages scopes per thread.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PerThreadScopeManager : ScopeManager
+    {
+        private readonly ThreadLocal<Scope> threadLocalScope = new ThreadLocal<Scope>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PerThreadScopeManager"/> class.        
+        /// </summary>
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> to be associated with this <see cref="ScopeManager"/>.</param>
+        public PerThreadScopeManager(IServiceFactory serviceFactory)
+            : base(serviceFactory)
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets the current <see cref="Scope"/>.
+        /// </summary>
+        public override Scope CurrentScope
+        {
+            get { return threadLocalScope.Value; }
+            set { threadLocalScope.Value = value; }
         }
     }
 
     /// <summary>
     /// Represents a scope.
     /// </summary>
-    public class Scope : IDisposable
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class Scope : IServiceFactory, IDisposable
     {
         private readonly IList<IDisposable> disposableObjects = new List<IDisposable>();
 
-        private readonly ScopeManager scopeManager;
+        private readonly IScopeManager scopeManager;
+        private readonly IServiceFactory serviceFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Scope"/> class.
         /// </summary>
         /// <param name="scopeManager">The <see cref="scopeManager"/> that manages this <see cref="Scope"/>.</param>
         /// <param name="parentScope">The parent <see cref="Scope"/>.</param>
-        public Scope(ScopeManager scopeManager, Scope parentScope)
+        public Scope(IScopeManager scopeManager, Scope parentScope)
         {
             this.scopeManager = scopeManager;
+            serviceFactory = scopeManager.ServiceFactory;
             ParentScope = parentScope;
         }
 
@@ -5757,6 +5993,114 @@ namespace DbReader.LightInject
             DisposeTrackedInstances();
             OnCompleted();
         }
+      
+        /// <summary>
+        /// Starts a new <see cref="Scope"/>.
+        /// </summary>
+        /// <returns><see cref="Scope"/></returns>
+        public Scope BeginScope()
+        {
+            return serviceFactory.BeginScope();            
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type of the requested service.</param>
+        /// <returns>The requested service instance.</returns>
+        public object GetInstance(Type serviceType)
+        {
+            return WithThisScope(() => serviceFactory.GetInstance(serviceType));            
+        }
+
+        /// <summary>
+        /// Gets a named instance of the given <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type of the requested service.</param>
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance.</returns>
+        public object GetInstance(Type serviceType, string serviceName)
+        {
+            return WithThisScope(() => serviceFactory.GetInstance(serviceType, serviceName));
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type of the requested service.</param>
+        /// <param name="arguments">The arguments to be passed to the target instance.</param>
+        /// <returns>The requested service instance.</returns>
+        public object GetInstance(Type serviceType, object[] arguments)
+        {
+            return WithThisScope(() => serviceFactory.GetInstance(serviceType, arguments));            
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type of the requested service.</param>
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <param name="arguments">The arguments to be passed to the target instance.</param>
+        /// <returns>The requested service instance.</returns>
+        public object GetInstance(Type serviceType, string serviceName, object[] arguments)
+        {
+            return WithThisScope(() => serviceFactory.GetInstance(serviceType, serviceName, arguments));
+        }
+
+        /// <summary>
+        /// Gets an instance of the given <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type of the requested service.</param>
+        /// <returns>The requested service instance if available, otherwise null.</returns>
+        public object TryGetInstance(Type serviceType)
+        {
+            return WithThisScope(() => serviceFactory.TryGetInstance(serviceType));
+        }
+
+        /// <summary>
+        /// Gets a named instance of the given <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type of the requested service.</param>
+        /// <param name="serviceName">The name of the requested service.</param>
+        /// <returns>The requested service instance if available, otherwise null.</returns>
+        public object TryGetInstance(Type serviceType, string serviceName)
+        {
+            return WithThisScope(() => serviceFactory.TryGetInstance(serviceType, serviceName));
+        }
+
+        /// <summary>
+        /// Gets all instances of the given <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type of services to resolve.</param>
+        /// <returns>A list that contains all implementations of the <paramref name="serviceType"/>.</returns>
+        public IEnumerable<object> GetAllInstances(Type serviceType)
+        {
+            return WithThisScope(() => serviceFactory.GetAllInstances(serviceType));
+        }
+
+        /// <summary>
+        /// Creates an instance of a concrete class.
+        /// </summary>
+        /// <param name="serviceType">The type of class for which to create an instance.</param>
+        /// <returns>An instance of the <paramref name="serviceType"/>.</returns>
+        public object Create(Type serviceType)
+        {
+            return WithThisScope(() => serviceFactory.Create(serviceType));
+        }
+
+        private T WithThisScope<T>(Func<T> function)
+        {
+            var previosScope = scopeManager.CurrentScope;
+            scopeManager.CurrentScope = this;
+            try
+            {
+                return function();
+            }
+            finally
+            {
+                scopeManager.CurrentScope = previosScope;
+            }
+        }
 
         private void DisposeTrackedInstances()
         {
@@ -5770,10 +6114,7 @@ namespace DbReader.LightInject
         {
             scopeManager.EndScope(this);
             var completedHandler = Completed;
-            if (completedHandler != null)
-            {
-                completedHandler(this, new EventArgs());
-            }
+            completedHandler?.Invoke(this, new EventArgs());
         }
     }
 
@@ -5781,7 +6122,8 @@ namespace DbReader.LightInject
     /// Used at the assembly level to describe the composition root(s) for the target assembly.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    public class CompositionRootTypeAttribute : Attribute
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class CompositionRootTypeAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositionRootTypeAttribute"/> class.
@@ -5802,7 +6144,8 @@ namespace DbReader.LightInject
     /// A class that is capable of extracting attributes of type
     /// <see cref="CompositionRootTypeAttribute"/> from an <see cref="Assembly"/>.
     /// </summary>
-    public class CompositionRootAttributeExtractor : ICompositionRootAttributeExtractor
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class CompositionRootAttributeExtractor : ICompositionRootAttributeExtractor
     {
         /// <summary>
         /// Gets a list of attributes of type <see cref="CompositionRootTypeAttribute"/> from
@@ -5821,7 +6164,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extracts concrete <see cref="ICompositionRoot"/> implementations from an <see cref="Assembly"/>.
     /// </summary>
-    public class CompositionRootTypeExtractor : ITypeExtractor
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class CompositionRootTypeExtractor : ITypeExtractor
     {
         private readonly ICompositionRootAttributeExtractor compositionRootAttributeExtractor;
 
@@ -5862,7 +6206,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// A <see cref="ITypeExtractor"/> cache decorator.
     /// </summary>
-    public class CachedTypeExtractor : ITypeExtractor
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class CachedTypeExtractor : ITypeExtractor
     {
         private readonly ITypeExtractor typeExtractor;
 
@@ -5892,7 +6237,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extracts concrete types from an <see cref="Assembly"/>.
     /// </summary>
-    public class ConcreteTypeExtractor : ITypeExtractor
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class ConcreteTypeExtractor : ITypeExtractor
     {
         private static readonly List<Type> InternalTypes = new List<Type>();
 
@@ -5904,7 +6250,6 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(Scope));
             InternalTypes.Add(typeof(PerContainerLifetime));
             InternalTypes.Add(typeof(PerScopeLifetime));
-            InternalTypes.Add(typeof(ScopeManager));
             InternalTypes.Add(typeof(ServiceRegistration));
             InternalTypes.Add(typeof(DecoratorRegistration));
             InternalTypes.Add(typeof(ServiceRequest));
@@ -5942,6 +6287,7 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(CompositionRootAttributeExtractor));
 #if NET45 || NET46 || NETSTANDARD13
             InternalTypes.Add(typeof(PerLogicalCallContextScopeManagerProvider));
+            InternalTypes.Add(typeof(PerLogicalCallContextScopeManager));
             InternalTypes.Add(typeof(LogicalThreadStorage<>));
 #endif
 #if PCL_111
@@ -5983,7 +6329,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// A class that is responsible for instantiating and executing an <see cref="ICompositionRoot"/>.
     /// </summary>
-    public class CompositionRootExecutor : ICompositionRootExecutor
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class CompositionRootExecutor : ICompositionRootExecutor
     {
         private readonly IServiceRegistry serviceRegistry;
         private readonly Func<Type, ICompositionRoot> activator;
@@ -6027,7 +6374,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// An assembly scanner that registers services based on the types contained within an <see cref="Assembly"/>.
     /// </summary>
-    public class AssemblyScanner : IAssemblyScanner
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class AssemblyScanner : IAssemblyScanner
     {
         private readonly ITypeExtractor concreteTypeExtractor;
         private readonly ITypeExtractor compositionRootTypeExtractor;
@@ -6163,7 +6511,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Selects the properties that represents a dependency to the target <see cref="Type"/>.
     /// </summary>
-    public class PropertySelector : IPropertySelector
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class PropertySelector : IPropertySelector
     {
         /// <summary>
         /// Selects properties that represents a dependency from the given <paramref name="type"/>.
@@ -6195,7 +6544,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Loads all assemblies from the application base directory that matches the given search pattern.
     /// </summary>
-    public class AssemblyLoader : IAssemblyLoader
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class AssemblyLoader : IAssemblyLoader
     {
         /// <summary>
         /// Loads a set of assemblies based on the given <paramref name="searchPattern"/>.
@@ -6232,7 +6582,8 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public sealed class KeyValue<TKey, TValue>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal sealed class KeyValue<TKey, TValue>
     {
         /// <summary>
         /// The key of this <see cref="KeyValue{TKey,TValue}"/> instance.
@@ -6260,7 +6611,8 @@ namespace DbReader.LightInject
     /// Represents a simple "add only" immutable list.
     /// </summary>
     /// <typeparam name="T">The type of items contained in the list.</typeparam>
-    public sealed class ImmutableList<T>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal sealed class ImmutableList<T>
     {
         /// <summary>
         /// Represents an empty <see cref="ImmutableList{T}"/>.
@@ -6311,7 +6663,8 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public sealed class ImmutableHashTable<TKey, TValue>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal sealed class ImmutableHashTable<TKey, TValue>
     {
         /// <summary>
         /// An empty <see cref="ImmutableHashTree{TKey,TValue}"/>.
@@ -6398,7 +6751,8 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public sealed class ImmutableHashTree<TKey, TValue>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal sealed class ImmutableHashTree<TKey, TValue>
     {
         /// <summary>
         /// An empty <see cref="ImmutableHashTree{TKey,TValue}"/>.
@@ -6557,7 +6911,8 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents an MSIL instruction to be emitted into a dynamic method.
     /// </summary>
-    public class Instruction
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class Instruction
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Instruction"/> class.
@@ -6596,7 +6951,8 @@ namespace DbReader.LightInject
     /// Represents an MSIL instruction to be emitted into a dynamic method.
     /// </summary>
     /// <typeparam name="T">The type of argument used in this instruction.</typeparam>
-    public class Instruction<T> : Instruction
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class Instruction<T> : Instruction
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Instruction{T}"/> class.
@@ -6630,7 +6986,8 @@ namespace DbReader.LightInject
     /// An abstraction of the <see cref="ILGenerator"/> class that provides information
     /// about the <see cref="Type"/> currently on the stack.
     /// </summary>
-    public class Emitter : IEmitter
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class Emitter : IEmitter
     {
         private readonly ILGenerator generator;
 
@@ -7022,24 +7379,11 @@ namespace DbReader.LightInject
     /// Provides storage per logical thread of execution.
     /// </summary>
     /// <typeparam name="T">The type of the value contained in this <see cref="LogicalThreadStorage{T}"/>.</typeparam>
-    public class LogicalThreadStorage<T>
-    {
-        private readonly Func<T> valueFactory;
-
-        private readonly string key;
-
-        private readonly object lockObject = new object();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogicalThreadStorage{T}"/> class.
-        /// </summary>
-        /// <param name="valueFactory">The value factory used to create an instance of <typeparamref name="T"/>.</param>
-        public LogicalThreadStorage(Func<T> valueFactory)
-        {
-            this.valueFactory = valueFactory;
-            key = Guid.NewGuid().ToString();
-        }
-
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class LogicalThreadStorage<T>
+    {        
+        private readonly string key = Guid.NewGuid().ToString();
+               
         /// <summary>
         /// Gets the value for the current logical thread of execution.
         /// </summary>
@@ -7050,23 +7394,18 @@ namespace DbReader.LightInject
         {
             get
             {
-                var holder = (LogicalThreadValue)CallContext.LogicalGetData(key);
-                if (holder != null)
+                var logicalThreadValue = (LogicalThreadValue)CallContext.LogicalGetData(key);
+                return logicalThreadValue != null ? logicalThreadValue.Value : default(T);
+            }
+            set
+            {
+                LogicalThreadValue logicalThreadValue = null;
+                if (value != null)
                 {
-                    return holder.Value;
+                    logicalThreadValue = new LogicalThreadValue { Value = value };
                 }
 
-                lock (lockObject)
-                {
-                    holder = (LogicalThreadValue)CallContext.LogicalGetData(key);
-                    if (holder == null)
-                    {
-                        holder = new LogicalThreadValue { Value = valueFactory() };
-                        CallContext.LogicalSetData(key, holder);
-                    }
-                }
-
-                return holder.Value;
+                CallContext.LogicalSetData(key, logicalThreadValue);
             }
         }
 
@@ -7096,69 +7435,46 @@ namespace DbReader.LightInject
     /// Provides storage per logical thread of execution.
     /// </summary>
     /// <typeparam name="T">The type of the value contained in this <see cref="LogicalThreadStorage{T}"/>.</typeparam>
-    public class LogicalThreadStorage<T>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class LogicalThreadStorage<T>
     {
-        private readonly Func<T> valueFactory;
-
-        private readonly AsyncLocal<T> asyncLocal;
+        private readonly AsyncLocal<T> asyncLocal = new AsyncLocal<T>();
 
         private readonly object lockObject = new object();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LogicalThreadStorage{T}"/> class.
-        /// </summary>
-        /// <param name="valueFactory">The value factory used to create an instance of <typeparamref name="T"/>.</param>
-        public LogicalThreadStorage(Func<T> valueFactory)
-        {
-            asyncLocal = new AsyncLocal<T>();
-            this.valueFactory = valueFactory;
-        }
-
-        /// <summary>
-        /// Gets the value for the current logical thread of execution.
+        /// Gets or sets the value for the current logical thread of execution.
         /// </summary>
         /// <value>
         /// The value for the current logical thread of execution.
         /// </value>
         public T Value
         {
-            get
-            {
-                lock (lockObject)
-                {
-                    T value = asyncLocal.Value;
-                    if (value == null)
-                    {
-                        asyncLocal.Value = valueFactory();
-                    }
-
-                    return asyncLocal.Value;
-                }
-            }
+            get { return asyncLocal.Value; }
+            set { asyncLocal.Value = value; }
         }
     }
 #endif
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class LifetimeHelper
     {
         static LifetimeHelper()
         {
             GetInstanceMethod = typeof(ILifetime).GetTypeInfo().GetDeclaredMethod("GetInstance");
-            GetCurrentScopeMethod = typeof(ScopeManager).GetTypeInfo().GetDeclaredProperty("CurrentScope").GetMethod;
-            GetScopeManagerMethod = typeof(IScopeManagerProvider).GetTypeInfo().GetDeclaredMethod("GetScopeManager");
+            GetCurrentScopeMethod = typeof(IScopeManager).GetTypeInfo().GetDeclaredProperty("CurrentScope").GetMethod;
         }
 
         public static MethodInfo GetInstanceMethod { get; private set; }
 
         public static MethodInfo GetCurrentScopeMethod { get; private set; }
-
-        public static MethodInfo GetScopeManagerMethod { get; private set; }
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class DelegateTypeExtensions
     {
         private static readonly MethodInfo OpenGenericGetInstanceMethodInfo =
-            typeof(IServiceFactory).GetTypeInfo().DeclaredMethods.Where(m => m.Name == "GetInstance" & m.GetParameters().Length == 0).Single();
+            typeof(ServiceFactoryExtensions).GetTypeInfo().DeclaredMethods.Where(m => m.Name == "GetInstance" & m.GetParameters().Length == 1).Single();
 
         private static readonly ThreadSafeDictionary<Type, MethodInfo> GetInstanceMethods =
             new ThreadSafeDictionary<Type, MethodInfo>();
@@ -7176,6 +7492,7 @@ namespace DbReader.LightInject
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class NamedDelegateTypeExtensions
     {
         private static readonly MethodInfo CreateInstanceDelegateMethodInfo =
@@ -7207,6 +7524,7 @@ namespace DbReader.LightInject
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class ReflectionHelper
     {
         private static readonly Lazy<ThreadSafeDictionary<Type, MethodInfo>> GetInstanceWithParametersMethods;
@@ -7244,7 +7562,7 @@ namespace DbReader.LightInject
         {
             Type[] genericTypeArguments = serviceType.GetTypeInfo().GenericTypeArguments;
             MethodInfo openGenericMethod =
-                typeof(IServiceFactory).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "GetInstance"
+                typeof(ServiceFactoryExtensions).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "GetInstance"
                     && m.GetGenericArguments().Length == genericTypeArguments.Length && m.GetParameters().All(p => p.Name != "serviceName"));
 
             MethodInfo closedGenericMethod = openGenericMethod.MakeGenericMethod(genericTypeArguments);
@@ -7289,6 +7607,7 @@ namespace DbReader.LightInject
     /// Contains a set of extension method that represents
     /// a compability layer for reflection methods.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class TypeHelper
     {
 #if NET45 || NET46
@@ -7301,38 +7620,6 @@ namespace DbReader.LightInject
         public static MethodInfo GetMethodInfo(this Delegate del)
         {
             return del.Method;
-        }
-
-        /// <summary>
-        /// Gets a <see cref="MethodInfo"/> that represents a private method on the target <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The target <see cref="Type"/>.</param>
-        /// <param name="name">The name of the private method.</param>
-        /// <returns>A <see cref="MethodInfo"/> that represents a private method on the target <paramref name="type"/>.</returns>
-        public static MethodInfo GetPrivateMethod(this Type type, string name)
-        {
-            return type.GetTypeInfo().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        }
-
-        /// <summary>
-        /// Gets a <see cref="MethodInfo"/> that represents a private static method on the target <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The target <see cref="Type"/>.</param>
-        /// <param name="name">The name of the private method.</param>
-        /// <returns>A <see cref="MethodInfo"/> that represents a private static method on the target <paramref name="type"/>.</returns>
-        public static MethodInfo GetPrivateStaticMethod(this Type type, string name)
-        {
-            return type.GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic);
-        }
-
-        /// <summary>
-        /// Gets an array of <see cref="MethodInfo"/> objects that represents private static methods on the target <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The target <see cref="Type"/>.</param>
-        /// <returns>An array of <see cref="MethodInfo"/> objects that represents private static methods on the target <paramref name="type"/>.</returns>
-        public static MethodInfo[] GetPrivateStaticMethods(this Type type)
-        {
-            return type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
         }
 
         /// <summary>
@@ -7477,6 +7764,7 @@ namespace DbReader.LightInject
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class LazyTypeExtensions
     {
         private static readonly ThreadSafeDictionary<Type, ConstructorInfo> Constructors = new ThreadSafeDictionary<Type, ConstructorInfo>();
@@ -7493,6 +7781,7 @@ namespace DbReader.LightInject
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class EnumerableTypeExtensions
     {
         private static readonly ThreadSafeDictionary<Type, Type> EnumerableTypes = new ThreadSafeDictionary<Type, Type>();
@@ -7508,6 +7797,7 @@ namespace DbReader.LightInject
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class FuncTypeExtensions
     {
         private static readonly ThreadSafeDictionary<Type, Type> FuncTypes = new ThreadSafeDictionary<Type, Type>();

@@ -19,11 +19,7 @@
             dataRecord.GetBytes(i, 0, buffer, 0, (int)length);
             return buffer;
         }
-
-       
-
-       
-
+              
         public static char[] GetChars(this IDataRecord dataRecord, int i)
         {
             long length = dataRecord.GetChars(i, 0, null, 0, int.MaxValue);

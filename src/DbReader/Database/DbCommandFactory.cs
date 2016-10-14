@@ -29,7 +29,7 @@
         /// <returns></returns>
         public IDbCommand CreateCommand(IDbConnection dbConnection, string sql, object arguments)
         {
-            var command = dbConnection.CreateCommand();
+            var command = dbConnection.CreateCommand();            
             command.CommandText = sql;
             var parameterValues = argumentMapper.Map(sql, arguments);
             foreach (var parameterValue in parameterValues)

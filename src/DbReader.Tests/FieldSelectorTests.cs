@@ -11,13 +11,16 @@
 
     public class FieldSelectorTests
     {
-        //[ScopedTheory, InjectData]
-        //public void ShouldReturnSameInstanceWithinScope(IFieldSelector first, IFieldSelector second)
-        //{
-        //    first.ShouldBeSameAs(second);
-        //}
+       
+        public void ShouldReturnSameInstanceWithinScope(Func<IFieldSelector> factory)
+        {
+            var first = factory();
+            var second = factory();
+            first.ShouldBeSameAs(second);
+        }
 
-        
+       
+       
         public void Execute_ValidColumnns_ReturnsDictionary(IFieldSelector fieldSelector)
         {
             IDataRecord dataRecord = new { SomeColumn = 42 }.ToDataRecord();

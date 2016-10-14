@@ -36,15 +36,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgumentConverter.cs" />
     <Compile Include="Construction\Cache.cs" />
     <Compile Include="Construction\CachedInstanceReaderMethodBuilder.cs" />
     <Compile Include="Construction\CachedKeyReaderMethodBuilder.cs" />
@@ -67,6 +65,7 @@
     <Compile Include="Construction\PrefixResolver.cs" />
     <Compile Include="Construction\PropertyReaderMethodBuilder.cs" />
     <Compile Include="Construction\ReaderMethodBuilder.cs" />
+    <Compile Include="ContainerExtensions.cs" />
     <Compile Include="Database\ArgumentMapper.cs" />
     <Compile Include="Database\DbCommandFactory.cs" />
     <Compile Include="Database\IArgumentMapper.cs" />
@@ -85,6 +84,7 @@
     <Compile Include="Extensions\TypeReflectionExtensions.cs" />
     <Compile Include="Interfaces\IArgumentParser.cs" />
     <Compile Include="ErrorMessages.cs" />
+    <Compile Include="LightInject\LightInject.cs" />
     <Compile Include="Mapping\CachedPropertyMapper.cs" />
     <Compile Include="Mapping\IPropertyMapper.cs" />
     <Compile Include="Mapping\KeyPropertyMapper.cs" />
@@ -102,7 +102,6 @@
     <Compile Include="Readers\KeyReader.cs" />
     <Compile Include="Readers\InstanceReader.cs" />
     <Compile Include="Readers\IReader.cs" />
-    <Compile Include="LightInject\LightInject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Selectors\CachedFieldSelector.cs" />
     <Compile Include="Selectors\CachedPropertySelector.cs" />
@@ -124,7 +123,9 @@
     <Compile Include="Selectors\SimplePropertySelector.cs" />
     <Compile Include="ValueConverter.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

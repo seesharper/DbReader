@@ -5,12 +5,22 @@
     using System.Data.Common;
     using System.Threading.Tasks;
     using Database;
+    using LightInject;
+    using static DbReaderOptions;
 
     public static class DbConnectionExtensions
-    {                
+    {
+        private static readonly IServiceContainer Container = new ServiceContainer();
+
+        static DbConnectionExtensions()
+        {
+            Container.RegisterFrom<CompositionRoot>();
+        }
+
         public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string sql, object arguments = null)
-        {            
-            var command = DbReaderOptions.CommandFactory.CreateCommand(dbConnection, sql, arguments);                
+        {
+            var command = Container.GetInstance<IDbCommandFactory>().CreateCommand(dbConnection, sql, arguments);
+            CommandInitializer?.Invoke(command);
             var dataReader = command.ExecuteReader();
             SqlStatement.Current = sql;
             return dataReader.Read<T>();                                                                
@@ -21,13 +31,11 @@
             string sql,
             object arguments = null)
         {
-            var command = DbReaderOptions.CommandFactory.CreateCommand(dbConnection, sql, arguments);
+            var command = Container.GetInstance<IDbCommandFactory>().CreateCommand(dbConnection, sql, arguments);
+            CommandInitializer?.Invoke(command);
             var dataReader = await ((DbCommand)command).ExecuteReaderAsync();
             SqlStatement.Current = sql;
             return dataReader.Read<T>();
         }
-    }
-
-
-    
+    }    
 }

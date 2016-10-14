@@ -16,13 +16,22 @@ namespace DbReader.Construction
         /// </summary>
         /// <param name="returnType">The return type of the dynamic method.</param>
         /// <param name="parameterTypes">The parameter types of the dynamic method.</param>
-        public DynamicMethodSkeleton(string name, Type returnType, Type[] parameterTypes)
+        public DynamicMethodSkeleton(string name, Type returnType, Type[] parameterTypes, Module module)
         {
             dynamicMethod = new DynamicMethod(
-                "DbReaderDynamicMethod",
+                name,
                 returnType,
                 parameterTypes,
-                typeof(DynamicMethodSkeleton).GetTypeInfo().Module);
+                module);
+        }
+
+        public DynamicMethodSkeleton(string name, Type returnType, Type[] parameterTypes, Type owner)
+        {
+            dynamicMethod = new DynamicMethod(
+                name,
+                returnType,
+                parameterTypes,
+                owner);
         }
 
         /// <summary>

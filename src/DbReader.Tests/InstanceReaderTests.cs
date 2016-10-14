@@ -2,7 +2,8 @@
 {
     using System;
     using System.Collections.Generic;    
-    using System.Linq;    
+    using System.Linq;
+    using Database;
     using DbReader.Interfaces;
     using Readers;
     using Shouldly;
@@ -12,7 +13,7 @@
     {
         static InstanceReaderTests()
         {
-            ValueConverter.RegisterReadDelegate((record, i) => new CustomValueType(record.GetInt32(i)));
+            DbReaderOptions.WhenReading<CustomValueType>().Use((record, ordinal) => new CustomValueType(record.GetInt32(ordinal)));              
         }
 
         public void ShouldReadStringValue(IInstanceReader<ClassWithProperty<string>> reader)
@@ -221,24 +222,16 @@
                 new { MasterId = 1 ,Details_DetailId = 2 ,SubDetails_SubdetailId = 5 }
             };
 
-
-
-            var instances = rows.ToDataReader().Read<Master>();
-
-            instances.Count().ShouldBe(1);
-            instances.Single().Details.Count().ShouldBe(2);
-
-            //instance.TopLevelOneToManyRelation.Count().ShouldBe(1);
-            //instance.TopLevelOneToManyRelation.First().Id.ShouldBe(84);
-            //instance.TopLevelOneToManyRelation.First().OneToManyRelation.Count().ShouldBe(1);
-            //instance.TopLevelOneToManyRelation.First().OneToManyRelation.First().Id.ShouldBe(168);
+            var instances = rows.ToDataReader().Read<Master>().ToArray();
+            instances.Length.ShouldBe(1);
+            instances.Single().Details.Count().ShouldBe(2);           
         }
 
-        //public void ShouldThrowExceptionWhenTypesAreIncompatible(IInstanceReader<ClassWithProperty<int>> reader)
-        //{
-        //    var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
-        //    Assert.Throws<InvalidOperationException>(() => reader.Read(dataRecord, string.Empty));
-        //}
+        public void ShouldThrowExceptionWhenTypesAreIncompatible(IInstanceReader<ClassWithProperty<int>> reader)
+        {            
+            var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
+            Should.Throw<InvalidOperationException>(() => reader.Read(dataRecord, string.Empty));            
+        }
     }
 
 

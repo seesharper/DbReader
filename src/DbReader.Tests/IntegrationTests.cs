@@ -84,5 +84,17 @@
             }
         }
 
+        public void ShouldThrowExceptionWhenArgumentNotFound()
+        {
+            using (var connection = CreateConnection())
+            {
+                Should.Throw<InvalidOperationException>(
+                    () =>
+                        connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
+                            new {InvalidArgument = "ALFKI"})).Message.ShouldStartWith("Unable to resolve an argument value for parameter");                                
+            }
+        }
+
+
     }    
 }

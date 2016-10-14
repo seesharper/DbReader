@@ -6,6 +6,7 @@
     using System.Data;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Net;
     using System.Reflection;
     using Database;
     using Interfaces;
@@ -18,15 +19,17 @@
 
         private static Func<PropertyInfo, bool> keyConvention;
 
+        public static Action<IDbCommand> CommandInitializer { get; set; }
+
         static DbReaderOptions()
         {
             KeyConvention = p =>
                 p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase);
-            ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");
-
-            CommandFactory = new DbCommandFactory(new ArgumentMapper(ParameterParser,new ArgumentParser(new ReadablePropertySelector())));
+            ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");            
         }
+
+        
 
         public static ReadDelegate<TProperty> WhenReading<TProperty>()
         {
@@ -59,9 +62,7 @@
         /// reponsible for parsing the parameter names from a given sql statement.
         /// </summary>
         public static IParameterParser ParameterParser { get; set; }
-        
-        public static IDbCommandFactory CommandFactory  { get; set; }
-
+               
         public static void KeySelector<T>(params Expression<Func<T, object>>[] keyExpressions)
         {
             PropertyInfo[] properties = new PropertyInfo[keyExpressions.Length];
@@ -92,8 +93,8 @@
     public class PassDelegate<TArgument>
     {
         public void ConvertTo<TParameter>(Func<TArgument, TParameter> convertFunction)
-        {
-            ValueConverter.RegisterConvertDelegate(convertFunction);
+        {            
+            ArgumentConverter.RegisterConvertDelegate(convertFunction);
         }
     }
 }

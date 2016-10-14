@@ -55,14 +55,13 @@ namespace DbReader.Tests
         /// Initializes a new instance of the <see cref="LightInjectConvention"/> class.
         /// </summary>
         public LightInjectConvention()
-        {
-            FixtureExecution.Wrap(WrapFixtureExecution);
-            
+        {                        
             CaseExecution.Wrap(WrapCaseExecution);
                         
             ClassExecution.Wrap(WrapClassExecution);
 
             ClassExecution.UsingFactory(CreateTestClassInstance);
+            
 
             if (UseMethodInjection)
             {
@@ -108,18 +107,21 @@ namespace DbReader.Tests
 
         private object CreateTestClassInstance(Type type)
         {
-            containers[type].BeginScope();
+            //containers[type].BeginScope();
             return containers[type].GetInstance(type);
         }
 
         private void WrapClassExecution(Class context, Action next)
         {           
-            var container = CreateContainer(context);            
-            next();
-            CleanupContainer(context, container);
+            var container = CreateContainer(context);
+            using (container.BeginScope())
+            {
+                next();
+            }                         
+            ReleaseContainer(context, container);
         }
 
-        private void CleanupContainer(Class context, IServiceContainer container)
+        private void ReleaseContainer(Class context, IServiceContainer container)
         {
             container.Dispose();
             containers.TryRemove(context.Type, out container);
@@ -170,10 +172,6 @@ namespace DbReader.Tests
             return instance;
         }
 
-        private void WrapFixtureExecution(Fixture context, Action next)
-        {            
-            next();
-            containers[context.Class.Type].EndCurrentScope();
-        }
+        
     }
 }
