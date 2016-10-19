@@ -17,6 +17,13 @@
     {
         private readonly IPropertySelector readablePropertySelector;
         private readonly IMethodSkeletonFactory methodSkeletonFactory;
+        private static readonly MethodInfo GetTypeFromHandleMethod;
+
+        static ArgumentParser()
+        {
+            GetTypeFromHandleMethod = typeof(Type).GetTypeInfo().DeclaredMethods
+              .Single(m => m.Name == "GetTypeFromHandle");
+        }
 
         public ArgumentParser(IPropertySelector readablePropertySelector, IMethodSkeletonFactory methodSkeletonFactory)
         {
@@ -33,7 +40,7 @@
 
             Dictionary<string, object> map = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             CreateParseMethod(value.GetType())(value, map);
-
+            return map;
             var properties = readablePropertySelector.Execute(value.GetType());
             return properties.ToDictionary(prop => prop.Name, prop => prop.GetValue(value) ?? DBNull.Value, StringComparer.OrdinalIgnoreCase);
         }
@@ -55,8 +62,15 @@
             {
                 generator.Emit(OpCodes.Ldarg_1);
                 generator.Emit(OpCodes.Ldstr, property.Name);
-                generator.Emit(OpCodes.Ldloc, instance);                
+                                                
+                generator.Emit(OpCodes.Ldloc, instance);
                 generator.Emit(OpCodes.Callvirt, property.GetMethod);
+                if (property.PropertyType.GetTypeInfo().IsValueType)
+                {
+                    generator.Emit(OpCodes.Box, property.PropertyType);
+                }
+
+
                 MethodInfo addmethod = typeof (Dictionary<string, object>).GetTypeInfo().GetDeclaredMethod("Add");
                 generator.Emit(OpCodes.Callvirt, addmethod);                                
             }

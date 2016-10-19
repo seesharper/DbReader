@@ -19,7 +19,7 @@
         {
             RegisterSingletonServices(serviceRegistry);
             RegisterScopedServices(serviceRegistry);
-            ((ServiceContainer)serviceRegistry).Validate(message => { Trace.TraceWarning(message);});
+           // ((ServiceContainer)serviceRegistry).Validate(message => { Trace.TraceWarning(message);});
         }
        
         private static IReaderMethodBuilder<IStructuralEquatable> CreateConstructorReaderMethodBuilder(Type type, IServiceFactory factory)
@@ -78,14 +78,18 @@
                 .Decorate(typeof(IInstanceReader<>), typeof(CachedInstanceReader<>))
             
                 .Register(typeof(IInstanceReaderMethodBuilder<>), typeof(InstanceReaderMethodBuilder<>), new PerScopeLifetime())
-            //serviceRegistry.Decorate(typeof(IInstanceReaderMethodBuilder<>), typeof(CachedInstanceReaderMethodBuilder<>));
+                //.Decorate(typeof(IInstanceReaderMethodBuilder<>), typeof(CachedInstanceReaderMethodBuilder<>))
 
 
-                .Register<IPropertyMapper, KeyPropertyMapper>("KeyPropertyMapper", new PerScopeLifetime())
+                .Register<IKeyPropertyMapper, KeyPropertyMapper>(new PerScopeLifetime())
+                .Decorate<IKeyPropertyMapper, KeyPropertyMapperValidator>()
+                
+
+                
+                .Register<IPropertyMapper, PropertyMapper>(new PerScopeLifetime())
                 .Decorate<IPropertyMapper, PropertyTypeValidator>()
-                .Register<IPropertyMapper, PropertyMapper>("PropertyMapper", new PerScopeLifetime())
-            //serviceRegistry.Decorate<IPropertyMapper, CachedPropertyMapper>();
-                .Decorate(typeof(IPropertyMapper), typeof(KeyPropertyMapperValidator), sr => sr.ImplementingType == typeof(KeyPropertyMapper))
+                .Decorate<IPropertyMapper, CachedPropertyMapper>()
+                
 
 
                 .Register<IKeyReader, KeyReader>(new PerScopeLifetime())

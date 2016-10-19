@@ -475,7 +475,7 @@ This instructs DbReader to use our custom read delegate whenever it encounters a
 The Guid also needs to be converted back into a byte array when passing a Guid value as a parameter to a query.
 
 ```
-DbReaderOptions.WhenPassing<Guid>().ConvertTo(guid => guid.ToByteArray());
+DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray());
 ```
 
 

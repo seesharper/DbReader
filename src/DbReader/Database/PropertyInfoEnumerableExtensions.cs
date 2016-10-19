@@ -16,13 +16,9 @@ namespace DbReader.Database
             public int Compare(PropertyInfo x, PropertyInfo y)
             {
 
-#if NETSTANDARD15
-                var xToken = x.GetMetadataToken();
-                var ytoken = y.GetMetadataToken();
-#else
                 var xToken = x.MetadataToken;
                 var ytoken = y.MetadataToken;
-#endif
+
                 if (xToken < ytoken)
                 {
                     return -1;

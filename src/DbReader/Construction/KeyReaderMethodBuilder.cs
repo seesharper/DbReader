@@ -16,7 +16,7 @@ namespace DbReader.Construction
     {
         private readonly Func<Type, IReaderMethodBuilder<IStructuralEquatable>> constructorReaderMethodBuilderFactory;
 
-        private readonly IPropertyMapper keyPropertyMapper;
+        private readonly IKeyPropertyMapper keyPropertyMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyReaderMethodBuilder{T}"/> class.
@@ -26,7 +26,7 @@ namespace DbReader.Construction
         /// <param name="keyPropertyMapper">The <see cref="IPropertyMapper"/> that is responsible for mapping key properties to key fields.</param>
         public KeyReaderMethodBuilder(
             Func<Type, IReaderMethodBuilder<IStructuralEquatable>> constructorReaderMethodBuilderFactory, 
-            IPropertyMapper keyPropertyMapper)
+            IKeyPropertyMapper keyPropertyMapper)
         {
             this.constructorReaderMethodBuilderFactory = constructorReaderMethodBuilderFactory;
             this.keyPropertyMapper = keyPropertyMapper;

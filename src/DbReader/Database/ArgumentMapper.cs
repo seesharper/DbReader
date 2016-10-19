@@ -38,15 +38,22 @@
                 return result;
             }
             var parameterNames = parameterParser.GetParameters(sql);
-            var namedArguments = argumentParser.Parse(arguments);                        
-            foreach (var parameterName in parameterNames)
+            var namedArguments = argumentParser.Parse(arguments);
+            if (parameterNames.Length > 0)
             {
-                object argument;
-                if (!namedArguments.TryGetValue(parameterName, out argument))
+                foreach (var parameterName in parameterNames)
                 {
-                    throw new InvalidOperationException(ErrorMessages.MissingArgument.FormatWith(parameterName));
+                    object argument;
+                    if (!namedArguments.TryGetValue(parameterName, out argument))
+                    {
+                        throw new InvalidOperationException(ErrorMessages.MissingArgument.FormatWith(parameterName));
+                    }
+                    result.Add(parameterName, argument);
                 }
-                result.Add(parameterName, argument);                
+            }
+            else
+            {
+                return namedArguments;
             }
             return result;
         }

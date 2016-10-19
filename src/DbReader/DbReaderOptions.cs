@@ -92,9 +92,9 @@
 
     public class PassDelegate<TArgument>
     {
-        public void ConvertTo<TParameter>(Func<TArgument, TParameter> convertFunction)
+        public void Use(Action<IDataParameter, TArgument> convertFunction)
         {            
-            ArgumentConverter.RegisterConvertDelegate(convertFunction);
+            ArgumentProcessor.RegisterProcessDelegate(convertFunction);
         }
     }
 }

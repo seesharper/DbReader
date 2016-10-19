@@ -8,7 +8,7 @@ private const string csharpProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79E
 
 
 string pathToBuildDirectory = @"tmp/";
-private string version = "1.0.1-beta-2";
+private string version = "1.0.1-beta-3";
 
 private string fileVersion = Regex.Match(version, @"(^[\d\.]+)-?").Groups[1].Captures[0].Value;
 
@@ -41,7 +41,7 @@ private void CopyBinaryFilesToNuGetLibDirectory()
 {
 	CopyBinaryFile("NET45", "net45");
 	CopyBinaryFile("NET46", "net46");		
-	CopyBinaryFile("NETSTANDARD15", "netstandard1.5");       		
+	CopyBinaryFile("NETSTANDARD16", "netstandard1.6");       		
 }
 
 
@@ -96,8 +96,8 @@ private void Build(string frameworkMoniker)
 
 private void BuildDotNet()
 {		
-	string pathToProjectFile = Path.Combine(pathToBuildDirectory, @"netstandard15/Binary/DbReader/project.json");
-	DotNet.Build(pathToProjectFile, "netstandard15");
+	string pathToProjectFile = Path.Combine(pathToBuildDirectory, @"netstandard16/Binary/DbReader/project.json");
+	DotNet.Build(pathToProjectFile, "netstandard16");
 }
 
 private void RestoreNuGetPackages()
@@ -149,7 +149,7 @@ private void InitializBuildDirectories()
 	DirectoryUtils.Delete(pathToBuildDirectory);	
 	Execute(() => InitializeNugetBuildDirectory("NET45"), "Preparing Net45");
 	Execute(() => InitializeNugetBuildDirectory("NET46"), "Preparing Net46");	
-	Execute(() => InitializeNugetBuildDirectory("NETSTANDARD15"), "Preparing NetStandard1.5");	    						
+	Execute(() => InitializeNugetBuildDirectory("NETSTANDARD16"), "Preparing NetStandard1.6");	    						
 }
 
 private void InitializeNugetBuildDirectory(string frameworkMoniker)
@@ -162,7 +162,9 @@ private void InitializeNugetBuildDirectory(string frameworkMoniker)
 	{
 		var pathToJsonTemplateFile = Path.Combine(pathToBinary, "DbReader/project.json_");
 		var pathToJsonFile = Path.Combine(pathToBinary, "DbReader/project.json");
-		File.Move(pathToJsonTemplateFile, pathToJsonFile);	
+		File.Move(pathToJsonTemplateFile, pathToJsonFile);
+		string pathToLightInject = Path.Combine(pathToBinary, "DbReader/LightInject/LightInject.cs");
+		ReplaceInFile(@".*\[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage\]\r\n",string.Empty,pathToLightInject);	
 	}				  
 }
 
@@ -179,14 +181,14 @@ private void RenameSolutionFiles()
 {	
 	RenameSolutionFile("NET45");
 	RenameSolutionFile("NET46");	
-	RenameSolutionFile("NETSTANDARD15");	    
+	RenameSolutionFile("NETSTANDARD16");	    
 }
 
 private void PatchAssemblyInfo()
 {
 	Execute(() => PatchAssemblyInfo("Net45"), "Patching AssemblyInfo (Net45)");
 	Execute(() => PatchAssemblyInfo("Net46"), "Patching AssemblyInfo (Net46)");	
-	Execute(() => PatchAssemblyInfo("NETSTANDARD15"), "Patching AssemblyInfo (NetStandard1.5)");	    
+	Execute(() => PatchAssemblyInfo("NETSTANDARD16"), "Patching AssemblyInfo (NetStandard1.6)");	    
 }
 
 private void PatchAssemblyInfo(string framework)

@@ -36,7 +36,7 @@
             {
                 var parameter = command.CreateParameter();
                 parameter.Value = parameterValue.Value;
-                parameter.ParameterName = parameterValue.Key;
+                parameter.ParameterName = parameterValue.Key;                
                 command.Parameters.Add(parameter);
             }
             return command;

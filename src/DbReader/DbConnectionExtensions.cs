@@ -21,8 +21,7 @@
         {
             var command = Container.GetInstance<IDbCommandFactory>().CreateCommand(dbConnection, sql, arguments);
             CommandInitializer?.Invoke(command);
-            var dataReader = command.ExecuteReader();
-            SqlStatement.Current = sql;
+            var dataReader = command.ExecuteReader();            
             return dataReader.Read<T>();                                                                
         }
 
@@ -33,8 +32,7 @@
         {
             var command = Container.GetInstance<IDbCommandFactory>().CreateCommand(dbConnection, sql, arguments);
             CommandInitializer?.Invoke(command);
-            var dataReader = await ((DbCommand)command).ExecuteReaderAsync();
-            SqlStatement.Current = sql;
+            var dataReader = await ((DbCommand)command).ExecuteReaderAsync();            
             return dataReader.Read<T>();
         }
     }    

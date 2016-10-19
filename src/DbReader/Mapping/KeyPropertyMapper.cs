@@ -8,7 +8,7 @@
     /// An <see cref="IPropertyMapper"/> decorator that maps key fields from a given <see cref="IDataRecord"/>
     /// according to the specified <see cref="DbReaderOptions.KeyConvention"/>.
     /// </summary>
-    public class KeyPropertyMapper : IPropertyMapper
+    public class KeyPropertyMapper : IKeyPropertyMapper
     {
         private readonly IPropertyMapper propertyMapper;
         

@@ -13,6 +13,13 @@
 
         private string connectionString = @"Data Source = ..\..\db\northwind.db";
 
+        static IntegrationTests()
+        {
+            DbReaderOptions.WhenPassing<CustomValueType>()
+                .Use((parameter, argument) => parameter.Value = argument.Value);
+        }
+
+
         public IntegrationTests()
         {
 
@@ -93,6 +100,16 @@
                         connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
                             new {InvalidArgument = "ALFKI"})).Message.ShouldStartWith("Unable to resolve an argument value for parameter");                                
             }
+        }
+
+        public void ShouldBeAbleToConvertArgument()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Employee>(SQL.EmployeesWithOrdersAndTerritories, new { EmployeeId = new CustomValueType(7) });
+                customers.Count().ShouldBe(1);
+            }
+
         }
 
 

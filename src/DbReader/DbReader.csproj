@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgumentConverter.cs" />
+    <Compile Include="ArgumentProcessor.cs" />
     <Compile Include="Construction\Cache.cs" />
     <Compile Include="Construction\CachedInstanceReaderMethodBuilder.cs" />
     <Compile Include="Construction\CachedKeyReaderMethodBuilder.cs" />
@@ -73,7 +73,6 @@
     <Compile Include="Database\IParameterParser.cs" />
     <Compile Include="Database\PropertyInfoEnumerableExtensions.cs" />
     <Compile Include="Database\RegExParameterParser.cs" />
-    <Compile Include="Database\SqlStatement.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DbReaderOptions.cs" />
@@ -86,6 +85,7 @@
     <Compile Include="ErrorMessages.cs" />
     <Compile Include="LightInject\LightInject.cs" />
     <Compile Include="Mapping\CachedPropertyMapper.cs" />
+    <Compile Include="Mapping\IKeyPropertyMapper.cs" />
     <Compile Include="Mapping\IPropertyMapper.cs" />
     <Compile Include="Mapping\KeyPropertyMapper.cs" />
     <Compile Include="Mapping\KeyPropertyMapperValidator.cs" />

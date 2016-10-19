@@ -23,78 +23,78 @@
             }
             
             if (type == typeof(bool))
-            {
-                return typeof(IDataRecord).GetMethod("GetBoolean");
+            {               
+                return typeof (IDataRecord).GetTypeInfo().GetMethod("GetBoolean");
             }
            
             if (type == typeof(byte))
             {
-                return typeof(IDataRecord).GetMethod("GetByte");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetByte");
             }
 
             if (type == typeof(char))
             {
-                return typeof(IDataRecord).GetMethod("GetChar");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetChar");
             }           
 
             if (type == typeof(char[]))
             {
-                return typeof(DataRecordExtensions).GetMethod("GetChars");
+                return typeof(DataRecordExtensions).GetTypeInfo().GetMethod("GetChars");
             }
 
             if (type == typeof(DateTime))
             {
-                return typeof(IDataRecord).GetMethod("GetDateTime");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetDateTime");
             }
 
             if (type == typeof(decimal))
             {
-                return typeof(IDataRecord).GetMethod("GetDecimal");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetDecimal");
             }
 
             if (type == typeof(double))
             {
-                return typeof(IDataRecord).GetMethod("GetDouble");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetDouble");
             }
 
             if (type == typeof(float))
             {
-                return typeof(IDataRecord).GetMethod("GetFloat");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetFloat");
             }
 
             if (type == typeof(byte[]))
             {
-                return typeof(DataRecordExtensions).GetMethod("GetBytes", new[] { typeof(IDataRecord), typeof(int) });
+                return typeof(DataRecordExtensions).GetTypeInfo().GetMethod("GetBytes", new[] { typeof(IDataRecord), typeof(int) });
             }
 
             if (type == typeof(char))
             {
-                return typeof(IDataRecord).GetMethod("GetChar");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetChar");
             }
 
             if (type == typeof(char[]))
             {
-                return typeof(IDataRecord).GetMethod("GetChars");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetChars");
             }
 
             if (type == typeof(string))
             {
-                return typeof(IDataRecord).GetMethod("GetString");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetString");
             }
 
             if (type == typeof(int))
             {
-                return typeof(IDataRecord).GetMethod("GetInt32");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetInt32");
             }
 
             if (type == typeof(long))
             {
-                return typeof(IDataRecord).GetMethod("GetInt64");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetInt64");
             }
 
             if (type == typeof(short))
             {
-                return typeof(IDataRecord).GetMethod("GetInt16");
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetInt16");
             }
 
             throw new ArgumentOutOfRangeException("type", string.Format("Unable to determine the get method for {0}", type));

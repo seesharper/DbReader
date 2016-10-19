@@ -11,8 +11,8 @@ namespace DbReader.Construction
     /// <typeparam name="TValue"></typeparam>
     public static class Cache<TValue>
     {
-        private static readonly ConcurrentDictionary<Tuple<Type, string, string>, TValue> CachedValues =
-            new ConcurrentDictionary<Tuple<Type, string, string>, TValue>();
+        private static readonly ConcurrentDictionary<Tuple<Type, string>, TValue> CachedValues =
+            new ConcurrentDictionary<Tuple<Type, string>, TValue>();
 
         /// <summary>
         /// Gets or adds a value of <typeparamref name="TValue"/> based on the 
@@ -26,7 +26,7 @@ namespace DbReader.Construction
         /// given <paramref name="type"/> and <paramref name="prefix"/>.</returns>
         public static TValue GetOrAdd(Type type, string prefix, Func<TValue> delegateFactory)
         {
-            var key = Tuple.Create(type, SqlStatement.Current, prefix);
+            var key = Tuple.Create(type, prefix);
             return CachedValues.GetOrAdd(key, _ => delegateFactory());
         }
     }

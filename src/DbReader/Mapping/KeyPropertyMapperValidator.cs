@@ -9,15 +9,15 @@
     /// the the result from an <see cref="IPropertyMapper"/> that maps 
     /// key properties to fields.
     /// </summary>
-    public class KeyPropertyMapperValidator : IPropertyMapper
+    public class KeyPropertyMapperValidator : IKeyPropertyMapper
     {
-        private readonly IPropertyMapper keyPropertyMapper;
+        private readonly IKeyPropertyMapper keyPropertyMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyPropertyMapperValidator"/> class.
         /// </summary>
         /// <param name="keyPropertyMapper">The target <see cref="IPropertyMapper"/>.</param>
-        public KeyPropertyMapperValidator(IPropertyMapper keyPropertyMapper)
+        public KeyPropertyMapperValidator(IKeyPropertyMapper keyPropertyMapper)
         {
             this.keyPropertyMapper = keyPropertyMapper;
         }
