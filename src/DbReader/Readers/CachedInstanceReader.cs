@@ -18,10 +18,8 @@ namespace DbReader.Readers
         private readonly IKeyReader keyReader;
 
         private readonly IOneToManyMethodBuilder<T> oneToManyMethodBuilder;
-
-        private readonly ConcurrentDictionary<IStructuralEquatable, T> queryCache = new ConcurrentDictionary<IStructuralEquatable, T>();
-
-        private readonly Dictionary<IStructuralEquatable, T> queryCache2 = new Dictionary<IStructuralEquatable, T>(); 
+        
+        private readonly Dictionary<IStructuralEquatable, T> queryCache = new Dictionary<IStructuralEquatable, T>(); 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedInstanceReader{T}"/> class.
@@ -45,33 +43,28 @@ namespace DbReader.Readers
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Read(IDataRecord dataRecord, string currentPrefix)
         {
+            return instanceReader.Read(dataRecord, currentPrefix);
+
             var instance = ReadInstance(dataRecord, currentPrefix);
-            var oneToManyMethod = oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix);
-            if (oneToManyMethod != null)
-            {
-                oneToManyMethod(dataRecord, instance);
-            }
-            
+            oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix)?.Invoke(dataRecord, instance);
             return instance;
         }
 
         private T ReadInstance(IDataRecord dataRecord, string currentPrefix)
-        {
-            //return instanceReader.Read(dataRecord, currentPrefix);
+        {            
             var key = keyReader.Read(typeof(T), dataRecord, currentPrefix);
             if (key == null)
             {
                 return default(T);
             }
             T instance;
-            if (!queryCache2.TryGetValue(key, out instance))
+            if (!queryCache.TryGetValue(key, out instance))
             {
                 instance = instanceReader.Read(dataRecord, currentPrefix);
-                queryCache2.Add(key, instance);
+                queryCache.Add(key, instance);
             }
             return instance;
-
-            //return queryCache.GetOrAdd(key, k => instanceReader.Read(dataRecord, currentPrefix));
+            
         }
     }
 }

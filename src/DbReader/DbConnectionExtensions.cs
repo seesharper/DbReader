@@ -1,5 +1,6 @@
 ﻿namespace DbReader
 {
+    using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
@@ -19,10 +20,19 @@
 
         public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string sql, object arguments = null)
         {
+            var command = CreateCommand(dbConnection, sql, arguments);
+            using (var dataReader = command.ExecuteReader())
+            {
+                return dataReader.Read<T>();
+            }                
+        }
+       
+        public static IDbCommand CreateCommand(this IDbConnection dbConnection, string sql, object arguments)
+        {
+            SqlStatement.Current = sql;
             var command = Container.GetInstance<IDbCommandFactory>().CreateCommand(dbConnection, sql, arguments);
             CommandInitializer?.Invoke(command);
-            var dataReader = command.ExecuteReader();            
-            return dataReader.Read<T>();                                                                
+            return command;
         }
 
         public static async Task<IEnumerable<T>> ReadAsync<T>(
@@ -30,10 +40,11 @@
             string sql,
             object arguments = null)
         {
-            var command = Container.GetInstance<IDbCommandFactory>().CreateCommand(dbConnection, sql, arguments);
-            CommandInitializer?.Invoke(command);
-            var dataReader = await ((DbCommand)command).ExecuteReaderAsync();            
-            return dataReader.Read<T>();
+            var command = CreateCommand(dbConnection, sql, arguments);
+            using (var dataReader = await ((DbCommand) command).ExecuteReaderAsync())
+            {
+                return dataReader.Read<T>();
+            }                
         }
     }    
 }

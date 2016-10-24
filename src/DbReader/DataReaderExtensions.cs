@@ -21,7 +21,7 @@
 
         public static IEnumerable<T> Read<T>(this IDataReader dataReader)
         {
-            var result = new Collection<T>();
+            var result = new List<T>();
             var container = containerFactory.Value;
             using (container.BeginScope())
             {

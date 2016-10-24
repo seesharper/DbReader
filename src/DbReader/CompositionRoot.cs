@@ -78,7 +78,7 @@
                 .Decorate(typeof(IInstanceReader<>), typeof(CachedInstanceReader<>))
             
                 .Register(typeof(IInstanceReaderMethodBuilder<>), typeof(InstanceReaderMethodBuilder<>), new PerScopeLifetime())
-                //.Decorate(typeof(IInstanceReaderMethodBuilder<>), typeof(CachedInstanceReaderMethodBuilder<>))
+                .Decorate(typeof(IInstanceReaderMethodBuilder<>), typeof(CachedInstanceReaderMethodBuilder<>))
 
 
                 .Register<IKeyPropertyMapper, KeyPropertyMapper>(new PerScopeLifetime())

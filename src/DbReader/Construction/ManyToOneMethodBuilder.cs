@@ -70,7 +70,7 @@
                     generator.Emit(OpCodes.Ldarg_0);
                     
 
-                    // Push the object reader.
+                    // Push the instance readers
                     generator.Emit(OpCodes.Ldarg_2);
                     generator.EmitFastInt(instanceReaders.Count - 1);
                     generator.Emit(OpCodes.Ldelem_Ref);

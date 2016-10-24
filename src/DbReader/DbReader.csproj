@@ -50,6 +50,7 @@
     <Compile Include="Construction\CachedReaderMethodBuilder.cs" />
     <Compile Include="Construction\ConstructorReaderMethodBuilder.cs" />
     <Compile Include="Construction\DynamicMethodSkeleton.cs" />
+    <Compile Include="Construction\FastCache.cs" />
     <Compile Include="Construction\IKeyReaderMethodBuilder.cs" />
     <Compile Include="Construction\IManyToOneMethodBuilder.cs" />
     <Compile Include="Construction\IMethodSkeleton.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Selectors\ParameterlessConstructorSelector.cs" />
     <Compile Include="Selectors\ReadablePropertySelector.cs" />
     <Compile Include="Selectors\SimplePropertySelector.cs" />
+    <Compile Include="SqlStatement.cs" />
     <Compile Include="ValueConverter.cs" />
   </ItemGroup>
   <ItemGroup>

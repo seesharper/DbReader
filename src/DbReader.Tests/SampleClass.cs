@@ -18,12 +18,29 @@
     }
 
 
+    public class CustomerWithOrders
+    {
+        public string CustomerWithOrdersId { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
+    }
+
     public class Customer
     {
         public string CustomerId { get; set; }
 
-        public ICollection<Order> Orders { get; set; }
+        public string CompanyName { get; set; }
+
+        public string ContactName { get; set; }
+
+        public string ContactTitle { get; set; }
+
+        
+
     }
+
+
+
 
 
    
