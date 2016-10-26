@@ -43,14 +43,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentProcessor.cs" />
-    <Compile Include="Construction\Cache.cs" />
+    <Compile Include="Construction\IArgumentParserMethodBuilder.cs" />
+    <Compile Include="Construction\StaticCache.cs" />
     <Compile Include="Construction\CachedInstanceReaderMethodBuilder.cs" />
     <Compile Include="Construction\CachedKeyReaderMethodBuilder.cs" />
     <Compile Include="Construction\CachedOneToManyMethodBuilder.cs" />
     <Compile Include="Construction\CachedReaderMethodBuilder.cs" />
     <Compile Include="Construction\ConstructorReaderMethodBuilder.cs" />
     <Compile Include="Construction\DynamicMethodSkeleton.cs" />
-    <Compile Include="Construction\FastCache.cs" />
+    <Compile Include="Construction\Cache.cs" />
     <Compile Include="Construction\IKeyReaderMethodBuilder.cs" />
     <Compile Include="Construction\IManyToOneMethodBuilder.cs" />
     <Compile Include="Construction\IMethodSkeleton.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Selectors\ReadablePropertySelector.cs" />
     <Compile Include="Selectors\SimplePropertySelector.cs" />
     <Compile Include="SqlStatement.cs" />
+    <Compile Include="TypeEvaluator.cs" />
     <Compile Include="ValueConverter.cs" />
   </ItemGroup>
   <ItemGroup>

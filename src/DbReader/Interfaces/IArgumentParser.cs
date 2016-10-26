@@ -10,76 +10,26 @@
 
     public interface IArgumentParser
     {
-        IReadOnlyDictionary<string, object> Parse(object value);
+        IReadOnlyDictionary<string, ArgumentValue> Parse(object value);
     }
 
     public class ArgumentParser : IArgumentParser
     {
-        private readonly IPropertySelector readablePropertySelector;
-        private readonly IMethodSkeletonFactory methodSkeletonFactory;
-        private static readonly MethodInfo GetTypeFromHandleMethod;
+        private readonly IArgumentParserMethodBuilder argumentParserMethodBuilder;
 
-        static ArgumentParser()
+        public ArgumentParser(IArgumentParserMethodBuilder argumentParserMethodBuilder)
         {
-            GetTypeFromHandleMethod = typeof(Type).GetTypeInfo().DeclaredMethods
-              .Single(m => m.Name == "GetTypeFromHandle");
+            this.argumentParserMethodBuilder = argumentParserMethodBuilder;
         }
 
-        public ArgumentParser(IPropertySelector readablePropertySelector, IMethodSkeletonFactory methodSkeletonFactory)
-        {
-            this.readablePropertySelector = readablePropertySelector;
-            this.methodSkeletonFactory = methodSkeletonFactory;
-        }
-
-        public IReadOnlyDictionary<string, object> Parse(object value)
-        {
-            if (value == null)
-            {
-                return new Dictionary<string, object>();
-            }
-
-            Dictionary<string, object> map = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            CreateParseMethod(value.GetType())(value, map);
+        public IReadOnlyDictionary<string, ArgumentValue> Parse(object value)
+        {            
+            Dictionary<string, ArgumentValue> map = new Dictionary<string, ArgumentValue>(StringComparer.OrdinalIgnoreCase);
+            var argumentParseMethod = argumentParserMethodBuilder.CreateMethod(value.GetType());
+            argumentParseMethod(value, map);
             return map;
-            var properties = readablePropertySelector.Execute(value.GetType());
-            return properties.ToDictionary(prop => prop.Name, prop => prop.GetValue(value) ?? DBNull.Value, StringComparer.OrdinalIgnoreCase);
         }
 
-        private Action<object, Dictionary<string, object>> CreateParseMethod(Type argumentsType)
-        {
-            var properties = readablePropertySelector.Execute(argumentsType);
-            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("ParseArguments", typeof (void),
-                new[] {typeof (object), typeof (Dictionary<string, object>)});
-            DynamicMethod dm = new DynamicMethod("ParseArguments", typeof (void),
-                new[] {typeof (object), typeof (Dictionary<string, object>)}, argumentsType);
-
-            var generator = dm.GetILGenerator();
-            LocalBuilder instance = generator.DeclareLocal(argumentsType);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Castclass,argumentsType);
-            generator.Emit(OpCodes.Stloc, instance);
-            foreach (var property in properties)
-            {
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Ldstr, property.Name);
-                                                
-                generator.Emit(OpCodes.Ldloc, instance);
-                generator.Emit(OpCodes.Callvirt, property.GetMethod);
-                if (property.PropertyType.GetTypeInfo().IsValueType)
-                {
-                    generator.Emit(OpCodes.Box, property.PropertyType);
-                }
-
-
-                MethodInfo addmethod = typeof (Dictionary<string, object>).GetTypeInfo().GetDeclaredMethod("Add");
-                generator.Emit(OpCodes.Callvirt, addmethod);                                
-            }
-
-            generator.Emit(OpCodes.Ret);
-
-            return
-                (Action<object, Dictionary<string, object>>)
-                    dm.CreateDelegate(typeof (Action<object, Dictionary<string, object>>));
-        } 
+       
     }
 }

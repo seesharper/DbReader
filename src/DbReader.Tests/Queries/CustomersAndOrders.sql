@@ -1,5 +1,5 @@
 ﻿SELECT 
-	c.CustomerID,
+	c.CustomerID as CustomerWithOrdersId,
 	o.OrderId
 FROM 
 	Customers c

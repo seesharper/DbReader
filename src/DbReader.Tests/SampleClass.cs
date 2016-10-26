@@ -33,10 +33,7 @@
 
         public string ContactName { get; set; }
 
-        public string ContactTitle { get; set; }
-
-        
-
+        public string ContactTitle { get; set; }        
     }
 
 

@@ -84,7 +84,7 @@
         {
             using (var connection = CreateConnection())
             {
-                var customers = connection.Read<CustomerWithOrders>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
                     new {CustomerId = "ALFKI"});
                 customers.Count().ShouldBe(1);
             }
@@ -144,7 +144,8 @@
         public void DbReaderVsDapper()
         {
             GetAllCustomersUsingDapper();
-            GetAllCustomersUsingPropertyReader();
+            GetAllCustomersUsingDbReader();
+            //GetAllCustomersUsingPropertyReader();
         }
 
 

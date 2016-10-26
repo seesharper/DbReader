@@ -32,7 +32,7 @@
         /// <returns>A method that reads the key fields from the given <paramref name="dataRecord"/>.</returns>
         public Func<IDataRecord, IStructuralEquatable> CreateMethod(Type type, IDataRecord dataRecord, string prefix)
         {
-            return Cache<Func<IDataRecord, IStructuralEquatable>>.GetOrAdd(type, prefix,
+            return StaticCache<Func<IDataRecord, IStructuralEquatable>>.GetOrAdd(type, prefix,
                 () => keyReaderMethodBuilder.CreateMethod(type, dataRecord, prefix));               
         }
     }

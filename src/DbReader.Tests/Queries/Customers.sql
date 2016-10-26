@@ -1,5 +1,5 @@
 ﻿SELECT 
-	CustomerId
+	CustomerId,
 	CompanyName,
 	ContactName,
 	ContactTitle	

@@ -1,6 +1,7 @@
 ﻿namespace DbReader.Database
 {
     using System.Collections.Generic;
+    using Construction;
 
     /// <summary>
     /// Represents a class that is capable of mapping the argument values to 
@@ -15,6 +16,6 @@
         /// <param name="sql">The query containing the parameters.</param>
         /// <param name="arguments">An object where each readable property represents a named argument value.</param>
         /// <returns>A </returns>
-        IReadOnlyDictionary<string, object> Map(string sql, object arguments);
+        IReadOnlyDictionary<string, ArgumentValue> Map(string sql, object arguments);
     }
 }

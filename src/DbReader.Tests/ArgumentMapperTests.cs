@@ -10,8 +10,8 @@
         public void ShouldMapParameters(IArgumentMapper argumentMapper)
         {
             var result = argumentMapper.Map(":firstParameter, :secondParameter", new {FirstParameter = 1, SecondParameter = 2});
-            result.First().Value.ShouldBe(1);
-            result.Last().Value.ShouldBe(2);
+            result.First().Value.Value.ShouldBe(1);
+            result.Last().Value.Value.ShouldBe(2);
         }
 
         public void ShouldThrowExceptionWhenParameterNameIsNotPresentInArgumentObject(IArgumentMapper argumentMapper)
@@ -28,8 +28,8 @@
         public void ShouldMapMissingParameters(IArgumentMapper argumentMapper)
         {
             var result = argumentMapper.Map(string.Empty, new { FirstParameter = 1, SecondParameter = 2 });
-            result.First().Value.ShouldBe(1);
-            result.Last().Value.ShouldBe(2);
+            result.First().Value.Value.ShouldBe(1);
+            result.Last().Value.Value.ShouldBe(2);
         }
     }
 }

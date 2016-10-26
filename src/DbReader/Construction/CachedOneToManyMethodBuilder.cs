@@ -24,7 +24,7 @@ namespace DbReader.Construction
 
         public Action<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
         {
-            return Cache<Action<IDataRecord, T>>.GetOrAdd(typeof (T), prefix,
+            return StaticCache<Action<IDataRecord, T>>.GetOrAdd(typeof (T), prefix,
                 () => oneToManyMethodBuilder.CreateMethod(dataRecord, prefix));
         }
     }

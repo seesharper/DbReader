@@ -32,7 +32,7 @@
         /// <returns>A list of <see cref="MappingInfo"/> instances that represents the mapping between a field and a property.</returns>
         public MappingInfo[] Execute(Type type, IDataRecord dataRecord, string prefix)
         {
-            return Cache<MappingInfo[]>.GetOrAdd(type, prefix,
+            return StaticCache<MappingInfo[]>.GetOrAdd(type, prefix,
                 () => propertyMapper.Execute(type, dataRecord, prefix));
         }
     }

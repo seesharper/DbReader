@@ -44,6 +44,8 @@
                 .Register<IDbCommandFactory, DbCommandFactory>(new PerContainerLifetime())
                 .Register<IArgumentMapper, ArgumentMapper>(new PerContainerLifetime())
                 .Register<IArgumentParser, ArgumentParser>(new PerContainerLifetime())
+                .Register<IArgumentParserMethodBuilder, ArgumentParserMethodBuilder>(new PerContainerLifetime())
+
 
                 .Register<IPropertySelector, ReadablePropertySelector>("ReadablePropertySelector", new PerContainerLifetime())
                 .Register<IPropertySelector, SimplePropertySelector>("SimplePropertySelector", new PerContainerLifetime())

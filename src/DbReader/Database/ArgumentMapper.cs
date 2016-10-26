@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Construction;
     using Extensions;
     using Interfaces;
 
@@ -30,9 +31,9 @@
         /// <param name="sql">The query containing the parameters.</param>
         /// <param name="arguments">An object where each readable property represents a named argument value.</param>
         /// <returns>A </returns>
-        public IReadOnlyDictionary<string, object> Map(string sql, object arguments)
+        public IReadOnlyDictionary<string, ArgumentValue> Map(string sql, object arguments)
         {
-            var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var result = new Dictionary<string, ArgumentValue>(StringComparer.OrdinalIgnoreCase);
             if (arguments == null)
             {
                 return result;
@@ -43,7 +44,7 @@
             {
                 foreach (var parameterName in parameterNames)
                 {
-                    object argument;
+                    ArgumentValue argument;
                     if (!namedArguments.TryGetValue(parameterName, out argument))
                     {
                         throw new InvalidOperationException(ErrorMessages.MissingArgument.FormatWith(parameterName));

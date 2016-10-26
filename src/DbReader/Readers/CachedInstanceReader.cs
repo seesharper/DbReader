@@ -42,9 +42,7 @@ namespace DbReader.Readers
         /// <param name="currentPrefix">The current prefix.</param>
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Read(IDataRecord dataRecord, string currentPrefix)
-        {
-            return instanceReader.Read(dataRecord, currentPrefix);
-
+        {            
             var instance = ReadInstance(dataRecord, currentPrefix);
             oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix)?.Invoke(dataRecord, instance);
             return instance;
