@@ -1,22 +1,24 @@
 ﻿namespace DbReader.Database
 {
     using System.Data;
+    using Interfaces;
 
     /// <summary>
     /// A class that is capable of creating a <see cref="IDbCommand"/>
     /// </summary>
     public class DbCommandFactory : IDbCommandFactory
     {
-        private readonly IArgumentMapper argumentMapper;
+        private readonly IArgumentParser argumentParser;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DbCommandFactory"/> class.
         /// </summary>
         /// <param name="argumentMapper">The <see cref="IArgumentMapper"/> that is responsible for mapping the argument values 
         /// to the parameters present in a given SQL statement.</param>
-        public DbCommandFactory(IArgumentMapper argumentMapper)
+        /// <param name="argumentParser"></param>
+        public DbCommandFactory(IArgumentParser argumentParser)
         {
-            this.argumentMapper = argumentMapper;
+            this.argumentParser = argumentParser;
         }
 
         /// <summary>
@@ -31,13 +33,10 @@
         {
             var command = dbConnection.CreateCommand();            
             command.CommandText = sql;
-            var parameterValues = argumentMapper.Map(sql, arguments);
-            foreach (var parameterValue in parameterValues)
-            {
-                var parameter = command.CreateParameter();
-                parameter.Value = parameterValue.Value;
-                parameter.ParameterName = parameterValue.Key;
-                
+            var parameters = argumentParser.Parse(sql, arguments, () => command.CreateParameter());
+            
+            foreach (var parameter in parameters)
+            {                                
                 command.Parameters.Add(parameter);
             }
             return command;

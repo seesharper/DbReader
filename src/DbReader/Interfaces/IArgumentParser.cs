@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
@@ -10,7 +11,7 @@
 
     public interface IArgumentParser
     {
-        IReadOnlyDictionary<string, ArgumentValue> Parse(object value);
+        IDataParameter[] Parse(string sql, object value, Func<IDataParameter> parameterFactory);
     }
 
     public class ArgumentParser : IArgumentParser
@@ -22,14 +23,10 @@
             this.argumentParserMethodBuilder = argumentParserMethodBuilder;
         }
 
-        public IReadOnlyDictionary<string, ArgumentValue> Parse(object value)
-        {            
-            Dictionary<string, ArgumentValue> map = new Dictionary<string, ArgumentValue>(StringComparer.OrdinalIgnoreCase);
-            var argumentParseMethod = argumentParserMethodBuilder.CreateMethod(value.GetType());
-            argumentParseMethod(value, map);
-            return map;
-        }
-
-       
+        public IDataParameter[] Parse(string sql, object value, Func<IDataParameter> parameterFactory)
+        {                        
+            var argumentParseMethod = argumentParserMethodBuilder.CreateMethod(sql, value.GetType());
+            return argumentParseMethod(value, parameterFactory);
+        }       
     }
 }

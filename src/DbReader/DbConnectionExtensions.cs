@@ -12,10 +12,12 @@
     public static class DbConnectionExtensions
     {
         private static readonly IServiceContainer Container = new ServiceContainer();
+        private static readonly IDbCommandFactory DbCommandFactory;
 
         static DbConnectionExtensions()
         {
             Container.RegisterFrom<CompositionRoot>();
+            DbCommandFactory = Container.GetInstance<IDbCommandFactory>();
         }
 
         public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string sql, object arguments = null)
@@ -30,7 +32,7 @@
         public static IDbCommand CreateCommand(this IDbConnection dbConnection, string sql, object arguments)
         {
             SqlStatement.Current = sql;
-            var command = Container.GetInstance<IDbCommandFactory>().CreateCommand(dbConnection, sql, arguments);
+            var command = DbCommandFactory.CreateCommand(dbConnection, sql, arguments);
             CommandInitializer?.Invoke(command);
             return command;
         }

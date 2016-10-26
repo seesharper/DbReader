@@ -68,7 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentProcessorTests.cs" />
-    <Compile Include="ArgumentMapperTests.cs" />
+    <Compile Include="ArgumentParserTests.cs" />
     <Compile Include="AssemblyAssert.cs" />
     <Compile Include="ConstructorSelectorTests.cs" />
     <Compile Include="CustomValueType.cs" />

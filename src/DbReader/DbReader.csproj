@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentProcessor.cs" />
+    <Compile Include="Construction\ArgumentParserMethodBuilder.cs" />
+    <Compile Include="Construction\CachedArgumentParserMethodBuilder.cs" />
     <Compile Include="Construction\IArgumentParserMethodBuilder.cs" />
     <Compile Include="Construction\StaticCache.cs" />
     <Compile Include="Construction\CachedInstanceReaderMethodBuilder.cs" />
@@ -68,9 +70,7 @@
     <Compile Include="Construction\PropertyReaderMethodBuilder.cs" />
     <Compile Include="Construction\ReaderMethodBuilder.cs" />
     <Compile Include="ContainerExtensions.cs" />
-    <Compile Include="Database\ArgumentMapper.cs" />
     <Compile Include="Database\DbCommandFactory.cs" />
-    <Compile Include="Database\IArgumentMapper.cs" />
     <Compile Include="Database\IDbCommandFactory.cs" />
     <Compile Include="Database\IParameterParser.cs" />
     <Compile Include="Database\PropertyInfoEnumerableExtensions.cs" />

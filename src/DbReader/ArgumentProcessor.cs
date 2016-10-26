@@ -23,8 +23,6 @@ namespace DbReader
             ConvertMethod = typeof (ArgumentProcessor).GetTypeInfo().DeclaredMethods
                 .Single(m => m.Name == "Process");
           
-
-
         }
 
         public static void RegisterProcessDelegate<TArgument>(Action<IDataParameter, TArgument> convertFunction)
@@ -54,6 +52,11 @@ namespace DbReader
             ProcessDelegates[argumentType](dataParameter, argument);
         }
 
-        
+        public static Action<IDataParameter, object> GetProcessDelegate(Type propertyType)
+        {
+            Action<IDataParameter, object> processDelegate;
+            ProcessDelegates.TryGetValue(propertyType, out processDelegate);
+            return processDelegate;            
+        }
     }
 }
