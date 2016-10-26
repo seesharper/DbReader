@@ -37,11 +37,11 @@
         public void GetPrefix_ExistingPrefix_AppendsToExistingPrefix(IPrefixResolver prefixResolver)
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
-            var dataRecord = new { Customer_Orders_OrderId = 42L }.ToDataRecord();
+            var dataRecord = new { CustomerWithOrders_Orders_OrderId = 42L }.ToDataRecord();
 
             var prefix = prefixResolver.GetPrefix(property, dataRecord, "CustomerWithOrders");
 
-            prefix.ShouldBe("Customer_Orders");
+            prefix.ShouldBe("CustomerWithOrders_Orders");
         }
 
         public void GetPrefix_UnknownPrefix_ReturnsNull(IPrefixResolver prefixResolver)

@@ -51,5 +51,13 @@
             result[1].ParameterName.ShouldBe("secondParameter");
         }
 
+
+        public void ShouldReturnEmptyArrayWhenArgumentObjectIsNull(IArgumentParser argumentParser)
+        {
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
+                null,
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+            result.ShouldBeEmpty();
+        }
     }
 }

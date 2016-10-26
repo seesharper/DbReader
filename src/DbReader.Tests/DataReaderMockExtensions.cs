@@ -110,6 +110,7 @@
         /// <returns>An implementation of IDataReader based on the public properties of T</returns>
         public static IDataReader ToDataReader<T>(this IEnumerable<T> items)
         {
+            SqlStatement.Current = Guid.NewGuid().ToString();
             return new DataReader<T>(items);
         }
 

@@ -24,7 +24,11 @@
         }
 
         public IDataParameter[] Parse(string sql, object value, Func<IDataParameter> parameterFactory)
-        {                        
+        {
+            if (value == null)
+            {
+                return new IDataParameter[] {};
+            }
             var argumentParseMethod = argumentParserMethodBuilder.CreateMethod(sql, value.GetType());
             return argumentParseMethod(value, parameterFactory);
         }       

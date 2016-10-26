@@ -1,7 +1,6 @@
 ﻿namespace DbReader.Tests
 {
     using System;
-    using DbReader.Interfaces;
     using Mapping;
     using Shouldly;
 
