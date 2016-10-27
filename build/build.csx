@@ -52,18 +52,6 @@ private void CreateBinaryPackage()
 	NuGet.CreatePackage(pathToMetadataFile, pathToBuildDirectory);
 }
 
-private void CopySourceFile(string frameworkMoniker, string packageDirectoryName)
-{
-	string pathToMetadata = "../src/DbReader/NuGet";
-	string pathToPackageDirectory = Path.Combine(pathToBuildDirectory, "NugetPackages/Source/package");	
-	RoboCopy(pathToMetadata, pathToPackageDirectory, "DbReader.Source.nuspec");	
-	string pathToSourceFile = "tmp/" + frameworkMoniker + "/Source/DbReader";
-	string pathToDestination = Path.Combine(pathToPackageDirectory, "content/" + packageDirectoryName + "/DbReader");
-	RoboCopy(pathToSourceFile, pathToDestination, "DbReader.cs");
-	FileUtils.Rename(Path.Combine(pathToDestination, "DbReader.cs"), "DbReader.cs.pp");
-	ReplaceInFile(@"namespace \S*", "namespace $rootnamespace$.DbReader", Path.Combine(pathToDestination, "DbReader.cs.pp"));
-}
-
 private void CopyBinaryFile(string frameworkMoniker, string packageDirectoryName)
 {
 	string pathToMetadata = "../src/DbReader/NuGet";
@@ -165,6 +153,7 @@ private void InitializeNugetBuildDirectory(string frameworkMoniker)
 		File.Move(pathToJsonTemplateFile, pathToJsonFile);
 		string pathToLightInject = Path.Combine(pathToBinary, "DbReader/LightInject/LightInject.cs");
 		ReplaceInFile(@".*\[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage\]\r\n",string.Empty,pathToLightInject);	
+		ReplaceInFile(@".*\[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage\]\n",string.Empty,pathToLightInject);	
 	}				  
 }
 
@@ -195,14 +184,6 @@ private void PatchAssemblyInfo(string framework)
 {	
 	var pathToAssemblyInfo = Path.Combine(pathToBuildDirectory, framework + @"\Binary\DbReader\Properties\AssemblyInfo.cs");	
 	PatchAssemblyVersionInfo(version, fileVersion, framework, pathToAssemblyInfo);			
-}
-
-private void PatchInternalsVisibleToAttribute(string pathToAssemblyInfo)
-{
-	var assemblyInfo = ReadFile(pathToAssemblyInfo);   
-	StringBuilder sb = new StringBuilder(assemblyInfo);
-	sb.AppendLine(@"[assembly: InternalsVisibleTo(""DbReader.Tests"")]");
-	WriteFile(pathToAssemblyInfo, sb.ToString());
 }
 
 private void PatchProjectFiles()
