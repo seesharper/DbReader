@@ -29,7 +29,7 @@
             }                
         }
 
-        public static IDataReader ExecuteReader(this IDbConnection dbConnection, string sql, object arguments)
+        public static IDataReader ExecuteReader(this IDbConnection dbConnection, string sql, object arguments = null)
         {
             var command = CreateCommand(dbConnection, sql, arguments);
             return command.ExecuteReader();
