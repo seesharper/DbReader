@@ -8,7 +8,7 @@ private const string csharpProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79E
 
 
 string pathToBuildDirectory = @"tmp/";
-private string version = "1.0.1-beta-5";
+private string version = "1.0.1-beta-6";
 
 private string fileVersion = Regex.Match(version, @"(^[\d\.]+)-?").Groups[1].Captures[0].Value;
 
@@ -153,6 +153,7 @@ private void InitializeNugetBuildDirectory(string frameworkMoniker)
 		File.Move(pathToJsonTemplateFile, pathToJsonFile);
 		string pathToLightInject = Path.Combine(pathToBinary, "DbReader/LightInject/LightInject.cs");
 		ReplaceInFile(@".*\[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage\]\r\n",string.Empty,pathToLightInject);	
+		// Do another replace to make this work on AppVeyor. Go figure 
 		ReplaceInFile(@".*\[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage\]\n",string.Empty,pathToLightInject);	
 	}				  
 }

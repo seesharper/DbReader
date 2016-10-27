@@ -28,7 +28,13 @@
                 return dataReader.Read<T>();
             }                
         }
-       
+
+        public static IDataReader ExecuteReader(this IDbConnection dbConnection, string sql, object arguments)
+        {
+            var command = CreateCommand(dbConnection, sql, arguments);
+            return command.ExecuteReader();
+        }
+
         public static IDbCommand CreateCommand(this IDbConnection dbConnection, string sql, object arguments)
         {
             SqlStatement.Current = sql;
