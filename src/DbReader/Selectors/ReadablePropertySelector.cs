@@ -19,7 +19,7 @@
         public PropertyInfo[] Execute(Type type)
         {
             PropertyInfo[] properties = type.GetProperties();
-            return properties.Where(p => (p.PropertyType.IsSimpleType() || ArgumentProcessor.CanProcess(p.PropertyType)) && p.IsReadable()).ToArray();
+            return properties.Where(p => p.PropertyType.IsSimpleType() && p.IsReadable()).ToArray();
         }        
     }
 }

@@ -28,9 +28,7 @@
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase);
             ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");            
         }
-
         
-
         public static ReadDelegate<TProperty> WhenReading<TProperty>()
         {
             return new ReadDelegate<TProperty>();

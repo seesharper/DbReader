@@ -46,10 +46,10 @@
                 return nextPrefix;
             }
             
-            if (IsAtRootLevel(currentPrefix) && HasAtLeastOneMappedPropertyAtTheRootLevel(navigationProperty, dataRecord))
-            {
-                return string.Empty;
-            }
+            //if (IsAtRootLevel(currentPrefix) && HasAtLeastOneMappedPropertyAtTheRootLevel(navigationProperty, dataRecord))
+            //{
+            //    return string.Empty;
+            //}
 
             return null;
         }

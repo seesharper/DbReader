@@ -1,6 +1,6 @@
 ﻿SELECT 
 	c.CustomerID as CustomerWithOrdersId,
-	o.OrderId
+	o.OrderId as O_OrderId
 FROM 
 	Customers c
 INNER JOIN 

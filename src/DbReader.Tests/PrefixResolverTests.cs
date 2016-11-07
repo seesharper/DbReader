@@ -6,12 +6,12 @@
 
     public class PrefixResolverTests
     {
-        public void GetPrefix_NoPrefix_ReturnsEmptyPrefix(IPrefixResolver prefixResolver)
+        public void GetPrefix_NoPrefix_Null(IPrefixResolver prefixResolver)
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
             var dataRecord = new { OrderId = 42L }.ToDataRecord();
             var prefix = prefixResolver.GetPrefix(property, dataRecord, string.Empty);
-            prefix.ShouldBeEmpty();
+            prefix.ShouldBeNull();
         }
 
         public void GetPrefix_FullPrefix_ReturnsPrefix(IPrefixResolver prefixResolver)

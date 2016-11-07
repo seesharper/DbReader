@@ -44,26 +44,5 @@ namespace DbReader.Construction
 
 
 
-    public class FastCacheKey
-    {       
-        private readonly string prefix;
-        private readonly string sql;
-
-        public FastCacheKey(string prefix, string sql)
-        {            
-            this.prefix = prefix;
-            this.sql = sql;
-        }
-
-        public override int GetHashCode()
-        {
-            return sql.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            var other = (FastCacheKey) obj;
-            return (other.prefix == prefix) && (other.sql == sql);
-        }
-    }
+    
 }

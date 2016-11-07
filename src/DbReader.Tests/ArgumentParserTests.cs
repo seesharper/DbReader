@@ -51,6 +51,25 @@
             result[1].ParameterName.ShouldBe("secondParameter");
         }
 
+        public void ShouldHandleDifferentTypeForSameSql(IArgumentParser argumentParser)
+        {
+            var result1 = argumentParser.Parse(":firstParameter, :secondParameter",
+                new { FirstParameter = 1, SecondParameter = 2 },
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+
+            result1[0].ParameterName.ShouldBe("firstParameter");
+            result1[1].ParameterName.ShouldBe("secondParameter");
+
+            var result2 = argumentParser.Parse(":firstParameter, :secondParameter",
+                new { firstParameter = 1, secondParameter = 2 },
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+
+            result2[0].ParameterName.ShouldBe("firstParameter");
+            result2[1].ParameterName.ShouldBe("secondParameter");
+
+
+        }
+
 
         public void ShouldReturnEmptyArrayWhenArgumentObjectIsNull(IArgumentParser argumentParser)
         {

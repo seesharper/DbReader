@@ -478,6 +478,11 @@ The Guid also needs to be converted back into a byte array when passing a Guid v
 DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray());
 ```
 
+## Reading "simple" types
+
+```
+	connection.Read<Value<int>>
+```
 
 
 

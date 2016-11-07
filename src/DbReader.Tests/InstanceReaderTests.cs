@@ -211,6 +211,14 @@
             instance.SecondProperty.Id.ShouldBe(3);
         }
 
+        public void ShouldHandleManyToOneWithoutAnyMatchingColumns(
+            IInstanceReader<ClassWithProperty<ClassWithId>> instanceReader)
+        {
+            var dataRecord = new { Id = 1}.ToDataRecord();
+            var instance = instanceReader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldBeNull();
+        }
+
         public void ShouldReadInstanceWithNestedOneToManyRelation(IInstanceReader<ClassWithNestedOnToManyRelation> instanceReader)
         {
             var rows = new[]

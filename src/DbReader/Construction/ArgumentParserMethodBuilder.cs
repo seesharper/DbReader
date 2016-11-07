@@ -45,7 +45,7 @@ namespace DbReader.Construction
             var processDelegates = new List<Action<IDataParameter, object>>();
 
             var parameterNames = parameterParser.GetParameters(commandText);            
-            var properties = readablePropertySelector.Execute(argumentsType);
+            var properties = readablePropertySelector.Execute(argumentsType).OrderByDeclaration().ToArray();
             if (parameterNames.Length > 0)
             {
                 properties = properties.Where(p => parameterNames.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray();

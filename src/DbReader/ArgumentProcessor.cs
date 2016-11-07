@@ -41,12 +41,7 @@ namespace DbReader
                 ProcessDelegates.TryAdd(argumentType, processDelegate);
             }
         }
-
-        public static bool CanProcess(Type argumentType)
-        {
-            return ProcessDelegates.ContainsKey(argumentType);
-        }
-
+        
         public static void Process(Type argumentType, IDataParameter dataParameter, object argument)
         {
             ProcessDelegates[argumentType](dataParameter, argument);
