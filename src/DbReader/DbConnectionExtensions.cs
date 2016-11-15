@@ -17,13 +17,13 @@
         static DbConnectionExtensions()
         {
             Container.RegisterFrom<CompositionRoot>();
+            DataReaderExtensions.SetContainer(Container);
             DbCommandFactory = Container.GetInstance<IDbCommandFactory>();
         }
 
         public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string sql, object arguments = null)
-        {
-            var command = CreateCommand(dbConnection, sql, arguments);
-            using (var dataReader = command.ExecuteReader())
+        {                        
+            using (var dataReader = dbConnection.ExecuteReader(sql, arguments))
             {
                 return dataReader.Read<T>();
             }                
@@ -35,7 +35,7 @@
             return command.ExecuteReader();
         }
 
-        public static IDbCommand CreateCommand(this IDbConnection dbConnection, string sql, object arguments)
+        public static IDbCommand CreateCommand(this IDbConnection dbConnection, string sql, object arguments = null)
         {
             SqlStatement.Current = sql;
             var command = DbCommandFactory.CreateCommand(dbConnection, sql, arguments);
@@ -47,12 +47,18 @@
             this IDbConnection dbConnection,
             string sql,
             object arguments = null)
-        {
-            var command = CreateCommand(dbConnection, sql, arguments);
-            using (var dataReader = await ((DbCommand) command).ExecuteReaderAsync())
+        {            
+            using (var dataReader = await dbConnection.ExecuteReaderAsync(sql, arguments))
             {
+                SqlStatement.Current = sql;
                 return dataReader.Read<T>();
             }                
+        }
+
+        public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, string sql, object arguments = null)
+        {
+            var command = CreateCommand(dbConnection, sql, arguments);
+            return await ((DbCommand) command).ExecuteReaderAsync();
         }
     }    
 }

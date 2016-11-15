@@ -53,12 +53,7 @@
 
             return null;
         }
-
-        private static bool IsAtRootLevel(string currentPrefix)
-        {
-            return currentPrefix == string.Empty;
-        }
-
+      
         private static string CreatePrefix(string currentPrefix, string nextPrefix)
         {
             if (string.IsNullOrEmpty(currentPrefix))
@@ -68,12 +63,7 @@
 
             return currentPrefix + "_" + nextPrefix;
         }
-
-        private bool HasAtLeastOneMappedPropertyAtTheRootLevel(PropertyInfo navigationProperty, IDataRecord dataRecord)
-        {
-            return HasAtLeastOneMappedProperty(navigationProperty.PropertyType, dataRecord, string.Empty);
-        }       
-                
+                           
         private bool TryGetPrefixBasedOnPropertyName(PropertyInfo navigationProperty, IDataRecord dataRecord, string currentPrefix, out string nextPrefix)
         {
             nextPrefix = CreatePrefix(currentPrefix, navigationProperty.Name);

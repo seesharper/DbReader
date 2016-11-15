@@ -1,6 +1,9 @@
 ﻿namespace DbReader.Tests
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Runtime.InteropServices;
     using Extensions;
     using Shouldly;
 
@@ -60,6 +63,16 @@
         public void IsSimpleType_Nullable_ReturnsTrue()
         {
             typeof(int?).IsSimpleType().ShouldBeTrue();
+        }
+
+        public void IsEnumerable_IEnumerable_ReturnsTrue()
+        {
+            typeof(IEnumerable<int>).IsEnumerable().ShouldBeTrue();
+        }
+
+        public void IsEnumerable_CollectionTypeImplementingIEnumerable_ReturnsTrue()
+        {
+            typeof(Collection<int>).IsEnumerable().ShouldBeTrue();
         }
     }
 }

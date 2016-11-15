@@ -8,5 +8,11 @@
         public const string MissingKeyProperties = "The type ({0}) does not contain any properties that is considered a key property.";
         public const string UnmappedKeyProperty = "The property ({0}) is considered a key property, but is not available in the result set. Please make sure that the result set contains a field that can be mapped this property.";
         public const string MissingArgument = "Unable to resolve an argument value for parameter ({0}). Please make sure that the argument object passed into the Read method has a property named '{0}'";
+
+        public const string InvalidCollectionType =
+            "The navigation property (one-to-many) {0} must have one of the following types {1}";
+
+        public const string SimpleProjectType =
+            "{0} Simple types such as string and int are not allowed as the item type for a collection property.";
     }
 }

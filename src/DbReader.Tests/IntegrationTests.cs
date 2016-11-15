@@ -7,6 +7,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
     using Construction;
     using Dapper;
     using Extensions;
@@ -69,6 +70,17 @@
             }
         }
 
+        public async Task ShouldReadCustomersAsync()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = await connection.ReadAsync<Customer>(SQL.Customers);
+                customers.Count().ShouldBe(93);
+            }
+        }
+
+
+
         public void ShouldReadCustomersAndOrders()
         {
             using (var connection = CreateConnection())
@@ -120,6 +132,20 @@
                 customers.Count().ShouldBe(1);
             }
 
+        }
+
+        public void ShouldInvokeCommandInitializer()
+        {
+            bool invoked = false;
+            DbReaderOptions.CommandInitializer = command => { invoked = true; };
+
+            using (var connection = CreateConnection())
+            {
+                connection.CreateCommand(SQL.Customers);
+            }
+            invoked.ShouldBeTrue();
+
+            DbReaderOptions.CommandInitializer = null;
         }
 
 
@@ -194,40 +220,40 @@
             }
         }
 
-        public void GetAllCustomersUsingPropertyReader()
-        {
-            var container = new ServiceContainer();
-            container.RegisterFrom<CompositionRoot>();
+        //public void GetAllCustomersUsingPropertyReader()
+        //{
+        //    var container = new ServiceContainer();
+        //    container.RegisterFrom<CompositionRoot>();
 
-            var propertyreaderMethodBuilder = container.GetInstance<IReaderMethodBuilder<Customer>>("PropertyReaderMethodBuilder");
-            var method = propertyreaderMethodBuilder.CreateMethod();
-            int[] ordinals = new[] {0,1,2,3};
-            using (var connection = CreateConnection())
-            {
+        //    var propertyreaderMethodBuilder = container.GetInstance<IReaderMethodBuilder<Customer>>("PropertyReaderMethodBuilder");
+        //    var method = propertyreaderMethodBuilder.CreateMethod();
+        //    int[] ordinals = new[] {0,1,2,3};
+        //    using (var connection = CreateConnection())
+        //    {
                 
 
-                var dbReaderResult = Measure.Run(() =>
-                {
-                    List<Customer> result = new List<Customer>();
-                    //var command = connection.CreateCommand(SQL.Customers, null);
-                    var command = connection.CreateCommand();
-                    command.CommandText = SQL.Customers;
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var customer = method(reader, ordinals);
-                            result.Add(customer);
-                        }
+        //        var dbReaderResult = Measure.Run(() =>
+        //        {
+        //            List<Customer> result = new List<Customer>();
+        //            //var command = connection.CreateCommand(SQL.Customers, null);
+        //            var command = connection.CreateCommand();
+        //            command.CommandText = SQL.Customers;
+        //            using (var reader = command.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    var customer = method(reader, ordinals);
+        //                    result.Add(customer);
+        //                }
                         
-                    }
+        //            }
 
-                }, 10,
-                    "DbReader-PropertyReader (All Customers)");
-                Console.WriteLine(dbReaderResult);
-            }
+        //        }, 10,
+        //            "DbReader-PropertyReader (All Customers)");
+        //        Console.WriteLine(dbReaderResult);
+        //    }
 
-        }
+        //}
 
 
     }

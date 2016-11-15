@@ -7,7 +7,7 @@
 
     /// <summary>
     /// A <see cref="IPropertySelector"/> that selects properties 
-    /// that represents a "One-to-many" navigation property.
+    /// that represents a "one-to-many" navigation property.
     /// </summary>
     public class OneToManyPropertySelector : IPropertySelector
     {

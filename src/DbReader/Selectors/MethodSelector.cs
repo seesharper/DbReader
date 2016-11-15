@@ -65,17 +65,7 @@
             if (type == typeof(byte[]))
             {
                 return typeof(DataRecordExtensions).GetTypeInfo().GetMethod("GetBytes", new[] { typeof(IDataRecord), typeof(int) });
-            }
-
-            if (type == typeof(char))
-            {
-                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetChar");
-            }
-
-            if (type == typeof(char[]))
-            {
-                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetChars");
-            }
+            }           
 
             if (type == typeof(string))
             {

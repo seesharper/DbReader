@@ -21,8 +21,8 @@
             var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
             var instance = reader.Read(dataRecord, string.Empty);
             instance.Property.ShouldBe("SomeValue");
-        }
-        
+        }       
+
         public void ShouldReadInt64Value(IInstanceReader<ClassWithProperty<long>> reader)
         {
             var dataRecord = new { Id = 42, Property = (long)84 }.ToDataRecord();
@@ -270,26 +270,16 @@
     }
 
     public class Master
-    {
-        public Master()
-        {
-            Details = new List<Detail>();
-        }
-        
+    {               
         public int MasterId { get; set; }
         public string MasterName { get; set; }
-        public List<Detail> Details { get; set; }
+        public IEnumerable<Detail> Details { get; set; }
     }
     public class Detail
-    {
-        public Detail()
-        {
-            SubDetails = new List<SubDetail>();
-        }
-        
+    {               
         public int DetailId { get; set; }
         public string DetailName { get; set; }
-        public List<SubDetail> SubDetails { get; set; }
+        public IEnumerable<SubDetail> SubDetails { get; set; }
 
     }
     public class SubDetail

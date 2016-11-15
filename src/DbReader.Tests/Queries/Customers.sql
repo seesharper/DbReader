@@ -2,7 +2,13 @@
 	CustomerId,
 	CompanyName,
 	ContactName,
-	ContactTitle	
-
+	ContactTitle,
+	Address,
+    City,
+    Region,
+	PostalCode,
+    Country,
+    Phone,
+    Fax 
 FROM 
 	Customers

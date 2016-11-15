@@ -51,6 +51,7 @@
                 .Register<IPropertySelector, SimplePropertySelector>("SimplePropertySelector", new PerContainerLifetime())
                 .Register<IPropertySelector, ManyToOnePropertySelector>("ManyToOnePropertySelector", new PerContainerLifetime())
                 .Register<IPropertySelector, OneToManyPropertySelector>("OneToManyPropertySelector", new PerContainerLifetime())
+                .Decorate(typeof(IPropertySelector), typeof(OneToManyPropertyValidator), sr => sr.ImplementingType == typeof(OneToManyPropertySelector))
                 .Decorate<IPropertySelector, CachedPropertySelector>()
 
                 .Register<Func<Type, object>>(factory => type => factory.GetInstance(type), new PerContainerLifetime())

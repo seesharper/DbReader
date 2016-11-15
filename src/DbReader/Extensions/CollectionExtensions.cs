@@ -6,7 +6,7 @@ namespace DbReader.Extensions
     using System.Reflection;
 
     /// <summary>
-    /// Extends the <see cref="ICollection{T}"/> interface..
+    /// Extends the <see cref="ICollection{T}"/> interface.
     /// </summary>
     public static class CollectionExtensions
     {

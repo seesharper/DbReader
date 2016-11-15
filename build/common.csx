@@ -417,15 +417,18 @@ public static class Command
                               
                 if (Regex.Matches(e.Data, capture,RegexOptions.Multiline).Count > 0)
                 {
-                    lastProcessOutput.AppendLine(e.Data);
-                    WriteLine(e.Data);        
+                    Console.WriteLine(e.Data);
+                    // lastProcessOutput.AppendLine(e.Data);
+                    // WriteLine(e.Data);        
                 }                                             
             };                        
         }
         process.ErrorDataReceived += (s, e) => 
         {
-            lastStandardErrorOutput.AppendLine();
-            lastStandardErrorOutput.AppendLine(e.Data);                        
+            Console.WriteLine(e.Data);
+//            WriteLine(e.Data);
+//            lastStandardErrorOutput.AppendLine();
+//            lastStandardErrorOutput.AppendLine(e.Data);                        
         };
     }
 

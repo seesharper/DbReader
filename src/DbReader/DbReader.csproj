@@ -21,8 +21,7 @@
     <DefineConstants>TRACE;DEBUG;NET46</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Debug\DbReader.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,8 +30,7 @@
     <DefineConstants>TRACE;NET46</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Release\DbReader.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -70,20 +68,21 @@
     <Compile Include="Construction\PropertyReaderMethodBuilder.cs" />
     <Compile Include="Construction\ReaderMethodBuilder.cs" />
     <Compile Include="ContainerExtensions.cs" />
+    <Compile Include="Database\ArgumentParser.cs" />
     <Compile Include="Database\DbCommandFactory.cs" />
+    <Compile Include="Database\IArgumentParser.cs" />
     <Compile Include="Database\IDbCommandFactory.cs" />
     <Compile Include="Database\IParameterParser.cs" />
-    <Compile Include="Database\PropertyInfoEnumerableExtensions.cs" />
     <Compile Include="Database\RegExParameterParser.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DbReaderOptions.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\GeneratorExtensions.cs" />
+    <Compile Include="Extensions\PropertyInfoEnumerableExtensions.cs" />
     <Compile Include="Extensions\PropertyReflectionExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeReflectionExtensions.cs" />
-    <Compile Include="Interfaces\IArgumentParser.cs" />
     <Compile Include="ErrorMessages.cs" />
     <Compile Include="LightInject\LightInject.cs" />
     <Compile Include="Mapping\CachedPropertyMapper.cs" />
@@ -119,6 +118,7 @@
     <Compile Include="Selectors\ManyToOnePropertySelector.cs" />
     <Compile Include="Selectors\MethodSelector.cs" />
     <Compile Include="Selectors\OneToManyPropertySelector.cs" />
+    <Compile Include="Selectors\OneToManyPropertyValidator.cs" />
     <Compile Include="Selectors\OrdinalSelector.cs" />
     <Compile Include="Selectors\ParameterlessConstructorSelector.cs" />
     <Compile Include="Selectors\ReadablePropertySelector.cs" />

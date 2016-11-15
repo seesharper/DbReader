@@ -10,12 +10,7 @@
             {
                 throw new ArgumentNullException(paramName);    
             }            
-        }
-
-        public static void IsNotNull<T>(T value, string parameterName, string message)
-        {
-
-        }
+        }       
     }
 
 

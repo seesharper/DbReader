@@ -19,7 +19,9 @@
        
         private static IServiceContainer CreateContainer()
         {
-            return new ServiceContainer();
+            var container = new ServiceContainer();
+            container.RegisterFrom<CompositionRoot>();
+            return container;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

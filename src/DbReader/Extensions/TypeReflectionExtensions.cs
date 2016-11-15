@@ -91,7 +91,7 @@ namespace DbReader.Extensions
         /// <returns><b>true</b> if the <paramref name="type"/> implements <see cref="ICollection{T}"/>, otherwise <b>false</b></returns>       
         public static bool IsEnumerable(this Type type)
         {
-            return IsEnumerableOfT(type) || (!type.IsArray && type.GetInterfaces().Any(IsEnumerableOfT));
+            return IsEnumerableOfT(type) || (type.GetInterfaces().Any(IsEnumerableOfT));
         }
 
         /// <summary>

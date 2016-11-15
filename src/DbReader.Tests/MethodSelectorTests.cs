@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data;
+    using System.Text;
     using DbReader.Interfaces;
     using Selectors;
     using Shouldly;
@@ -118,6 +119,12 @@
             var dataRecord = new { SomeColumn = (float?)42 }.ToDataRecord();
             var result = InvokeMethod<float?>(dataRecord);
             result.ShouldBe(42);
+        }
+
+        public void Invoke_UnknownDatatype_ThrowsException()
+        {
+            var dataRecord = new { SomeColumn = (StringBuilder)null }.ToDataRecord();
+            Should.Throw<ArgumentOutOfRangeException>(() => InvokeMethod<StringBuilder>(dataRecord));            
         }
 
         private T InvokeMethod<T>(IDataRecord dataRecord)
