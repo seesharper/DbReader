@@ -44,6 +44,8 @@
     <Compile Include="Construction\ArgumentParserMethodBuilder.cs" />
     <Compile Include="Construction\CachedArgumentParserMethodBuilder.cs" />
     <Compile Include="Construction\IArgumentParserMethodBuilder.cs" />
+    <Compile Include="Construction\PropertyReaderDelegate.cs" />
+    <Compile Include="Construction\PropertyReaderDelegateCache.cs" />
     <Compile Include="Construction\StaticCache.cs" />
     <Compile Include="Construction\CachedInstanceReaderMethodBuilder.cs" />
     <Compile Include="Construction\CachedKeyReaderMethodBuilder.cs" />

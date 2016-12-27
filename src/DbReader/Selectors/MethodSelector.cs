@@ -5,6 +5,10 @@
     using System.Reflection;
     using Extensions;
 
+    /// <summary>
+    /// A class that is capable of selecting the 
+    /// appropriate <see cref="IDataRecord"/> get method.
+    /// </summary>
     public class MethodSelector : IMethodSelector
     {
         /// <summary>

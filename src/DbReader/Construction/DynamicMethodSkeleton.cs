@@ -14,8 +14,10 @@ namespace DbReader.Construction
         /// <summary>
         /// Initializes a new instance of the <see cref="DynamicMethodSkeleton"/> class.
         /// </summary>
+        /// <param name="name">The name of the dynamic method.</param>
         /// <param name="returnType">The return type of the dynamic method.</param>
         /// <param name="parameterTypes">The parameter types of the dynamic method.</param>
+        /// <param name="module">A <see cref="Module"/> representing the module with which the dynamic method is to be logically associated.</param>
         public DynamicMethodSkeleton(string name, Type returnType, Type[] parameterTypes, Module module)
         {
             dynamicMethod = new DynamicMethod(
@@ -25,6 +27,13 @@ namespace DbReader.Construction
                 module);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DynamicMethodSkeleton"/> class.
+        /// </summary>
+        /// <param name="name">The name of the dynamic method.</param>
+        /// <param name="returnType">The return type of the dynamic method.</param>
+        /// <param name="parameterTypes">The parameter types of the dynamic method.</param>
+        /// <param name="owner">A <see cref="Type"/> with which the dynamic method is logically associated. The dynamic method has access to all members of the type.</param>
         public DynamicMethodSkeleton(string name, Type returnType, Type[] parameterTypes, Type owner)
         {
             dynamicMethod = new DynamicMethod(

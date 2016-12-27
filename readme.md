@@ -404,60 +404,28 @@ ol.ModifiedBy AS FLP_SLP_TLP_ModifiedBy
 
 ## Stored Procedures
 
-**DbReader** makes no attempt to generalize calling stored procedures as this in most cases requires code that is specific to the database engine. **DbReader** relies on the *ICommandFactory* interface when it comes to creating commands and this represents an extension point where we can plug in support for features that are specific to the database engine. The following example shows how to add support for calling an Oracle procedure.
+**DbReader** makes no attempt to generalize calling stored procedures as this in most cases requires code that is specific to the database engine. **DbReader** allows custom initialization of an IDbCommand through the DbReaderOptions.CommandInitializer property.
+
+This is an extension point where we can plug in support for features that are specific to the database engine. The following example shows how to add support for calling an Oracle procedure.
 
 ```
-public class OracleCommandFactory : ICommandFactory
+DbReaderOptions.CommandInitializer = InitializeCommand;
+
+private static void InitializeCommand(IDbCommand command)
 {
-    private readonly ICommandFactory commandFactory;
-
-    public OracleCommandFactory(ICommandFactory commandFactory)
-    {
-        this.commandFactory = commandFactory;
-    }
-
-    public IDbCommand CreateCommand(IDbConnection dbConnection, string sql, object arguments)
-    {
-        if (LooksLikeAProcedure(sql))
-        {
-            return CreateOracleProcedureCommand(dbConnection, sql, arguments);
-        }
-        return commandFactory.CreateCommand(dbConnection, sql, arguments);
-    }
-
-    private static bool LooksLikeAProcedure(string sql)
-    {
-        return !sql.TrimStart().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static IDbCommand CreateOracleProcedureCommand(IDbConnection dbConnection, string sql, object arguments)
-    {
-        var command = dbConnection.CreateCommand();
-        command.CommandText = sql;
-        command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.Add(new OracleParameter(string.Empty, OracleDbType.RefCursor, ParameterDirection.ReturnValue));
-
-        var decomposer = new Decomposer(new ReadablePropertySelector());
-        var propertyValues = decomposer.Decompose(arguments);
-        foreach (var propertyValue in propertyValues)
-        {
-            var parameter = new OracleParameter();
-            parameter.ParameterName = propertyValue.Key;
-            parameter.Value = propertyValue.Value;
-            parameter.Direction = ParameterDirection.Input;
-            command.Parameters.Add(parameter);
-        }
-
-        return command;
-    }
+	if (!command.CommandText.TrimStart().StartsWith("select", StringComparison.OrdinalIgnoreCase))
+	{
+		command.CommandType = CommandType.StoredProcedure;
+		command.Parameters.Insert(0, new OracleParameter
+		{
+			OracleDbType = OracleDbType.RefCursor,
+			Direction = ParameterDirection.ReturnValue
+		});
+	}
 }
 ```
 
-We can now just "decorate" the existing *ICommandFactory* with our custom *OracleCommandFactory* class.
 
-```
-DbReaderOptions.CommandFactory = new OracleCommandFactory(DbReaderOptions.CommandFactory);
-```
 
 ## Custom Conversions
 
@@ -470,19 +438,14 @@ Since we probably don't want to represent a Guid as a byte array in our classes,
 DbReaderOptions.WhenReading<Guid>().Use((datarecord, ordinal) => new Guid(dataRecord.ReadBytes(1,16)));
 ```
 
-This instructs DbReader to use our custom read delegate whenever it encounters a Guid property.
+This instructs **DbReader** to use our custom read delegate whenever it encounters a *Guid* property.
  
-The Guid also needs to be converted back into a byte array when passing a Guid value as a parameter to a query.
+The *Guid* also needs to be converted back into a byte array when passing a *Guid* value as a parameter to a query.
 
 ```
 DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray());
 ```
 
-## Reading "simple" types
-
-```
-	connection.Read<Value<int>>
-```
 
 
 

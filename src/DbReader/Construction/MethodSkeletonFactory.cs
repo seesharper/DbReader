@@ -7,18 +7,7 @@
     /// A class that is capable of providing an <see cref="IMethodSkeleton"/> instance.
     /// </summary>
     public class DynamicMethodSkeletonFactory : IMethodSkeletonFactory
-    {
-        private readonly Func<string, Type, Type[], IMethodSkeleton> factoryDelegate;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MethodSkeletonFactory"/> class.
-        /// </summary>
-        /// <param name="factoryDelegate">A factory delegate used to create an <see cref="IMethodSkeleton"/> instance</param>
-        public DynamicMethodSkeletonFactory()
-        {
-            
-        }
-
+    {               
         /// <summary>
         /// Gets an <see cref="IMethodSkeleton"/> instance.
         /// </summary>

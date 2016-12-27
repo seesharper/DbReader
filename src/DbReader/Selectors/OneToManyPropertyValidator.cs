@@ -1,16 +1,17 @@
 ﻿namespace DbReader.Selectors
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Net;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
     using System.Text;
     using Extensions;
 
+    /// <summary>
+    /// An <see cref="IPropertySelector"/> decorator that validates that the 
+    /// properties selected for one-to-many relationsships are valid.
+    /// </summary>
     public class OneToManyPropertyValidator : IPropertySelector
     {
         private readonly IPropertySelector oneToManyPropertySelector;
@@ -31,11 +32,20 @@
             });
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OneToManyPropertyValidator"/> class.
+        /// </summary>
+        /// <param name="oneToManyPropertySelector">The target <see cref="IPropertySelector"/>.</param>
         public OneToManyPropertyValidator(IPropertySelector oneToManyPropertySelector)
         {
             this.oneToManyPropertySelector = oneToManyPropertySelector;
         }
 
+        /// <summary>
+        /// Executes the selector and returns a list of properties.
+        /// </summary>
+        /// <param name="type">The target <see cref="Type"/>.</param>
+        /// <returns>An array of <see cref="PropertyInfo"/> instances.</returns>
         public PropertyInfo[] Execute(Type type)
         {
             var properties = oneToManyPropertySelector.Execute(type);

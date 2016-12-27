@@ -10,6 +10,10 @@ namespace DbReader.Construction
     using Extensions;
     using Selectors;
 
+    /// <summary>
+    /// A class that based on a given sql and the type of the arguments object,
+    /// can create a method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.
+    /// </summary>
     public class ArgumentParserMethodBuilder : IArgumentParserMethodBuilder
     {
         private readonly IPropertySelector readablePropertySelector;
@@ -28,9 +32,14 @@ namespace DbReader.Construction
             DataParameterSetValueMethod =
                 typeof(IDataParameter).GetTypeInfo().GetProperty("Value").SetMethod;
             ProcessDelegateInvokeMethod = typeof(Action<IDataParameter, object>).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "Invoke");
-
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArgumentParserMethodBuilder"/> class.
+        /// </summary>
+        /// <param name="readablePropertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting readable properties from a given type.</param>
+        /// <param name="parameterParser">The <see cref="IParameterParser"/> that is responsible for parsing parameters from a SQL statement.</param>
+        /// <param name="methodSkeletonFactory">The <see cref="IMethodSkeletonFactory"/> that is responsible for providing a <see cref="IMethodSkeleton"/>.</param>
         public ArgumentParserMethodBuilder(IPropertySelector readablePropertySelector, IParameterParser parameterParser, IMethodSkeletonFactory methodSkeletonFactory)
         {
             this.readablePropertySelector = readablePropertySelector;
@@ -39,12 +48,18 @@ namespace DbReader.Construction
         }
 
 
-        public Func<object, Func<IDataParameter> ,IDataParameter[]> CreateMethod(string commandText, Type argumentsType)
+        /// <summary>
+        /// Creates a method at runtime that maps an argument object instance into a list of data parameters.
+        /// </summary>
+        /// <param name="sql">The sql statement for which to create the method.</param>
+        /// <param name="argumentsType">The arguments type for which to create the method.</param>
+        /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
+        public Func<object, Func<IDataParameter> ,IDataParameter[]> CreateMethod(string sql, Type argumentsType)
         {
             
             var processDelegates = new List<Action<IDataParameter, object>>();
 
-            var parameterNames = parameterParser.GetParameters(commandText);            
+            var parameterNames = parameterParser.GetParameters(sql);            
             var properties = readablePropertySelector.Execute(argumentsType).OrderByDeclaration().ToArray();
             if (parameterNames.Length > 0)
             {

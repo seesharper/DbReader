@@ -1,7 +1,6 @@
 ﻿namespace DbReader.Database
 {
     using System.Data;
-    using Interfaces;
 
     /// <summary>
     /// A class that is capable of creating a <see cref="IDbCommand"/>
@@ -12,10 +11,9 @@
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DbCommandFactory"/> class.
-        /// </summary>
-        /// <param name="argumentMapper">The <see cref="IArgumentMapper"/> that is responsible for mapping the argument values 
-        /// to the parameters present in a given SQL statement.</param>
-        /// <param name="argumentParser"></param>
+        /// </summary>       
+        /// <param name="argumentParser">The <see cref="IArgumentParser"/> that is responsible for mapping the parameters from
+        /// a given query to the arguments of an argument object.</param>
         public DbCommandFactory(IArgumentParser argumentParser)
         {
             this.argumentParser = argumentParser;

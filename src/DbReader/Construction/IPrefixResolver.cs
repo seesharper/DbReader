@@ -33,7 +33,7 @@ namespace DbReader.Construction
     public interface IPrefixResolver
     {
         /// <summary>
-        /// Returns the prefix for the given <see cref="navigationProperty"/>
+        /// Returns the prefix for the given <paramref name="navigationProperty"/>.
         /// </summary>
         /// <param name="navigationProperty">The property for which to get the prefix.</param>
         /// <param name="dataRecord">The <see cref="IDataRecord"/> that represents the available fields/columns.</param>

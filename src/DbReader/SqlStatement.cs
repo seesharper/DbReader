@@ -2,15 +2,15 @@
 {
     using System;
 
+    /// <summary>
+    /// Represents the query currently executing.
+    /// </summary>
     public class SqlStatement
     {
+        /// <summary>
+        /// The query currently executing. 
+        /// </summary>
         [ThreadStatic]
-        private static string current;
-
-        public static string Current
-        {
-            get { return current; }
-            set { current = value; }
-        }
+        public static string Current;      
     }
 }

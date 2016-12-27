@@ -10,7 +10,7 @@
     public interface IArgumentParserMethodBuilder
     {
         /// <summary>
-        /// 
+        /// Creates a method at runtime that maps an argument object instance into a list of data parameters.
         /// </summary>
         /// <param name="sql">The sql statement for which to create the method.</param>
         /// <param name="argumentsType">The arguments type for which to create the method.</param>

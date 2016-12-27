@@ -19,7 +19,7 @@ namespace DbReader.Construction
         private readonly IKeyPropertyMapper keyPropertyMapper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="KeyReaderMethodBuilder{T}"/> class.
+        /// Initializes a new instance of the <see cref="KeyReaderMethodBuilder"/> class.
         /// </summary>
         /// <param name="constructorReaderMethodBuilderFactory">The function used to create an <see cref="IReaderMethodBuilder{T}"/>
         /// that is responsible for building a method that reads key fields from a given <see cref="IDataRecord"/>.</param>
@@ -34,7 +34,8 @@ namespace DbReader.Construction
 
         /// <summary>
         /// Creates a method that reads the key fields from the given <paramref name="dataRecord"/>.
-        /// </summary>        
+        /// </summary>
+        /// <param name="type">The type for which to create the key reader method.</param>
         /// <param name="dataRecord">The target <see cref="IDataRecord"/>.</param>
         /// <param name="prefix">The field prefix used to identify the key fields.</param>
         /// <returns>A method that reads the key fields from the given <paramref name="dataRecord"/>.</returns>

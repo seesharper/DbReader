@@ -2,17 +2,17 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
     using System.Data;
     using System.Runtime.CompilerServices;
     using Construction;
-    using DbReader.Interfaces;
-    using DbReader.LightInject;
+    using LightInject;
     using Extensions;
     using Readers;
     using Selectors;
 
+    /// <summary>
+    /// Extends the <see cref="IDataReader"/> interface.
+    /// </summary>
     public static class DataReaderExtensions
     {
         private static Lazy<IServiceContainer> containerFactory = new Lazy<IServiceContainer>(CreateContainer);
@@ -53,7 +53,7 @@
         private static IEnumerable<T> ReadWithoutNavigationProperties<T>(IDataReader dataReader)
         {
             var result = new List<T>();
-            var propertyReaderDelegate = PropertyReaderDelegates<T>.Get(SqlStatement.Current);
+            var propertyReaderDelegate = PropertyReaderDelegateCache<T>.Get(SqlStatement.Current);
             if (propertyReaderDelegate == null)
             {
                 var container = containerFactory.Value;
@@ -68,7 +68,8 @@
                         Ordinals = ordinalsSelector.Execute(typeof(T), dataReader, string.Empty),
                         ReadMethod = propertyReaderMethodBuilder.CreateMethod()
                     };
-                    PropertyReaderDelegates<T>.Put(SqlStatement.Current, propertyReaderDelegate);
+
+                    PropertyReaderDelegateCache<T>.Put(SqlStatement.Current, propertyReaderDelegate);
                 }
             }
 
