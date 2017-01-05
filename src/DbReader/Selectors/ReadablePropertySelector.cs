@@ -1,6 +1,7 @@
 ﻿namespace DbReader.Selectors
 {
     using System;
+    using System.Data;
     using System.Linq;
     using System.Reflection;
     using Extensions;
@@ -19,7 +20,12 @@
         public PropertyInfo[] Execute(Type type)
         {
             PropertyInfo[] properties = type.GetProperties();
-            return properties.Where(p => p.PropertyType.IsSimpleType() && p.IsReadable()).ToArray();
+            return
+                properties.Where(
+                    p =>
+                        (p.PropertyType.IsSimpleType() ||
+                         typeof (IDataParameter).GetTypeInfo().IsAssignableFrom(p.PropertyType)) && p.IsReadable())
+                    .ToArray();
         }        
     }
 }

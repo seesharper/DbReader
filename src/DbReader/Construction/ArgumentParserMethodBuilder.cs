@@ -23,6 +23,7 @@ namespace DbReader.Construction
         private static readonly MethodInfo DataParameterSetParameterNameMethod;
         private static readonly MethodInfo DataParameterSetValueMethod;
         private static readonly MethodInfo ProcessDelegateInvokeMethod;
+        private static readonly MethodInfo SetNameMethod;
 
         static ArgumentParserMethodBuilder()
         {            
@@ -32,6 +33,7 @@ namespace DbReader.Construction
             DataParameterSetValueMethod =
                 typeof(IDataParameter).GetTypeInfo().GetProperty("Value").SetMethod;
             ProcessDelegateInvokeMethod = typeof(Action<IDataParameter, object>).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "Invoke");
+            SetNameMethod = typeof (DataParameterHelper).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "SetName");
         }
 
         /// <summary>
@@ -94,36 +96,19 @@ namespace DbReader.Construction
 
             for (int i = 0; i < properties.Length; i++)
             {
-                //Load, execute the parameter factory and store the dataparameter in a local variable
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Callvirt, ParameterFactoryInvokeMethod);
-                generator.Emit(OpCodes.Stloc, dataParameter);
-
-                //Set the parameter name;
-                generator.Emit(OpCodes.Ldloc, dataParameter);
-                generator.Emit(OpCodes.Ldstr, parameters[properties[i].Name]);
-                generator.Emit(OpCodes.Callvirt, DataParameterSetParameterNameMethod);
-
-                Action<IDataParameter, object> processDelegate = ArgumentProcessor.GetProcessDelegate(properties[i].PropertyType);
-                if (processDelegate != null)
+                if (typeof(IDataParameter).GetTypeInfo().IsAssignableFrom(properties[i].PropertyType))
                 {
-                    processDelegates.Add(processDelegate);
-                    int processDelegateIndex = processDelegates.Count - 1;
-
-                    //Load the argument process delegate
-                    generator.Emit(OpCodes.Ldarg_2);
-                    generator.EmitFastInt(processDelegateIndex);
-                    generator.Emit(OpCodes.Ldelem_Ref);
-
-                    generator.Emit(OpCodes.Ldloc, dataParameter);
                     generator.Emit(OpCodes.Ldloc, arguments);
                     generator.Emit(OpCodes.Callvirt, properties[i].GetMethod);
-                    if (properties[i].PropertyType.GetTypeInfo().IsValueType)
-                    {
-                        generator.Emit(OpCodes.Box, properties[i].PropertyType);
-                    }
-                    generator.Emit(OpCodes.Callvirt, ProcessDelegateInvokeMethod);
-                    
+
+                    //Store the dataparameter directly from the property
+                    generator.Emit(OpCodes.Stloc, dataParameter);
+                    generator.Emit(OpCodes.Ldloc, dataParameter);
+                    generator.Emit(OpCodes.Ldstr, properties[i].Name);
+
+                    //Set the name of the parameter if the parameter name if null
+                    generator.Emit(OpCodes.Call, SetNameMethod);
+
                     //Duplicate the topmost value on the stack (IDataParameter[])
                     generator.Emit(OpCodes.Dup);
                     generator.EmitFastInt(i);
@@ -132,27 +117,64 @@ namespace DbReader.Construction
                 }
                 else
                 {
-                    generator.Emit(OpCodes.Ldloc, dataParameter);
-                    generator.Emit(OpCodes.Ldloc, arguments);
-                    generator.Emit(OpCodes.Callvirt, properties[i].GetMethod);
-                    if (properties[i].PropertyType.GetTypeInfo().IsValueType)
-                    {
-                        generator.Emit(OpCodes.Box, properties[i].PropertyType);
-                    }
-                    generator.Emit(OpCodes.Callvirt, DataParameterSetValueMethod);
+                    //Load, execute the parameter factory and store the dataparameter in a local variable
+                    generator.Emit(OpCodes.Ldarg_1);
+                    generator.Emit(OpCodes.Callvirt, ParameterFactoryInvokeMethod);
+                    generator.Emit(OpCodes.Stloc, dataParameter);
 
-                    //Duplicate the topmost value on the stack (IDataParameter[])
-                    generator.Emit(OpCodes.Dup);
-                    generator.EmitFastInt(i);
+                    //Set the parameter name;
                     generator.Emit(OpCodes.Ldloc, dataParameter);
-                    generator.Emit(OpCodes.Stelem_Ref);
-                }
+                    generator.Emit(OpCodes.Ldstr, parameters[properties[i].Name]);
+                    generator.Emit(OpCodes.Callvirt, DataParameterSetParameterNameMethod);
+
+                    Action<IDataParameter, object> processDelegate = ArgumentProcessor.GetProcessDelegate(properties[i].PropertyType);
+                    if (processDelegate != null)
+                    {
+                        processDelegates.Add(processDelegate);
+                        int processDelegateIndex = processDelegates.Count - 1;
+
+                        //Load the argument process delegate
+                        generator.Emit(OpCodes.Ldarg_2);
+                        generator.EmitFastInt(processDelegateIndex);
+                        generator.Emit(OpCodes.Ldelem_Ref);
+
+                        generator.Emit(OpCodes.Ldloc, dataParameter);
+                        generator.Emit(OpCodes.Ldloc, arguments);
+                        generator.Emit(OpCodes.Callvirt, properties[i].GetMethod);
+                        if (properties[i].PropertyType.GetTypeInfo().IsValueType)
+                        {
+                            generator.Emit(OpCodes.Box, properties[i].PropertyType);
+                        }
+                        generator.Emit(OpCodes.Callvirt, ProcessDelegateInvokeMethod);
+
+                        //Duplicate the topmost value on the stack (IDataParameter[])
+                        generator.Emit(OpCodes.Dup);
+                        generator.EmitFastInt(i);
+                        generator.Emit(OpCodes.Ldloc, dataParameter);
+                        generator.Emit(OpCodes.Stelem_Ref);
+                    }
+                    else
+                    {
+                        generator.Emit(OpCodes.Ldloc, dataParameter);
+                        generator.Emit(OpCodes.Ldloc, arguments);
+                        generator.Emit(OpCodes.Callvirt, properties[i].GetMethod);
+                        if (properties[i].PropertyType.GetTypeInfo().IsValueType)
+                        {
+                            generator.Emit(OpCodes.Box, properties[i].PropertyType);
+                        }
+                        generator.Emit(OpCodes.Callvirt, DataParameterSetValueMethod);
+
+                        //Duplicate the topmost value on the stack (IDataParameter[])
+                        generator.Emit(OpCodes.Dup);
+                        generator.EmitFastInt(i);
+                        generator.Emit(OpCodes.Ldloc, dataParameter);
+                        generator.Emit(OpCodes.Stelem_Ref);
+                    }
+                }                                
             }
                                   
             generator.Emit(OpCodes.Ret);
-
             
-
             var method =
                 (Func<object, Func<IDataParameter>, Action<IDataParameter, object>[], IDataParameter[]>)
                     dm.CreateDelegate(typeof (Func<object, Func<IDataParameter>, Action<IDataParameter, object>[], IDataParameter[]>));
@@ -174,5 +196,7 @@ namespace DbReader.Construction
                 
             }
         }
+
+        
     }
 }

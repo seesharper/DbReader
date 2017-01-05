@@ -59,5 +59,39 @@
                 () => new Mock<IDataParameter>().SetupAllProperties().Object);
             result.ShouldBeEmpty();            
         }
+
+        public void Parse_WithDataParameter_ReturnsParameter(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
+                new {FirstParameter = 1, SecondParameter = parameterMock.Object},
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+
+            result[1].ShouldBeSameAs(parameterMock.Object);
+        }
+
+        public void Parse_DataParameterWithNoName_SetParameterNameToPropertyName(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
+                new { FirstParameter = 1, SecondParameter = parameterMock.Object },
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+
+            parameterMock.Object.ParameterName.ShouldBe("SecondParameter");
+        }
+
+        public void Parse_DataParameterWithName_DoesNotSetParameterNameToPropertyName(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+            parameterMock.Object.ParameterName = "SomeValue";
+
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
+                new { FirstParameter = 1, SecondParameter = parameterMock.Object },
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+
+            parameterMock.Object.ParameterName.ShouldBe("SomeValue");
+        }
     }
 }

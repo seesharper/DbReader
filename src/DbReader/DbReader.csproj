@@ -43,6 +43,7 @@
     <Compile Include="ArgumentProcessor.cs" />
     <Compile Include="Construction\ArgumentParserMethodBuilder.cs" />
     <Compile Include="Construction\CachedArgumentParserMethodBuilder.cs" />
+    <Compile Include="Construction\DataParameterHelper.cs" />
     <Compile Include="Construction\IArgumentParserMethodBuilder.cs" />
     <Compile Include="Construction\PropertyReaderDelegate.cs" />
     <Compile Include="Construction\PropertyReaderDelegateCache.cs" />
