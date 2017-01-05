@@ -102,6 +102,19 @@ DbReader makes passing an argument value very easy.
 ```
 dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
 ```
+**DbReader** will create an *IDataParameter* for each property of the anonymous type passed in as the argument object.
+
+If we need more control with the regards to the parameters, we can simply assign an *IDataParameter* instance to a property of the argument object.
+
+```
+ var parameter = new SQLiteParameter(DbType.String) { Value = "ALFKI" }
+ 
+ connection.Read<Customer>(sql, new { CustomerId = parameter });
+
+```
+
+
+
 		
 ## Aliasing
 

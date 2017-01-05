@@ -102,6 +102,17 @@
             }
         }
 
+        public void ShouldReadCustomerByIdUsingDataParameter()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
+                    new { CustomerId = new SQLiteParameter(DbType.String) {Value = "ALFKI"} });
+                customers.Count().ShouldBe(1);
+            }
+        }
+
+
         public void ShouldReadEmployeesWithOrdersAndTerritories()
         {
             using (var connection = CreateConnection())
