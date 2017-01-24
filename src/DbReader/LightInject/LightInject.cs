@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject version 5.0.0-RC1 (NET46)
+    LightInject version 5.0.0 (NET46)
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
@@ -656,13 +656,7 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="instance">The target instance for which to inject its property dependencies.</param>
         /// <returns>The <paramref name="instance"/> with its property dependencies injected.</returns>
-        object InjectProperties(object instance);
-
-        /// <summary>
-        /// Creates a clone of the current <see cref="IServiceContainer"/>.
-        /// </summary>
-        /// <returns>A new <see cref="IServiceContainer"/> instance.</returns>
-        IServiceContainer Clone();
+        object InjectProperties(object instance);        
     }
 
     /// <summary>
@@ -799,6 +793,22 @@ namespace DbReader.LightInject
         /// <param name="registration">The <see cref="Registration"/> that represents the implementing type to analyze.</param>
         /// <returns>A <see cref="ConstructionInfo"/> instance.</returns>
         ConstructionInfo Execute(Registration registration);
+    }
+
+    /// <summary>
+    /// Represents a class that maps the generic arguments/parameters from a generic servicetype
+    /// to a open generic implementing type.
+    /// </summary>
+    internal interface IGenericArgumentMapper
+    {
+        /// <summary>
+        /// Maps the generic arguments/parameters from the <paramref name="genericServiceType"/>
+        /// to the generic arguments/parameters in the <paramref name="openGenericImplementingType"/>.
+        /// </summary>
+        /// <param name="genericServiceType">The generic type containing the arguments/parameters to be mapped to the generic arguments/parameters of the <paramref name="openGenericImplementingType"/>.</param>
+        /// <param name="openGenericImplementingType">The open generic implementing type.</param>
+        /// <returns>A <see cref="GenericMappingResult"/></returns>
+        GenericMappingResult Map(Type genericServiceType, Type openGenericImplementingType);
     }
 
     /// <summary>
@@ -1756,6 +1766,7 @@ namespace DbReader.LightInject
         public ContainerOptions()
         {
             EnableVariance = true;
+            EnablePropertyInjection = true;
             LogFactory = t => message => { };
         }
 
@@ -1776,7 +1787,15 @@ namespace DbReader.LightInject
         /// Gets or sets the log factory that crates the delegate used for logging.
         /// </summary>
         public Func<Type, Action<LogEntry>> LogFactory { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets a value indicating whether property injection is enabled.
+        /// </summary>
+        /// <remarks>
+        /// The default value is true.
+        /// </remarks>
+        public bool EnablePropertyInjection { get; set; }
+
         private static ContainerOptions CreateDefaultContainerOptions()
         {
             return new ContainerOptions();
@@ -1868,8 +1887,11 @@ namespace DbReader.LightInject
             var concreteTypeExtractor = new CachedTypeExtractor(new ConcreteTypeExtractor());
             CompositionRootTypeExtractor = new CachedTypeExtractor(new CompositionRootTypeExtractor(new CompositionRootAttributeExtractor()));
             CompositionRootExecutor = new CompositionRootExecutor(this, type => (ICompositionRoot)Activator.CreateInstance(type));
-            AssemblyScanner = new AssemblyScanner(concreteTypeExtractor, CompositionRootTypeExtractor, CompositionRootExecutor);
-            PropertyDependencySelector = new PropertyDependencySelector(new PropertySelector());
+            PropertyDependencySelector = options.EnablePropertyInjection 
+                ? (IPropertyDependencySelector)new PropertyDependencySelector(new PropertySelector())
+                : new PropertyDependencyDisabler();
+            GenericArgumentMapper = new GenericArgumentMapper();
+            AssemblyScanner = new AssemblyScanner(concreteTypeExtractor, CompositionRootTypeExtractor, CompositionRootExecutor, GenericArgumentMapper);
             ConstructorDependencySelector = new ConstructorDependencySelector();
             ConstructorSelector = new MostResolvableConstructorSelector(CanGetInstance);
             constructionInfoProvider = new Lazy<IConstructionInfoProvider>(CreateConstructionInfoProvider);
@@ -1878,30 +1900,6 @@ namespace DbReader.LightInject
 #if NET45 || NET46
             AssemblyLoader = new AssemblyLoader();
 #endif
-        }
-
-        private ServiceContainer(
-          ContainerOptions options,
-          ServiceRegistry<Delegate> constructorDependencyFactories,
-          ServiceRegistry<Delegate> propertyDependencyFactories,
-          ServiceRegistry<ServiceRegistration> availableServices,
-          Storage<DecoratorRegistration> decorators,
-          Storage<ServiceOverride> overrides,
-          Storage<FactoryRule> factoryRules,
-          Storage<Initializer> initializers)
-            : this(options)
-        {
-            this.options = options;
-            this.constructorDependencyFactories = constructorDependencyFactories;
-            this.propertyDependencyFactories = propertyDependencyFactories;
-            this.decorators = decorators;
-            this.overrides = overrides;
-            this.factoryRules = factoryRules;
-            this.initializers = initializers;
-            foreach (var availableService in availableServices.Values.SelectMany(t => t.Values))
-            {
-                Register(availableService);
-            }
         }
 
         /// <summary>
@@ -1939,6 +1937,12 @@ namespace DbReader.LightInject
         /// for selecting the constructor to be used when creating new service instances.
         /// </summary>
         public IConstructorSelector ConstructorSelector { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IGenericArgumentMapper"/> that is responsible for
+        /// mapping generic arguments.
+        /// </summary>
+        public IGenericArgumentMapper GenericArgumentMapper { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IAssemblyScanner"/> instance that is responsible for scanning assemblies.
@@ -2316,7 +2320,7 @@ namespace DbReader.LightInject
             var serviceOverride = new ServiceOverride
                                       {
                                           CanOverride = serviceSelector,
-                                          ServiceRegistrationFactory = serviceRegistrationFactory
+                                          ServiceRegistrationFactory = serviceRegistrationFactory,
                                       };
             overrides.Add(serviceOverride);
             return this;
@@ -2864,25 +2868,8 @@ namespace DbReader.LightInject
             {
                 disposableLifetimeInstance.Dispose();
             }
-        }
-
-        /// <summary>
-        /// Creates a clone of the current <see cref="IServiceContainer"/>.
-        /// </summary>
-        /// <returns>A new <see cref="IServiceContainer"/> instance.</returns>
-        public IServiceContainer Clone()
-        {
-            return new ServiceContainer(
-                options,
-                constructorDependencyFactories,
-                propertyDependencyFactories,
-                availableServices,
-                decorators,
-                overrides,
-                factoryRules,
-                initializers);
-        }
-
+        }    
+           
         private static void EmitNewArray(IList<Action<IEmitter>> emitMethods, Type elementType, IEmitter emitter)
         {
             LocalBuilder array = emitter.DeclareLocal(elementType.MakeArrayType());
@@ -2931,7 +2918,7 @@ namespace DbReader.LightInject
                 ServiceType = serviceRegistration.ServiceType,
                 ImplementingType = closedGenericDecoratorType,
                 CanDecorate = openGenericDecorator.CanDecorate,
-                Index = openGenericDecorator.Index
+                Index = openGenericDecorator.Index,
             };
             return decoratorInfo;
         }
@@ -3218,7 +3205,7 @@ namespace DbReader.LightInject
                     ImplementingType =
                         deferredDecorator.ImplementingTypeFactory(this, serviceRegistration),
                     CanDecorate = sr => true,
-                    Index = deferredDecorator.Index
+                    Index = deferredDecorator.Index,
                 };
                 registrations.Add(decoratorRegistration);
             }
@@ -3601,7 +3588,7 @@ namespace DbReader.LightInject
                 ServiceType = serviceType,
                 ServiceName = serviceName,
                 FactoryExpression = rule.Factory,
-                Lifetime = CloneLifeTime(rule.LifeTime) ?? DefaultLifetime
+                Lifetime = CloneLifeTime(rule.LifeTime) ?? DefaultLifetime,
             };
             if (rule.LifeTime != null)
             {
@@ -3703,11 +3690,12 @@ namespace DbReader.LightInject
                 return null;
             }
 
-            Type[] closedGenericArguments = closedGenericServiceType.GetTypeInfo().GenericTypeArguments;
+            var mappingResult = GenericArgumentMapper.Map(closedGenericServiceType, openGenericServiceRegistration.ImplementingType);
+            var typeArguments = mappingResult.GetMappedArguments();
 
             Type closedGenericImplementingType = TryMakeGenericType(
                 openGenericServiceRegistration.ImplementingType,
-                closedGenericArguments);
+                typeArguments.ToArray());
 
             if (closedGenericImplementingType == null)
             {
@@ -3719,7 +3707,7 @@ namespace DbReader.LightInject
                 ServiceType = closedGenericServiceType,
                 ImplementingType = closedGenericImplementingType,
                 ServiceName = serviceName,
-                Lifetime = CloneLifeTime(openGenericServiceRegistration.Lifetime) ?? DefaultLifetime
+                Lifetime = CloneLifeTime(openGenericServiceRegistration.Lifetime) ?? DefaultLifetime,
             };
             Register(serviceRegistration);
             return GetEmitMethod(serviceRegistration.ServiceType, serviceRegistration.ServiceName);
@@ -3796,8 +3784,29 @@ namespace DbReader.LightInject
             Ensure.IsNotNull(serviceType, "type");
             Ensure.IsNotNull(implementingType, "implementingType");
             Ensure.IsNotNull(serviceName, "serviceName");
+            EnsureConstructable(serviceType, implementingType);
             var serviceRegistration = new ServiceRegistration { ServiceType = serviceType, ImplementingType = implementingType, ServiceName = serviceName, Lifetime = lifetime ?? DefaultLifetime };
             Register(serviceRegistration);
+        }
+
+        private void EnsureConstructable(Type serviceType, Type implementingType)
+        {
+            if (implementingType.GetTypeInfo().ContainsGenericParameters)
+            {
+                try
+                {
+                    GenericArgumentMapper.Map(serviceType, implementingType).GetMappedArguments();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(implementingType), ex.Message);
+                }
+            }
+            else
+            if (!serviceType.GetTypeInfo().IsAssignableFrom(implementingType.GetTypeInfo()))
+            {
+                throw new ArgumentOutOfRangeException(nameof(implementingType), $"The implementing type {implementingType.FullName} is not assignable from {serviceType.FullName}.");
+            }
         }
 
         private Action<IEmitter> ResolveEmitMethod(ServiceRegistration serviceRegistration)
@@ -3910,7 +3919,7 @@ namespace DbReader.LightInject
                 ServiceType = serviceType,
                 ServiceName = serviceName,
                 Value = value,
-                Lifetime = new PerContainerLifetime()
+                Lifetime = new PerContainerLifetime(),
             };
             Register(serviceRegistration);
         }
@@ -3922,7 +3931,7 @@ namespace DbReader.LightInject
                 ServiceType = typeof(TService),
                 FactoryExpression = factory,
                 ServiceName = serviceName,
-                Lifetime = lifetime ?? DefaultLifetime
+                Lifetime = lifetime ?? DefaultLifetime,
             };
             Register(serviceRegistration);
         }
@@ -3972,6 +3981,14 @@ namespace DbReader.LightInject
                 var snapshot = new T[Items.Length + 1];
                 Array.Copy(Items, snapshot, Items.Length);
                 return snapshot;
+            }
+        }
+
+        private class PropertyDependencyDisabler : IPropertyDependencySelector
+        {
+            public IEnumerable<PropertyDependency> Execute(Type type)
+            {
+                return new PropertyDependency[0];
             }
         }
 
@@ -5238,7 +5255,7 @@ namespace DbReader.LightInject
                                        ServiceName = string.Empty,
                                        ServiceType = p.ParameterType,
                                        Parameter = p,
-                                       IsRequired = true
+                                       IsRequired = true,
                                    });
         }
     }
@@ -5548,6 +5565,69 @@ namespace DbReader.LightInject
         {
             var lifeTime = Lifetime?.ToString() ?? "Transient";
             return $"ServiceType: '{ServiceType}', ServiceName: '{ServiceName}', ImplementingType: '{ImplementingType}', Lifetime: '{lifeTime}'";
+        }
+    }
+
+    /// <summary>
+    /// Represents the result from mappng generic arguments.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class GenericMappingResult
+    {
+        private readonly string[] genericParameterNames;
+        private readonly IDictionary<string, Type> genericArgumentMap;
+        private readonly Type genericServiceType;
+        private readonly Type openGenericImplementingType;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericMappingResult"/> class.
+        /// </summary>
+        /// <param name="genericParameterNames">The name of the generic parameters found in the <paramref name="openGenericImplementingType"/>.</param>
+        /// <param name="genericArgumentMap">A <see cref="IDictionary{TKey,TValue}"/> that contains the mapping
+        /// between a parameter name and the corresponding parameter or argument from the <paramref name="genericServiceType"/>.</param>
+        /// <param name="genericServiceType">The generic type containing the arguments/parameters to be mapped to the generic arguments/parameters of the <paramref name="openGenericImplementingType"/>.</param>
+        /// <param name="openGenericImplementingType">The open generic implementing type.</param>
+        internal GenericMappingResult(string[] genericParameterNames, IDictionary<string, Type> genericArgumentMap, Type genericServiceType, Type openGenericImplementingType)
+        {
+            this.genericParameterNames = genericParameterNames;
+            this.genericArgumentMap = genericArgumentMap;
+            this.genericServiceType = genericServiceType;
+            this.openGenericImplementingType = openGenericImplementingType;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="GenericMappingResult"/> is valid.
+        /// </summary>
+        public bool IsValid
+        {
+            get
+            {
+                if (!genericServiceType.GetTypeInfo().IsGenericType && openGenericImplementingType.GetTypeInfo().ContainsGenericParameters)
+                {
+                    return false;
+                }
+
+                return genericParameterNames.All(n => genericArgumentMap.ContainsKey(n));
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of the mapped arguments/parameters.
+        /// In the case of an closed generic service, this list can be used to
+        /// create a new generic type from the open generic implementing type.
+        /// </summary>
+        /// <returns>A list of the mapped arguments/parameters.</returns>
+        public Type[] GetMappedArguments()
+        {
+            var missingParameters = genericParameterNames.Where(n => !genericArgumentMap.ContainsKey(n)).ToArray();
+            if (missingParameters.Any())
+            {
+                var missingParametersString = missingParameters.Aggregate((current, next) => current + "," + next);
+                string message = $"The generic parameter(s) {missingParametersString} found in type {openGenericImplementingType.FullName} cannot be mapped from {genericServiceType.FullName}";
+                throw new InvalidOperationException(message);
+            }
+
+            return genericParameterNames.Select(parameterName => genericArgumentMap[parameterName]).ToArray();
         }
     }
 
@@ -6372,6 +6452,128 @@ namespace DbReader.LightInject
     }
 
     /// <summary>
+    /// A class that maps the generic arguments/parameters from a generic servicetype
+    /// to a open generic implementing type.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class GenericArgumentMapper : IGenericArgumentMapper
+    {
+        /// <summary>
+        /// Maps the generic arguments/parameters from the <paramref name="genericServiceType"/>
+        /// to the generic arguments/parameters in the <paramref name="openGenericImplementingType"/>.
+        /// </summary>
+        /// <param name="genericServiceType">The generic type containing the arguments/parameters to be mapped to the generic arguments/parameters of the <paramref name="openGenericImplementingType"/>.</param>
+        /// <param name="openGenericImplementingType">The open generic implementing type.</param>
+        /// <returns>A <see cref="GenericMappingResult"/></returns>
+        public GenericMappingResult Map(Type genericServiceType, Type openGenericImplementingType)
+        {
+            string[] genericParameterNames =
+                openGenericImplementingType.GetTypeInfo().GenericTypeParameters.Select(t => t.Name).ToArray();
+
+            var genericArgumentMap = CreateMap(genericServiceType, openGenericImplementingType, genericParameterNames);
+
+            return new GenericMappingResult(genericParameterNames, genericArgumentMap, genericServiceType, openGenericImplementingType);
+        }
+
+        private static Dictionary<string, Type> CreateMap(Type genericServiceType, Type openGenericImplementingType, string[] genericParameterNames)
+        {
+            var genericArgumentMap = new Dictionary<string, Type>(genericParameterNames.Length);
+
+            var genericArguments = GetGenericArgumentsOrParameters(genericServiceType);
+           
+            if (genericArguments.Length > 0)
+            {
+                genericServiceType = genericServiceType.GetTypeInfo().GetGenericTypeDefinition();
+            }
+            else
+            {
+                return genericArgumentMap;
+            }
+
+            Type baseTypeImplementingOpenGenericServiceType = GetBaseTypeImplementingGenericTypeDefinition(
+                openGenericImplementingType,
+                genericServiceType);
+
+            Type[] baseTypeGenericArguments = GetGenericArgumentsOrParameters(baseTypeImplementingOpenGenericServiceType);
+
+            MapGenericArguments(genericArguments, baseTypeGenericArguments, genericArgumentMap);
+            return genericArgumentMap;
+        }
+
+        private static Type[] GetGenericArgumentsOrParameters(Type type)
+        {
+            TypeInfo typeInfo = type.GetTypeInfo();
+            if (typeInfo.IsGenericTypeDefinition)
+            {
+                return typeInfo.GenericTypeParameters;
+            }
+
+            return typeInfo.GenericTypeArguments;
+        }
+
+        private static void MapGenericArguments(Type[] closedGenericArguments, Type[] baseTypeGenericArguments, IDictionary<string, Type> map)
+        {
+            for (int index = 0; index < baseTypeGenericArguments.Length; index++)
+            {
+                var baseTypeGenericArgument = baseTypeGenericArguments[index];
+                var closedGenericArgument = closedGenericArguments[index];
+                if (baseTypeGenericArgument.GetTypeInfo().IsGenericParameter)
+                {
+                    map[baseTypeGenericArgument.Name] = closedGenericArgument;
+                }
+                else if (baseTypeGenericArgument.GetTypeInfo().IsGenericType)
+                {
+                    if (closedGenericArgument.GetTypeInfo().IsGenericType)
+                    {
+                        MapGenericArguments(closedGenericArgument.GetTypeInfo().GenericTypeArguments, baseTypeGenericArgument.GetTypeInfo().GenericTypeArguments, map);
+                    }
+                    else
+                    {
+                        MapGenericArguments(closedGenericArguments, baseTypeGenericArgument.GetTypeInfo().GenericTypeArguments, map);
+                    }
+                }
+            }
+        }
+
+        private static Type GetBaseTypeImplementingGenericTypeDefinition(Type implementingType, Type genericTypeDefinition)
+        {
+            Type baseTypeImplementingGenericTypeDefinition = null;
+
+            if (genericTypeDefinition.GetTypeInfo().IsInterface)
+            {
+                baseTypeImplementingGenericTypeDefinition = implementingType
+                    .GetTypeInfo().ImplementedInterfaces
+                    .FirstOrDefault(i => i.GetTypeInfo().IsGenericType && i.GetTypeInfo().GetGenericTypeDefinition() == genericTypeDefinition);
+            }
+            else
+            {
+                Type baseType = implementingType;
+                while (!ImplementsOpenGenericTypeDefinition(genericTypeDefinition, baseType) && baseType != typeof(object))
+                {
+                    baseType = baseType.GetTypeInfo().BaseType;
+                }
+
+                if (baseType != typeof(object))
+                {
+                    baseTypeImplementingGenericTypeDefinition = baseType;
+                }
+            }
+
+            if (baseTypeImplementingGenericTypeDefinition == null)
+            {
+                throw new InvalidOperationException($"The generic type definition {genericTypeDefinition.FullName} not implemented by implementing type {implementingType.FullName}");
+            }
+
+            return baseTypeImplementingGenericTypeDefinition;
+        }
+
+        private static bool ImplementsOpenGenericTypeDefinition(Type genericTypeDefinition, Type baseType)
+        {
+            return baseType.GetTypeInfo().IsGenericType && baseType.GetTypeInfo().GetGenericTypeDefinition() == genericTypeDefinition;
+        }
+    }
+
+    /// <summary>
     /// An assembly scanner that registers services based on the types contained within an <see cref="Assembly"/>.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
@@ -6380,6 +6582,7 @@ namespace DbReader.LightInject
         private readonly ITypeExtractor concreteTypeExtractor;
         private readonly ITypeExtractor compositionRootTypeExtractor;
         private readonly ICompositionRootExecutor compositionRootExecutor;
+        private readonly IGenericArgumentMapper genericArgumentMapper;
         private Assembly currentAssembly;
 
         /// <summary>
@@ -6391,11 +6594,14 @@ namespace DbReader.LightInject
         /// extracting <see cref="ICompositionRoot"/> implementations from the assembly being scanned.</param>
         /// <param name="compositionRootExecutor">The <see cref="ICompositionRootExecutor"/> that is
         /// responsible for creating and executing an <see cref="ICompositionRoot"/>.</param>
-        public AssemblyScanner(ITypeExtractor concreteTypeExtractor, ITypeExtractor compositionRootTypeExtractor, ICompositionRootExecutor compositionRootExecutor)
+        /// <param name="genericArgumentMapper">The <see cref="IGenericArgumentMapper"/> that is responsible
+        /// for determining if an open generic type can be created from the information provided by a given abstraction.</param>
+        public AssemblyScanner(ITypeExtractor concreteTypeExtractor, ITypeExtractor compositionRootTypeExtractor, ICompositionRootExecutor compositionRootExecutor, IGenericArgumentMapper genericArgumentMapper)
         {
             this.concreteTypeExtractor = concreteTypeExtractor;
             this.compositionRootTypeExtractor = compositionRootTypeExtractor;
             this.compositionRootExecutor = compositionRootExecutor;
+            this.genericArgumentMapper = genericArgumentMapper;
         }
 
         /// <summary>
@@ -6499,6 +6705,14 @@ namespace DbReader.LightInject
         private void RegisterInternal(Type serviceType, Type implementingType, IServiceRegistry serviceRegistry, ILifetime lifetime)
         {
             var serviceTypeInfo = serviceType.GetTypeInfo();
+            if (implementingType.GetTypeInfo().ContainsGenericParameters)
+            {
+                if (!genericArgumentMapper.Map(serviceType, implementingType).IsValid)
+                {
+                    return;
+                }
+            }
+
             if (serviceTypeInfo.IsGenericType && serviceTypeInfo.ContainsGenericParameters)
             {
                 serviceType = serviceTypeInfo.GetGenericTypeDefinition();

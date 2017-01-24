@@ -6,7 +6,6 @@ namespace DbReader.Construction
     public class CachedReaderMethodBuilder<T> : IReaderMethodBuilder<T>
     {
         
-
         private Lazy<Func<IDataRecord, int[], T>> cache;
 
         public CachedReaderMethodBuilder(IReaderMethodBuilder<T> readerMethodBuilder)

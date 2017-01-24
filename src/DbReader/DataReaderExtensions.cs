@@ -24,6 +24,13 @@
             return container;
         }
 
+        /// <summary>
+        /// Reads the data from the given <paramref name="dataReader"/>
+        /// and translates the data into an <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of object to be created from the reader.</typeparam>
+        /// <param name="dataReader">The target <see cref="IDataReader"/>.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> that represents the data translated into objects.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<T> Read<T>(this IDataReader dataReader)
         {

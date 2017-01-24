@@ -62,11 +62,32 @@
             }
         }
 
-        public static IDataReader ExecuteReader(this IDbConnection dbConnection, string sql, object arguments = null)
+        /// <summary>
+        /// Executes the given <paramref name="query"/> and returns an <see cref="IDataReader"/>.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <returns><see cref="IDataReader"/></returns>
+        public static IDataReader ExecuteReader(this IDbConnection dbConnection, string query, object arguments = null)
         {
-            var command = CreateCommand(dbConnection, sql, arguments);
+            var command = CreateCommand(dbConnection, query, arguments);            
             return command.ExecuteReader();
         }
+
+        /// <summary>
+        /// Executes the given <paramref name="query"/> asynchronously and returns an <see cref="IDataReader"/>.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <returns><see cref="IDataReader"/></returns>
+        public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, string query, object arguments = null)
+        {
+            var command = CreateCommand(dbConnection, query, arguments);
+            return await ((DbCommand)command).ExecuteReaderAsync().ConfigureAwait(false);
+        }
+
 
         public static IDbCommand CreateCommand(this IDbConnection dbConnection, string sql, object arguments = null)
         {
@@ -78,10 +99,6 @@
 
        
 
-        public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, string sql, object arguments = null)
-        {
-            var command = CreateCommand(dbConnection, sql, arguments);
-            return await ((DbCommand) command).ExecuteReaderAsync();
-        }
+      
     }    
 }

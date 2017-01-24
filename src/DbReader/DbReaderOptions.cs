@@ -95,21 +95,4 @@
 
 
     }
-
-
-    public class ReadDelegate<TProperty>
-    {
-        public void Use(Func<IDataRecord, int, TProperty> readFunction)
-        {
-            ValueConverter.RegisterReadDelegate(readFunction);            
-        }
-    }
-
-    public class PassDelegate<TArgument>
-    {
-        public void Use(Action<IDataParameter, TArgument> convertFunction)
-        {            
-            ArgumentProcessor.RegisterProcessDelegate(convertFunction);
-        }
-    }
 }

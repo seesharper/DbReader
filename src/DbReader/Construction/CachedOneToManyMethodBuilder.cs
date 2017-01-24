@@ -8,7 +8,7 @@ namespace DbReader.Construction
     /// caches the dynamically created method used to populate collection
     /// properties of a given type.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The <see cref="Type"/> for which to create the dynamic method.</typeparam>
     public class CachedOneToManyMethodBuilder<T> : IOneToManyMethodBuilder<T>
     {      
         private readonly IOneToManyMethodBuilder<T> oneToManyMethodBuilder;        
@@ -22,6 +22,12 @@ namespace DbReader.Construction
             this.oneToManyMethodBuilder = oneToManyMethodBuilder;       
         }
 
+        /// <summary>
+        /// Creates a dynamic method that populates mapped collection properties.
+        /// </summary>
+        /// <param name="dataRecord">The source <see cref="IDataRecord"/>.</param>
+        /// <param name="prefix">The property prefix used to identify the fields in the <see cref="IDataRecord"/>.</param>
+        /// <returns>A delegate representing a dynamic method that populates mapped collection properties.</returns>
         public Action<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
         {
             return StaticCache<Action<IDataRecord, T>>.GetOrAdd(typeof (T), prefix,

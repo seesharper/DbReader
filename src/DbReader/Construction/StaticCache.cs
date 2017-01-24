@@ -2,8 +2,6 @@ namespace DbReader.Construction
 {
     using System;
     using System.Collections.Concurrent;
-    using Database;
-    using LightInject;
 
     /// <summary>
     /// A static CachedValues used to CachedValues things related 
