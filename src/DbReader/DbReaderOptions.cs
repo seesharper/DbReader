@@ -56,6 +56,9 @@
             return new PassDelegate<TArgument>();
         }        
 
+        /// <summary>
+        /// Gets or sets the convention to be used for determining if a given property is a key property.
+        /// </summary>
         public static Func<PropertyInfo, bool> KeyConvention
         {
             get
@@ -77,7 +80,13 @@
         /// reponsible for parsing the parameter names from a given sql statement.
         /// </summary>
         public static IParameterParser ParameterParser { get; set; }
+
                
+        /// <summary>
+        /// Specifies the key properties for a the type of <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="keyExpressions">The expressions that specifies the key property.</param>
+        /// <typeparam name="T">The type for which to specify key properties.</typeparam>
         public static void KeySelector<T>(params Expression<Func<T, object>>[] keyExpressions)
         {
             PropertyInfo[] properties = new PropertyInfo[keyExpressions.Length];

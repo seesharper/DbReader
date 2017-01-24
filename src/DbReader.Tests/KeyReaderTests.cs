@@ -12,7 +12,7 @@
     public class KeyReaderTests
     {
         public KeyReaderTests()
-        {
+        {            
             DbReaderOptions.KeySelector<ClassWithSingleKey>(c => c.KeyProperty);
             DbReaderOptions.KeySelector<ClassWithCompositeKey>(c => c.FirstKeyProperty, c => c.SecondKeyProperty);
         }

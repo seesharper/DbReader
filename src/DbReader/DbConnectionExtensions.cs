@@ -88,17 +88,20 @@
             return await ((DbCommand)command).ExecuteReaderAsync().ConfigureAwait(false);
         }
 
-
-        public static IDbCommand CreateCommand(this IDbConnection dbConnection, string sql, object arguments = null)
+        /// <summary>
+        /// Creates a new <see cref="IDbCommand"/> with the given <paramref name="query"/> and <paramref name="arguments"/>.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when creating the command.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <returns><see cref="IDbCommand"/></returns>
+        public static IDbCommand CreateCommand(this IDbConnection dbConnection, string query, object arguments = null)
         {
-            SqlStatement.Current = sql;
-            var command = DbCommandFactory.CreateCommand(dbConnection, sql, arguments);
+            SqlStatement.Current = query;
+            var command = DbCommandFactory.CreateCommand(dbConnection, query, arguments);
             CommandInitializer?.Invoke(command);
             return command;
         }
-
-       
-
-      
+             
     }    
 }

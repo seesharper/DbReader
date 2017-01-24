@@ -3,28 +3,50 @@
     using System;
     using System.Data;
 
+    /// <summary>
+    /// Extends the <see cref="IDataRecord"/> interface.
+    /// </summary>
     public static class DataRecordExtensions
     {
-        public static byte[] GetBytes(this IDataRecord dataRecord, int i, int length)
+        /// <summary>
+        /// Gets a byte array from the given <paramref name="dataRecord"/>.
+        /// </summary>
+        /// <param name="dataRecord">The target <see cref="IDataRecord"/>.</param>
+        /// <param name="ordinal">The ordinal of the column that contains the byte array.</param>
+        /// <param name="length">The number of bytes to read.</param>
+        /// <returns>An array of bytes read from the data record.</returns>
+        public static byte[] GetBytes(this IDataRecord dataRecord, int ordinal, int length)
         {
             byte[] buffer = new byte[length];
-            dataRecord.GetBytes(i, 0, buffer, 0, length);
+            dataRecord.GetBytes(ordinal, 0, buffer, 0, length);
             return buffer;
         }
 
-        public static byte[] GetBytes(this IDataRecord dataRecord, int i)
+        /// <summary>
+        /// Gets a byte array from the given <paramref name="dataRecord"/>.
+        /// </summary>
+        /// <param name="dataRecord">The target <see cref="IDataRecord"/>.</param>
+        /// <param name="ordinal">The ordinal of the column that contains the byte array.</param>
+        /// <returns>An array of bytes read from the data record.</returns>
+        public static byte[] GetBytes(this IDataRecord dataRecord, int ordinal)
         {
-            long length = dataRecord.GetBytes(i, 0, null, 0, int.MaxValue);
+            long length = dataRecord.GetBytes(ordinal, 0, null, 0, int.MaxValue);
             var buffer = new byte[length];
-            dataRecord.GetBytes(i, 0, buffer, 0, (int)length);
+            dataRecord.GetBytes(ordinal, 0, buffer, 0, (int)length);
             return buffer;
         }
-              
-        public static char[] GetChars(this IDataRecord dataRecord, int i)
+
+        /// <summary>
+        /// Gets a char array from the given <paramref name="dataRecord"/>.
+        /// </summary>
+        /// <param name="dataRecord">The target <see cref="IDataRecord"/>.</param>
+        /// <param name="ordinal">The ordinal of the column that contains the char array.</param>
+        /// <returns>An array of chars read from the data record.</returns>      
+        public static char[] GetChars(this IDataRecord dataRecord, int ordinal)
         {
-            long length = dataRecord.GetChars(i, 0, null, 0, int.MaxValue);
+            long length = dataRecord.GetChars(ordinal, 0, null, 0, int.MaxValue);
             var buffer = new char[length];
-            dataRecord.GetChars(i, 0, buffer, 0, (int)length);
+            dataRecord.GetChars(ordinal, 0, buffer, 0, (int)length);
             return buffer;
         }             
     }
