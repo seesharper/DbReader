@@ -43,10 +43,17 @@
         private static IEnumerable<T> ReadWithNavigationProperties<T>(IDataReader dataReader)
         {
             List<T> result = new List<T>();
+            var hasRows = dataReader.Read();
+            if (!hasRows)
+            {
+                return result;
+            }
+
             var container = containerFactory.Value;
             using (container.BeginScope())
             {
                 var instanceReader = container.GetInstance<IInstanceReader<T>>();
+                result.TryAdd(instanceReader.Read(dataReader, string.Empty));
                 while (dataReader.Read())
                 {
                     result.TryAdd(instanceReader.Read(dataReader, string.Empty));
@@ -58,8 +65,15 @@
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<T> ReadWithoutNavigationProperties<T>(IDataReader dataReader)
-        {
+        {           
             var result = new List<T>();
+
+            var hasRows = dataReader.Read();
+            if (!hasRows)
+            {
+                return result;
+            }
+
             var propertyReaderDelegate = PropertyReaderDelegateCache<T>.Get(SqlStatement.Current);
             if (propertyReaderDelegate == null)
             {
@@ -83,6 +97,7 @@
             var ordinals = propertyReaderDelegate.Ordinals;
             var readMethod = propertyReaderDelegate.ReadMethod;
 
+            result.Add(readMethod(dataReader, ordinals));
             while (dataReader.Read())
             {
                 result.Add(readMethod(dataReader, ordinals));
