@@ -79,7 +79,7 @@
 
     public class Territory
     {
-        public string TerritoryId { get; set; }
+        public string Id { get; set; }
         public string TerritoryDescription { get; set; }
     }
 }

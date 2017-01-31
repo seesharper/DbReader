@@ -28,5 +28,15 @@ namespace DbReader.Extensions
             MethodInfo getMethod = property.GetGetMethod();
             return getMethod != null && !getMethod.IsStatic && getMethod.IsPublic;            
         }
+
+        /// <summary>
+        /// Gets the "full name" of the <paramref name="property"/>.
+        /// </summary>
+        /// <param name="property">The <see cref="PropertyInfo"/> for which to get the full name.</param>
+        /// <returns>The "full name" of the <paramref name="property"/>.</returns>
+        public static string GetFullName(this PropertyInfo property)
+        {
+            return $"{property.PropertyType} {property.DeclaringType}.{property.Name}";
+        }
     }
 }

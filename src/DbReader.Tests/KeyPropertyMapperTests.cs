@@ -28,8 +28,9 @@
         public void Execute_UnMappedKeyProperty_ThrowsException(IKeyPropertyMapper keyPropertyMapper)
         {
             var dataRecord = new { InvalidField = 42 }.ToDataRecord();
-            Should.Throw<InvalidOperationException>(
+            var exception = Should.Throw<InvalidOperationException>(
                 () => keyPropertyMapper.Execute(typeof(ClassWithIdProperty), dataRecord, string.Empty));
+            exception.Message.ShouldContain("ClassWithIdProperty.Id");
         }
 
         public void Execute_MissingKeyProperty_ThrowsException(IKeyPropertyMapper keyPropertyMapper)

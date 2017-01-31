@@ -4,7 +4,7 @@
 	e.FirstName,
     o.OrderId AS Orders_OrderId,
 	o.OrderDate as Orders_OrderDate,
-	NULL as Territories_TerritoryId,
+	NULL as Territories_id,
 	NULL as Territories_TerritoryDescription
 FROM 
     Employees e
@@ -20,7 +20,7 @@ SELECT
 	e.FirstName,
 	NULL AS Orders_OrderId,
 	NULL AS Orders_OrderDate,
-	t.TerritoryId as Territories_TerritoryId,
+	t.TerritoryId as Territories_id,
 	t.TerritoryDescription as Territories_TerritoryDescription
 FROM 
     Employees e

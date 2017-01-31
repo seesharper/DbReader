@@ -42,7 +42,7 @@
             {
                 if (keyMappingInfo.ColumnInfo.Ordinal == -1)
                 {
-                    throw new InvalidOperationException(ErrorMessages.UnmappedKeyProperty.FormatWith(keyMappingInfo.Property));
+                    throw new InvalidOperationException(ErrorMessages.UnmappedKeyProperty.FormatWith(keyMappingInfo.Property.GetFullName()));
                 }
             }
 
