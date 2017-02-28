@@ -54,7 +54,8 @@
                 .Decorate(typeof(IPropertySelector), typeof(OneToManyPropertyValidator), sr => sr.ImplementingType == typeof(OneToManyPropertySelector))
                 .Decorate<IPropertySelector, CachedPropertySelector>()
 
-                .Register<Func<Type, object>>(factory => type => factory.GetInstance(type), new PerContainerLifetime())
+                //// This might need to inlude the prefix for hierachical queries.
+                //.Register<Func<Type, string,object>>(factory => (type, prefix) => factory.GetInstance(type, prefix), new PerContainerLifetime())
                 .Register<Func<Type, IReaderMethodBuilder<IStructuralEquatable>>>(
                     factory => type => CreateConstructorReaderMethodBuilder(type, factory), new PerContainerLifetime())
 
@@ -77,6 +78,9 @@
             
                 .Register<IPrefixResolver, PrefixResolver>(new PerScopeLifetime())
 
+                .Register<IInstanceReaderFactory>(f => new InstanceReaderFactory(f.GetInstance), new PerScopeLifetime())
+
+                //.Register(typeof(IInstanceReader<>), typeof(InstanceReader<>))
                 .Register(typeof(IInstanceReader<>), typeof(InstanceReader<>), new PerScopeLifetime())
                 .Decorate(typeof(IInstanceReader<>), typeof(CachedInstanceReader<>))
             

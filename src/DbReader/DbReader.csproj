@@ -104,6 +104,7 @@
     <Compile Include="ReadDelegate.cs" />
     <Compile Include="Readers\CachedInstanceReader.cs" />
     <Compile Include="Readers\IInstanceReader.cs" />
+    <Compile Include="Readers\IInstanceReaderFactory.cs" />
     <Compile Include="Readers\IKeyReader.cs" />
     <Compile Include="Readers\KeyReader.cs" />
     <Compile Include="Readers\InstanceReader.cs" />

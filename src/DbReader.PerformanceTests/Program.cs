@@ -13,7 +13,7 @@ namespace DbReader.PerformanceTests
         static void Main(string[] args)
         {
             IntegrationTests integrationTests = new IntegrationTests();
-            integrationTests.DbReaderVsDapper();
+            //integrationTests.DbReaderVsDapper();
             Console.ReadKey();
         }
     }

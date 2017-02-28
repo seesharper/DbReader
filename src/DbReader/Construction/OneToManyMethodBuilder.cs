@@ -19,7 +19,7 @@ namespace DbReader.Construction
     {
         private readonly IMethodSkeletonFactory methodSkeletonFactory;
         private readonly IPropertySelector oneToManyPropertySelector;
-        private readonly Func<Type, object> instanceReaderFactory;
+        private readonly IInstanceReaderFactory instanceReaderFactory;
         private readonly IPrefixResolver prefixResolver;
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace DbReader.Construction
         /// <param name="oneToManyPropertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting properties that represents a "one-to-many" relationship.</param>
         /// <param name="instanceReaderFactory">A factory delegate used to create <see cref="IInstanceReader{T}"/> instances for each "one-to-many" property.</param>
         /// <param name="prefixResolver">The <see cref="IPrefixResolver"/> that is responsible for resolving the prefix for each "one-to-many" property.</param>
-        public OneToManyMethodBuilder(IMethodSkeletonFactory methodSkeletonFactory, IPropertySelector oneToManyPropertySelector, Func<Type, object> instanceReaderFactory, IPrefixResolver prefixResolver)
+        public OneToManyMethodBuilder(IMethodSkeletonFactory methodSkeletonFactory, IPropertySelector oneToManyPropertySelector, IInstanceReaderFactory instanceReaderFactory, IPrefixResolver prefixResolver)
         {
             this.methodSkeletonFactory = methodSkeletonFactory;
             this.oneToManyPropertySelector = oneToManyPropertySelector;
@@ -66,7 +66,7 @@ namespace DbReader.Construction
                     Type instanceReaderType = typeof(IInstanceReader<>).MakeGenericType(elementType);
                     MethodInfo readMethod = instanceReaderType.GetMethod("Read");
 
-                    instanceReaders.Add(instanceReaderFactory(instanceReaderType));
+                    instanceReaders.Add(instanceReaderFactory.GetInstanceReader(instanceReaderType, propertyPrefix));
                     int instanceReaderIndex = instanceReaders.Count - 1;
 
                     MethodInfo getMethod = property.GetGetMethod();
@@ -94,13 +94,12 @@ namespace DbReader.Construction
 
                     generator.Emit(OpCodes.Call, tryAddMethod);                                                            
                 }
-                
-                generator.Emit(OpCodes.Ret);
-                       
+                                                       
             }
 
             if (shouldCreateMethod)
             {
+                generator.Emit(OpCodes.Ret);
                 var method = (Action<T, IDataRecord, object[]>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, object[]>));
                 return (record, instance) => method(instance, record, instanceReaders.ToArray());                
             }

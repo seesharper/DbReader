@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Data;
     using System.Data.SQLite;
     using System.Diagnostics;
@@ -9,12 +10,14 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Construction;
-    using Dapper;
+    //using Dapper;
     using Extensions;
     using Selectors;
     using Shouldly;
     using DbReader.LightInject;
     using DbReader;
+    using Readers;
+
     public class IntegrationTests
     {
         private string dbFile = @"..\..\db\northwind.db";
@@ -159,31 +162,56 @@
             DbReaderOptions.CommandInitializer = null;
         }
 
-
-        public void ShouldOutPerformDapperForListWithoutParameter(
-            IReaderMethodBuilder<CustomerWithOrders> propertyReaderMethodBuilder, IOrdinalSelector ordinalSelector)
+        public void ShouldReadEmployeeHierarchy()
         {
-
-
-
             using (var connection = CreateConnection())
-            {
-                var dapperResult = Measure.Run(() => connection.Query<Customer>(SQL.Customers), 100,
-                    "Dapper (All Customers)");
-                var dbReaderResult = Measure.Run(() => connection.Read<Customer>(SQL.Customers), 100,
-                    "DbReader (All Customers)");
-                
-                Console.WriteLine(dbReaderResult);
-                Console.WriteLine(dapperResult);
+            {                
+                var employees = connection.Read<Employee>(SQL.EmployeesHierarchy).ToArray();
+                Dictionary<long?, Employee> map = new Dictionary<long?, Employee>();
+                foreach (var employee in employees)
+                {                    
+                    if (employee.ReportsTo != null)
+                    {
+                        map[employee.ReportsTo].Employees.Add(employee);
+                    }
+                    map.Add(employee.EmployeeId, employee);
+                }
+
+                var initialEmployee = map.First().Value;
+                initialEmployee.Employees.Count().ShouldBe(5);
             }
         }
 
-        public void DbReaderVsDapper()
-        {
-            GetAllCustomersUsingDapper();
-            GetAllCustomersUsingDbReader();
-            //GetAllCustomersUsingPropertyReader();
-        }
+
+       
+
+    
+
+              
+        //public void ShouldOutPerformDapperForListWithoutParameter(
+        //    IReaderMethodBuilder<CustomerWithOrders> propertyReaderMethodBuilder, IOrdinalSelector ordinalSelector)
+        //{
+
+
+
+        //    using (var connection = CreateConnection())
+        //    {
+        //        var dapperResult = Measure.Run(() => connection.Query<Customer>(SQL.Customers), 100,
+        //            "Dapper (All Customers)");
+        //        var dbReaderResult = Measure.Run(() => connection.Read<Customer>(SQL.Customers), 100,
+        //            "DbReader (All Customers)");
+
+        //        Console.WriteLine(dbReaderResult);
+        //        Console.WriteLine(dapperResult);
+        //    }
+        //}
+
+        //public void DbReaderVsDapper()
+        //{
+        //    GetAllCustomersUsingDapper();
+        //    GetAllCustomersUsingDbReader();
+        //    //GetAllCustomersUsingPropertyReader();
+        //}
 
 
 
@@ -197,15 +225,15 @@
             }
         }
 
-        public void GetAllCustomersUsingDapper()
-        {
-            using (var connection = CreateConnection())
-            {
-                var dbReaderResult = Measure.Run(() => connection.Query<Customer>(SQL.Customers), 10,
-                    "Dapper (All Customers)");
-                Console.WriteLine(dbReaderResult);
-            }
-        }
+        //public void GetAllCustomersUsingDapper()
+        //{
+        //    using (var connection = CreateConnection())
+        //    {
+        //        var dbReaderResult = Measure.Run(() => connection.Query<Customer>(SQL.Customers), 10,
+        //            "Dapper (All Customers)");
+        //        Console.WriteLine(dbReaderResult);
+        //    }
+        //}
 
         public void GetAllCustomersUsingPlainDataReader()
         {

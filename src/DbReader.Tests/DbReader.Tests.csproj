@@ -75,6 +75,7 @@
     <Compile Include="CustomValueType.cs" />
     <Compile Include="DataReaderMockExtensions.cs" />
     <Compile Include="DataRecordExtensionTests.cs" />
+    <Compile Include="DbReaderExtensions.cs" />
     <Compile Include="FakeSql.cs" />
     <Compile Include="FieldSelectorTests.cs" />
     <Compile Include="InlineDataConvention.cs" />
@@ -120,6 +121,7 @@
     <EmbeddedResource Include="SQL.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SQL.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +130,7 @@
   <ItemGroup>
     <Content Include="Queries\Customers.sql" />
     <Content Include="Queries\CustomersAndOrders.sql" />
+    <Content Include="Queries\EmployeesHierarchy.sql" />
     <Content Include="Queries\EmployeesWithOrdersAndTerritories.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

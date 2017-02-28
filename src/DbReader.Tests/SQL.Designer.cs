@@ -62,7 +62,17 @@ namespace DbReader.Tests {
         
         /// <summary>
         ///   Looks up a localized string similar to SELECT 
-        ///	CustomerId
+        ///	CustomerId,
+        ///	CompanyName,
+        ///	ContactName,
+        ///	ContactTitle,
+        ///	Address,
+        ///    City,
+        ///    Region,
+        ///	PostalCode,
+        ///    Country,
+        ///    Phone,
+        ///    Fax 
         ///FROM 
         ///	Customers
         ///.
@@ -75,8 +85,8 @@ namespace DbReader.Tests {
         
         /// <summary>
         ///   Looks up a localized string similar to SELECT 
-        ///	c.CustomerID,
-        ///	o.OrderId
+        ///	c.CustomerID as CustomerWithOrdersId,
+        ///	o.OrderId as O_OrderId
         ///FROM 
         ///	Customers c
         ///INNER JOIN 
@@ -91,13 +101,48 @@ namespace DbReader.Tests {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to WITH RECURSIVE ctx
+        ///(
+        ///    employeeid,   
+        ///    reportsto
+        ///)
+        ///AS
+        ///(
+        ///    SELECT 
+        ///        initial.employeeid,
+        ///        initial.reportsto        
+        ///    FROM            
+        ///        employees initial  
+        ///    UNION ALL
+        ///    SELECT
+        ///        emp.employeeid,
+        ///        emp.reportsto        
+        ///    FROM 
+        ///        employees emp
+        ///    INNER JOIN 
+        ///        ctx on ctx.employeeid = emp.reportsto
+        ///)    
+        ///
+        ///select     
+        ///    r.Employeeid as EmployeeId,
+        ///    r.FirstName as FirstName,
+        ///    r.LastName as LastName,
+        ///    e.Employeeid as  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EmployeesHierarchy {
+            get {
+                return ResourceManager.GetString("EmployeesHierarchy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SELECT 
         ///    e.EmployeeId,
         ///	e.LastName,
         ///	e.FirstName,
         ///    o.OrderId AS Orders_OrderId,
         ///	o.OrderDate as Orders_OrderDate,
-        ///	NULL as Territories_TerritoryId,
+        ///	NULL as Territories_id,
         ///	NULL as Territories_TerritoryDescription
         ///FROM 
         ///    Employees e
@@ -105,7 +150,7 @@ namespace DbReader.Tests {
         ///    Orders o 
         ///ON 
         ///    e.EmployeeId = o.employeeId AND
-        ///    e.EmployeeId = 7 
+        ///    e.EmployeeId = @EmployeeId 
         ///UNION
         ///SELECT 
         ///	e.EmployeeId,
@@ -113,8 +158,8 @@ namespace DbReader.Tests {
         ///	e.FirstName,
         ///	NULL AS Orders_OrderId,
         ///	NULL AS Orders_OrderDate,
-        ///	t.TerritoryId as Territories_TerritoryId,
-        ///	t.TerritoryDescription as Terri [rest of string was truncated]&quot;;.
+        ///	t.TerritoryId as Territories_id,
+        ///	t.TerritoryDescription as Territories_T [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EmployeesWithOrdersAndTerritories {
             get {

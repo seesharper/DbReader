@@ -19,7 +19,7 @@
     {
         private readonly IMethodSkeletonFactory methodSkeletonFactory;
         private readonly IPropertySelector manyToOnePropertySelector;
-        private readonly Func<Type, object> instanceReaderFactory;
+        private readonly IInstanceReaderFactory instanceReaderFactory;
         private readonly IPrefixResolver prefixResolver;
 
         /// <summary>
@@ -29,7 +29,7 @@
         /// <param name="manyToOnePropertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting properties that represents a "many-to-one" relationship.</param>
         /// <param name="instanceReaderFactory">A factory delegate used to create <see cref="IInstanceReader{T}"/> instances for each "many-to-one" property.</param>
         /// <param name="prefixResolver">The <see cref="IPrefixResolver"/> that is responsible for resolving the prefix for each "many-to-one" property.</param>
-        public ManyToOneMethodBuilder(IMethodSkeletonFactory methodSkeletonFactory, IPropertySelector manyToOnePropertySelector, Func<Type, object> instanceReaderFactory, IPrefixResolver prefixResolver)
+        public ManyToOneMethodBuilder(IMethodSkeletonFactory methodSkeletonFactory, IPropertySelector manyToOnePropertySelector, IInstanceReaderFactory instanceReaderFactory, IPrefixResolver prefixResolver)
         {
             this.methodSkeletonFactory = methodSkeletonFactory;
             this.manyToOnePropertySelector = manyToOnePropertySelector;
@@ -63,7 +63,7 @@
                 {
                     shouldCreateMethod = true;
                     Type instanceReaderType = typeof(IInstanceReader<>).MakeGenericType(property.PropertyType);
-                    object instanceReader = instanceReaderFactory(instanceReaderType);
+                    object instanceReader = instanceReaderFactory.GetInstanceReader(instanceReaderType, propertyPrefix);
                     
                     instanceReaders.Add(instanceReader);
                     

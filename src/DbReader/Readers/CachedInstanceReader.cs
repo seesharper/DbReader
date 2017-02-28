@@ -44,7 +44,8 @@ namespace DbReader.Readers
         public T Read(IDataRecord dataRecord, string currentPrefix)
         {            
             var instance = ReadInstance(dataRecord, currentPrefix);
-            oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix)?.Invoke(dataRecord, instance);
+            var method = oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix);
+            method?.Invoke(dataRecord, instance);
             return instance;
         }
 

@@ -22,7 +22,6 @@
             var instance = reader.Read(dataRecord, string.Empty);
             instance.Property.ShouldBe("SomeValue");
         }       
-
         public void ShouldReadInt64Value(IInstanceReader<ClassWithProperty<long>> reader)
         {
             var dataRecord = new { Id = 42, Property = (long)84 }.ToDataRecord();
@@ -193,6 +192,20 @@
             instance.OneToManyRelation.Count().ShouldBe(1);
         }
 
+        public void ShouldReadInstanceWithRecursiveOneToManyRelation(IInstanceReader<ClassWithRecursiveOneToManyRelation> instanceReader)
+        {
+            var dataRecord = new [] { new {Id = 42, OneToManyRelation_Id = 64} , new { Id = 42, OneToManyRelation_Id = 128 } }.ToDataReader();
+
+            ClassWithRecursiveOneToManyRelation instance = null;
+            while (dataRecord.Read())
+            {
+                instance = instanceReader.Read(dataRecord, string.Empty);
+            }
+            
+            instance.OneToManyRelation.Count().ShouldBe(2);
+        }
+
+
         public void ShouldAddOneToManyRelationOnlyOnce(IInstanceReader<ClassWithOneToManyRelation> instanceReader)
         {
             var dataRecord = new { Id = 42, OneToManyRelation_Id = 84 }.ToDataRecord();
@@ -261,6 +274,14 @@
 
         public ICollection<ClassWithNoRelations> OneToManyRelation { get; set; }
     }
+
+    public class ClassWithRecursiveOneToManyRelation
+    {
+        public int Id { get; set; }
+
+        public ICollection<ClassWithRecursiveOneToManyRelation> OneToManyRelation { get; set; }
+    }
+
 
     public class ClassWithNestedOnToManyRelation
     {

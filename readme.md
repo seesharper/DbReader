@@ -57,11 +57,11 @@ FROM
 	Customers	
 ```
 
-| CustomerId    | CompanyName   |
-| ------------- |-------------- | 
-| ALFKI         | Alfreds Futterkiste |
-| ...           | ...      |
-| ...           | ...      |
+| CustomerId | CompanyName         |
+| ---------- | ------------------- |
+| ALFKI      | Alfreds Futterkiste |
+| ...        | ...                 |
+| ...        | ...                 |
 
 > It is important that each column in the result set matches the property name.  (Case insensitive)
 
@@ -93,9 +93,9 @@ FROM
 WHERE 
 	CustomerId = @CustomerId		
 ```
-| CustomerId    | CompanyName   |
-| ------------- |-------------- | 
-| ALFKI         | Alfreds Futterkiste |
+| CustomerId | CompanyName         |
+| ---------- | ------------------- |
+| ALFKI      | Alfreds Futterkiste |
 
 DbReader makes passing an argument value very easy.
 
@@ -115,7 +115,7 @@ If we need more control with the regards to the parameters, we can simply assign
 
 
 
-		
+
 ## Aliasing
 
 Sometimes we want give a property a different name than the target column returned from the query. The easiest way of doing this is simply to take advantage of column aliasing in the SQL statement.
@@ -139,11 +139,11 @@ FROM
 	Customers	
 ```
 
-| CustomerId    | Name   |
-| ------------- |-------------- | 
-| ALFKI         | Alfreds Futterkiste |
-| ...           | ...      |
-| ...           | ...      |
+| CustomerId | Name                |
+| ---------- | ------------------- |
+| ALFKI      | Alfreds Futterkiste |
+| ...        | ...                 |
+| ...        | ...                 |
 
 
 
@@ -199,7 +199,7 @@ This is where the true power of DbReader comes into play as we don't have to do 
 
 ```
 var customers = dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
-```	
+```
 
 > **DbReader** makes sure that only one instance of the *Customer* class is ever instantiated even if the customer information is "duplicated" six times in the result set.
 
@@ -403,7 +403,7 @@ INNER JOIN
 ON
 	c.CustomerId = o.CustomerId	AND
 	c.CustomerId = @CustomerID
-``` 
+```
 
 The length of the alias name might actually be a problem since we can nest these properties indefinitely.  Consider the following prefix/alias.
 ```
@@ -452,7 +452,7 @@ DbReaderOptions.WhenReading<Guid>().Use((datarecord, ordinal) => new Guid(dataRe
 ```
 
 This instructs **DbReader** to use our custom read delegate whenever it encounters a *Guid* property.
- 
+
 The *Guid* also needs to be converted back into a byte array when passing a *Guid* value as a parameter to a query.
 
 ```
@@ -461,16 +461,116 @@ DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = g
 
 
 
+## Hierarchical/Recursive Queries 
+
+Self referencing tables represents an infinite parent-child relationship and the following example shows how to write a query that recursively finds employees and their managers. This example uses SQLite, but most relational databases have a similar way of dealing with recursive queries.
+
+First lets have a look at how the employees table looks like
+
+| EmployeeID | FirstName | LastName  | ReportsTo |
+| ---------- | --------- | --------- | --------- |
+| 1          | Nancy     | Davolio   | 2         |
+| 2          | Andrew    | Fuller    | NULL      |
+| 3          | Janet     | Leverling | 2         |
+| 4          | Margaret  | Peacock   | 2         |
+| 5          | Steven    | Buchanan  | 2         |
+| 6          | Michael   | Suyama    | 5         |
+| 7          | Robert    | King      | 5         |
+| 8          | Laura     | Callahan  | 2         |
+| 9          | Anne      | Dodsworth | 5         |
 
 
 
+The *ReportsTo* column refers back to the *Employees* table and indicates the manager for each employee. For instance we can see that *Margaret* reports directly to Andrew who again reports to nobody (He is the boss), where as Laura reports to Margaret that in turn reports to Andrew. 
+
+Using what is known as a [Common Table Expression](https://www.sqlite.org/syntax/common-table-expression.html) we can create a query that shows the relationship using a level column that we in turn will use to map our result into a class.
+
+```sql
+WITH RECURSIVE ctx (
+    EmployeeId,  
+    FirstName,
+    LastName,
+    ReportsTo,
+    Level
+)
+AS (
+    SELECT initial.EmployeeId,           
+           initial.FirstName,
+           initial.LastName,
+           initial.ReportsTo,
+           0
+      FROM employees initial
+     WHERE initial.ReportsTo IS NULL
+    UNION
+    SELECT emp.Employeeid,           
+           emp.Firstname,
+           emp.Lastname,
+           emp.ReportsTo,
+           ctx.Level + 1
+      FROM employees emp
+           INNER JOIN
+           ctx ON ctx.EmployeeId = emp.ReportsTo
+)
+SELECT 
+    EmployeeId,    
+    FirstName,
+    LastName,
+    ReportsTo
+FROM 
+    ctx
+     ORDER BY level;
+
+```
 
 
 
+This will give us the following result.
+
+| EmployeeId | FirstName | LastName  | ReportsTo |
+| ---------- | --------- | --------- | --------- |
+| 2          | Andrew    | Fuller    | NULL      |
+| 5          | Steven    | Buchanan  | 2         |
+| 8          | Laura     | Callahan  | 2         |
+| 1          | Nancy     | Davolio   | 2         |
+| 3          | Janet     | Leverling | 2         |
+| 4          | Margaret  | Peacock   | 2         |
+| 9          | Anne      | Dodsworth | 5         |
+| 7          | Robert    | King      | 5         |
+| 6          | Michael   | Suyama    | 5         |
+
+The result is now ordered by level which greatly simplifies the mapping code on the C# side.
+
+```c#
+var employees = connection.Read<Employee>(SQL.EmployeesHierarchy).ToArray();
+var map = new Dictionary<long?, Employee>();
+foreach (var employee in employees)
+{                    
+  if (employee.ReportsTo != null)
+  {
+  	map[employee.ReportsTo].Employees.Add(employee);
+  }
+  map.Add(employee.EmployeeId, employee);
+}
+
+var initialEmployee = map.First().Value;
+```
+The *Employee* class looks like this 
+
+```c#
+public class Employee
+{
+    public long EmployeeId { get; set; }
+
+    public string LastName { get; set; }
+
+    public string FirstName { get; set; }
+    
+    public long? ReportsTo { get; set; }
+    
+    public ICollection<Employee> Employees { get; set; }
+}
+```
 
 
-
-
-
-
+> Note: The *ReportsTo* property might not actually be needed later on and we could for instance in a Web application decorate this property with the *JsonIgnoreAttribute* to avoid that this property is exposed to the client. 
 

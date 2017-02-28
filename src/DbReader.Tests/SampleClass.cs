@@ -66,16 +66,33 @@
 
     public class Employee
     {
-        public long EmployeeID { get; set; }
+        public long EmployeeId { get; set; }
+
+        public string LastName { get; set; }
+
+        public string FirstName { get; set; }
+        
+        public long? ReportsTo { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
+
+        public ICollection<Territory> Territories { get; set; }
+
+        public ICollection<Employee> Employees { get; set; }
+    }
+
+    public class EmployeeRow
+    {
+        [Key]
+        public long EmployeeId { get; set; }
 
         public string LastName { get; set; }
 
         public string FirstName { get; set; }
 
-        public ICollection<Order> Orders { get; set; }
-
-        public ICollection<Territory> Territories { get; set; }
+        public long? ReportsTo { get; set; }
     }
+
 
     public class Territory
     {
