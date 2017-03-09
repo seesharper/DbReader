@@ -1,6 +1,7 @@
 ﻿namespace DbReader.Tests
 {
     using System.Data;
+    using Extensions;
     using Moq;
     using Shouldly;
 
@@ -19,6 +20,11 @@
             ArgumentProcessor.Process(typeof(CustomValueType), dataParameterMock.Object, new CustomValueType(42));
 
             dataParameterMock.Object.Value.ShouldBe(42);
+        }
+
+        public void ShouldRecognizeCustomArgumentTypeAsSimpleType()
+        {
+            typeof(CustomValueType).IsSimpleType().ShouldBeTrue();
         }
     }
 }

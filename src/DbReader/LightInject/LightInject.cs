@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject version 5.0.0 (NET46)
+    LightInject version 5.0.2 (NET46)
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
@@ -42,13 +42,13 @@ namespace DbReader.LightInject
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NET46
+#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || NET46
     using System.IO;
 #endif
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NET46
+#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || NET46
     using System.Reflection.Emit;
 #endif
     using System.Runtime.CompilerServices;
@@ -479,7 +479,7 @@ namespace DbReader.LightInject
         IServiceRegistry RegisterPropertyDependency<TDependency>(
             Func<IServiceFactory, PropertyInfo, TDependency> factory);
 
-#if NET45 || NET46 || NETSTANDARD11
+#if NET45 || NET46 || NETSTANDARD16
         /// <summary>
         /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
         /// </summary>
@@ -853,7 +853,7 @@ namespace DbReader.LightInject
         void EndScope(Scope scope);
     }
 
-#if NET45 || NET46 || NETSTANDARD11
+#if NET45 || NET46 || NETSTANDARD16
 
     /// <summary>
     /// Represents a class that is responsible loading a set of assemblies based on the given search pattern.
@@ -1897,7 +1897,7 @@ namespace DbReader.LightInject
             constructionInfoProvider = new Lazy<IConstructionInfoProvider>(CreateConstructionInfoProvider);
             methodSkeletonFactory = (returnType, parameterTypes) => new DynamicMethodSkeleton(returnType, parameterTypes);
             ScopeManagerProvider = new PerThreadScopeManagerProvider();
-#if NET45 || NET46
+#if NET45 || NET46 || NETSTANDARD16
             AssemblyLoader = new AssemblyLoader();
 #endif
         }
@@ -1948,7 +1948,7 @@ namespace DbReader.LightInject
         /// Gets or sets the <see cref="IAssemblyScanner"/> instance that is responsible for scanning assemblies.
         /// </summary>
         public IAssemblyScanner AssemblyScanner { get; set; }
-#if NET45 || NETSTANDARD11 || NET46
+#if NET45 || NETSTANDARD16 || NET46
 
         /// <summary>
         /// Gets or sets the <see cref="IAssemblyLoader"/> instance that is responsible for loading assemblies during assembly scanning.
@@ -2225,7 +2225,7 @@ namespace DbReader.LightInject
             return this;
         }
 
-#if NET45 || NETSTANDARD11 || NET46
+#if NET45 || NETSTANDARD16 || NET46
         /// <summary>
         /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
         /// </summary>
@@ -3513,7 +3513,7 @@ namespace DbReader.LightInject
             {
                 emitter = CreateEmitMethodForArrayServiceRequest(serviceType);
             }
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || PCL_111 || NET46
+#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || PCL_111 || NET46
             else if (serviceType.IsReadOnlyCollectionOfT() || serviceType.IsReadOnlyListOfT())
             {
                 emitter = CreateEmitMethodForReadOnlyCollectionServiceRequest(serviceType);
@@ -3617,7 +3617,7 @@ namespace DbReader.LightInject
                 ms.Emit(OpCodes.Call, closedGenericToListMethod);
             };
         }
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || PCL_111 || NET46
+#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || PCL_111 || NET46
 
         private Action<IEmitter> CreateEmitMethodForReadOnlyCollectionServiceRequest(Type serviceType)
         {
@@ -4020,7 +4020,7 @@ namespace DbReader.LightInject
                 emitter = new Emitter(dynamicMethod.GetILGenerator(), parameterTypes);
             }
 #endif
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NET46
+#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || NET46
             private void CreateDynamicMethod(Type returnType, Type[] parameterTypes)
             {
                 dynamicMethod = new DynamicMethod(
@@ -4122,7 +4122,7 @@ namespace DbReader.LightInject
         }
     }
 
-#if NET45 || NETSTANDARD13 || NET46
+#if NET45 || NETSTANDARD13 || NETSTANDARD16 || NET46
 
     /// <summary>
     /// Manages a set of <see cref="Scope"/> instances.
@@ -4146,7 +4146,7 @@ namespace DbReader.LightInject
         /// </summary>
         public override Scope CurrentScope
         {
-            get { return currentScope.Value; }
+            get { return GetThisScopeOrFirstValidAncestor(currentScope.Value); }
             set { currentScope.Value = value; }
         }               
     }
@@ -5955,6 +5955,7 @@ namespace DbReader.LightInject
         public Scope BeginScope()
         {
             var currentScope = CurrentScope;
+           
             var scope = new Scope(this, currentScope);
             if (currentScope != null)
             {
@@ -5964,7 +5965,7 @@ namespace DbReader.LightInject
             CurrentScope = scope;
             return scope;
         }
-
+    
         /// <summary>
         /// Ends the given <paramref name="scope"/>.
         /// </summary>
@@ -5976,18 +5977,40 @@ namespace DbReader.LightInject
                 throw new InvalidOperationException("Attempt to end a scope before all child scopes are completed.");
             }
 
-            if (!ReferenceEquals(CurrentScope, scope))
+            Scope parentScope = scope.ParentScope;
+
+            // Only update the current scope if the scope being 
+            // ended is the current scope.         
+            if (ReferenceEquals(CurrentScope, scope))
             {
-                throw new InvalidOperationException("Attempt to end a scope that is currently not the current scope.");
+                CurrentScope = parentScope;
             }
 
-            var currentScope = scope.ParentScope;
-            if (currentScope != null)
+            // What to do with the scope reference on the other thread?
+            if (parentScope != null)
             {
-                currentScope.ChildScope = null;
+                parentScope.ChildScope = null;
+            }
+        }
+
+        /// <summary>
+        /// Ensures that we return a valid scope.
+        /// </summary>
+        /// <param name="scope">The scope to be validated.</param>
+        /// <returns>The given <paramref name="scope"/> or the first valid ancestor.</returns>
+        protected Scope GetThisScopeOrFirstValidAncestor(Scope scope)
+        {
+            // The scope could possible been disposed on another thread
+            // or logical thread context.
+            while (scope != null && scope.IsDisposed)
+            {
+                scope = scope.ParentScope;
             }
 
-            CurrentScope = currentScope;
+            // Update the current scope so that the previous current 
+            // scope can be garbage collected.
+            CurrentScope = scope;
+            return scope;
         }
     }
 
@@ -6013,7 +6036,7 @@ namespace DbReader.LightInject
         /// </summary>
         public override Scope CurrentScope
         {
-            get { return threadLocalScope.Value; }
+            get { return GetThisScopeOrFirstValidAncestor(threadLocalScope.Value); }
             set { threadLocalScope.Value = value; }
         }
     }
@@ -6040,6 +6063,8 @@ namespace DbReader.LightInject
             serviceFactory = scopeManager.ServiceFactory;
             ParentScope = parentScope;
         }
+
+        public bool IsDisposed { get; set; }
 
         /// <summary>
         /// Raised when the <see cref="Scope"/> is completed.
@@ -6069,9 +6094,10 @@ namespace DbReader.LightInject
         /// Disposes all instances tracked by this scope.
         /// </summary>
         public void Dispose()
-        {
+        {            
             DisposeTrackedInstances();
             OnCompleted();
+            IsDisposed = true;
         }
       
         /// <summary>
@@ -6336,7 +6362,7 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(Registration));
             InternalTypes.Add(typeof(ServiceContainer));
             InternalTypes.Add(typeof(ConstructionInfo));
-#if NET45 || NET46
+#if NET45 || NET46 || NETSTANDARD16
             InternalTypes.Add(typeof(AssemblyLoader));
 #endif
             InternalTypes.Add(typeof(TypeConstructionInfoBuilder));
@@ -6365,7 +6391,7 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(GetInstanceDelegate));
             InternalTypes.Add(typeof(ContainerOptions));
             InternalTypes.Add(typeof(CompositionRootAttributeExtractor));
-#if NET45 || NET46 || NETSTANDARD13
+#if NET45 || NET46 || NETSTANDARD13 || NETSTANDARD16
             InternalTypes.Add(typeof(PerLogicalCallContextScopeManagerProvider));
             InternalTypes.Add(typeof(PerLogicalCallContextScopeManager));
             InternalTypes.Add(typeof(LogicalThreadStorage<>));
@@ -6753,7 +6779,7 @@ namespace DbReader.LightInject
             return propertyInfo.SetMethod == null || propertyInfo.SetMethod.IsStatic || propertyInfo.SetMethod.IsPrivate || propertyInfo.GetIndexParameters().Length > 0;
         }
     }
-#if NET45 || NET46
+#if NET45 || NET46 
 
     /// <summary>
     /// Loads all assemblies from the application base directory that matches the given search pattern.
@@ -6768,13 +6794,13 @@ namespace DbReader.LightInject
         /// <returns>A list of assemblies based on the given <paramref name="searchPattern"/>.</returns>
         public IEnumerable<Assembly> Load(string searchPattern)
         {
-            string directory = Path.GetDirectoryName(new Uri(typeof(ServiceContainer).Assembly.CodeBase).LocalPath);
+            string directory = Path.GetDirectoryName(new Uri(GetAssemblyCodeBasePath()).LocalPath);
             if (directory != null)
             {
                 string[] searchPatterns = searchPattern.Split('|');
                 foreach (string file in searchPatterns.SelectMany(sp => Directory.GetFiles(directory, sp)).Where(CanLoad))
                 {
-                    yield return Assembly.LoadFrom(file);
+                    yield return LoadAssembly(file);
                 }
             }
         }
@@ -6788,8 +6814,85 @@ namespace DbReader.LightInject
         {
             return true;
         }
+
+        /// <summary>
+        /// Loads <see cref="Assembly"/> for the file located in <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">Full path to the file.</param>
+        /// <returns><see cref="Assembly"/> of the file.</returns>
+        protected virtual Assembly LoadAssembly(string filename)
+        {
+            return Assembly.LoadFrom(filename);
+        }
+
+        /// <summary>
+        /// Gets the path where the LightInject assembly is located.
+        /// </summary>
+        /// <returns>The path where the LightInject assembly is located.</returns>
+        protected virtual string GetAssemblyCodeBasePath()
+        {
+            return typeof(ServiceContainer).Assembly.CodeBase;
+        }
     }
 #endif
+
+#if NETSTANDARD16
+    /// <summary>
+    /// Loads all assemblies from the application base directory that matches the given search pattern.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal class AssemblyLoader : IAssemblyLoader
+    {
+        /// <summary>
+        /// Loads a set of assemblies based on the given <paramref name="searchPattern"/>.
+        /// </summary>
+        /// <param name="searchPattern">The search pattern to use.</param>
+        /// <returns>A list of assemblies based on the given <paramref name="searchPattern"/>.</returns>
+        public IEnumerable<Assembly> Load(string searchPattern)
+        {
+            string directory = Path.GetDirectoryName(new Uri(GetAssemblyCodeBasePath()).LocalPath);
+            if (directory != null)
+            {
+                string[] searchPatterns = searchPattern.Split('|');
+                foreach (string file in searchPatterns.SelectMany(sp => Directory.GetFiles(directory, sp)).Where(CanLoad))
+                {
+                    yield return LoadAssembly(file);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Indicates if the current <paramref name="fileName"/> represent a file that can be loaded.
+        /// </summary>
+        /// <param name="fileName">The name of the target file.</param>
+        /// <returns><b>true</b> if the file can be loaded, otherwise <b>false</b>.</returns>
+        protected virtual bool CanLoad(string fileName)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Loads <see cref="Assembly"/> for the file located in <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">Full path to the file.</param>
+        /// <returns><see cref="Assembly"/> of the file.</returns>
+        protected virtual Assembly LoadAssembly(string filename)
+        {
+            FileInfo fileInfo = new FileInfo(filename);
+            return Assembly.Load(new AssemblyName(fileInfo.Name.Replace(fileInfo.Extension, "")));
+        }
+
+        /// <summary>
+        /// Gets the path where the LightInject assembly is located.
+        /// </summary>
+        /// <returns>The path where the LightInject assembly is located.</returns>
+        protected virtual string GetAssemblyCodeBasePath()
+        {
+            return typeof(ServiceContainer).GetTypeInfo().Assembly.CodeBase;
+        }
+    }
+#endif
+
 
     /// <summary>
     /// Defines an immutable representation of a key and a value.
@@ -7644,7 +7747,7 @@ namespace DbReader.LightInject
         }
     }
 #endif
-#if NETSTANDARD13 || NET46
+#if NETSTANDARD13 || NETSTANDARD16 || NET46
     /// <summary>
     /// Provides storage per logical thread of execution.
     /// </summary>
@@ -7880,7 +7983,7 @@ namespace DbReader.LightInject
             var typeInfo = type.GetTypeInfo();
             return typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(ICollection<>);
         }
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || PCL_111 || NET46
+#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || PCL_111 || NET46
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="Type"/> is an <see cref="IReadOnlyCollection{T}"/> type.

@@ -53,5 +53,10 @@ namespace DbReader
             ProcessDelegates.TryGetValue(propertyType, out processDelegate);
             return processDelegate;            
         }
+
+        public static bool CanProcess(Type type)
+        {
+            return ProcessDelegates.ContainsKey(type);
+        }
     }
 }

@@ -81,7 +81,7 @@ namespace DbReader.Extensions
         public static bool IsSimpleType(this Type type)
         {
             type = type.GetUnderlyingType();
-            return type.GetTypeInfo().IsPrimitive || SimpleTypes.Contains(type) || ValueConverter.CanConvert(type);
+            return type.GetTypeInfo().IsPrimitive || SimpleTypes.Contains(type) || ValueConverter.CanConvert(type) || ArgumentProcessor.CanProcess(type);
         }
 
         /// <summary>
