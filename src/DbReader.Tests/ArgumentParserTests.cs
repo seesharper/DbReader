@@ -93,5 +93,27 @@
 
             parameterMock.Object.ParameterName.ShouldBe("SomeValue");
         }
+
+        public void Parse_DuplicateParameterName_ReturnsOnlyOneParameter(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+
+            var result = argumentParser.Parse(":firstParameter, :firstParameter",
+                new { FirstParameter = 1, SecondParameter = parameterMock.Object },
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+
+            result.Length.ShouldBe(1);
+        }
+
+        public void Parse_DuplicateParameterNameWithDifferentCasing_ReturnsOnlyOneParameter(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+
+            var result = argumentParser.Parse(":firstParameter, :FirstParameter",
+                new { FirstParameter = 1, SecondParameter = parameterMock.Object },
+                () => new Mock<IDataParameter>().SetupAllProperties().Object);
+
+            result.Length.ShouldBe(1);
+        }
     }
 }

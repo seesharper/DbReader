@@ -1,5 +1,6 @@
 ﻿namespace DbReader.Database
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -32,7 +33,7 @@
         /// <returns>A list of parameters used in the given <paramref name="sql"/>.</returns>
         public string[] GetParameters(string sql)
         {
-            var result = new HashSet<string>();
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var matches = Regex.Matches(sql, pattern).Cast<Match>();
             foreach (var match in matches)
             {
