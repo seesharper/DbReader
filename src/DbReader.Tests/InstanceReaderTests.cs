@@ -141,6 +141,22 @@
             instance.Property.ShouldBe(84);
         }
 
+        public void ShouldReadGuidValue(IInstanceReader<ClassWithProperty<Guid>> reader)
+        {
+            Guid guid = Guid.NewGuid();
+            var dataRecord = new { Id = 42, Property = guid }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(guid);
+        }
+
+        public void ShouldReadNullableGuidValue(IInstanceReader<ClassWithProperty<Guid?>> reader)
+        {
+            Guid? guid = Guid.NewGuid();
+            var dataRecord = new { Id = 42, Property = guid }.ToDataRecord();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(guid);
+        }
+
         public void ShouldReadCharValue(IInstanceReader<ClassWithProperty<char>> reader)
         {
             var dataRecord = new { Id = 42, Property = 'A' }.ToDataRecord();

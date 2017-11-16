@@ -91,6 +91,11 @@
                 return typeof(IDataRecord).GetTypeInfo().GetMethod("GetInt16");
             }
 
+            if (type == typeof(Guid))
+            {
+                return typeof(IDataRecord).GetTypeInfo().GetMethod("GetGuid");
+            }
+
             throw new ArgumentOutOfRangeException("type", string.Format("Unable to determine the get method for {0}", type));
         }        
     }
