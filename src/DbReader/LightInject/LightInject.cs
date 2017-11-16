@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject version 5.0.2 (NET46)
+    LightInject version 5.1.1
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
@@ -42,17 +42,14 @@ namespace DbReader.LightInject
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || NET46
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
-#endif
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || NET46
     using System.Reflection.Emit;
-#endif
     using System.Runtime.CompilerServices;
-#if NET45
+#if NET452
     using System.Runtime.Remoting.Messaging;
 #endif
     using System.Text;
@@ -60,7 +57,7 @@ namespace DbReader.LightInject
     using System.Threading;
 
     /// <summary>
-    /// A delegate that represent the dynamic method compiled to resolved service instances.
+    /// A delegate that represents the dynamic method compiled to resolved service instances.
     /// </summary>
     /// <param name="args">The arguments used by the dynamic method that this delegate represents.</param>
     /// <returns>A service instance.</returns>
@@ -69,7 +66,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Describes the logging level/severity.
     /// </summary>
-    public enum LogLevel
+    internal enum LogLevel
     {
         /// <summary>
         /// Indicates the <see cref="LogEntry"/> represents an information message.
@@ -451,7 +448,7 @@ namespace DbReader.LightInject
 
         /// <summary>
         /// Registers a factory delegate to be used when resolving a constructor dependency for
-        /// a implicitly registered service.
+        /// an implicitly registered service.
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
@@ -461,7 +458,7 @@ namespace DbReader.LightInject
 
         /// <summary>
         /// Registers a factory delegate to be used when resolving a constructor dependency for
-        /// a implicitly registered service.
+        /// an implicitly registered service.
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
@@ -471,7 +468,7 @@ namespace DbReader.LightInject
 
         /// <summary>
         /// Registers a factory delegate to be used when resolving a constructor dependency for
-        /// a implicitly registered service.
+        /// an implicitly registered service.
         /// </summary>
         /// <typeparam name="TDependency">The dependency type.</typeparam>
         /// <param name="factory">The factory delegate used to create an instance of the dependency.</param>
@@ -479,9 +476,9 @@ namespace DbReader.LightInject
         IServiceRegistry RegisterPropertyDependency<TDependency>(
             Func<IServiceFactory, PropertyInfo, TDependency> factory);
 
-#if NET45 || NET46 || NETSTANDARD16
+#if NET452 || NET46 || NETSTANDARD1_6
         /// <summary>
-        /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
+        /// Registers composition roots from assemblies in the base directory that match the <paramref name="searchPattern"/>.
         /// </summary>
         /// <param name="searchPattern">The search pattern used to filter the assembly files.</param>
         /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
@@ -569,7 +566,7 @@ namespace DbReader.LightInject
         /// </summary>
         /// <returns><see cref="Scope"/></returns>
         Scope BeginScope();
-       
+
         /// <summary>
         /// Gets an instance of the given <paramref name="serviceType"/>.
         /// </summary>
@@ -656,7 +653,7 @@ namespace DbReader.LightInject
         /// </summary>
         /// <param name="instance">The target instance for which to inject its property dependencies.</param>
         /// <returns>The <paramref name="instance"/> with its property dependencies injected.</returns>
-        object InjectProperties(object instance);        
+        object InjectProperties(object instance);
     }
 
     /// <summary>
@@ -853,7 +850,7 @@ namespace DbReader.LightInject
         void EndScope(Scope scope);
     }
 
-#if NET45 || NET46 || NETSTANDARD16
+#if NET452 || NET46 || NETSTANDARD1_6
 
     /// <summary>
     /// Represents a class that is responsible loading a set of assemblies based on the given search pattern.
@@ -1018,7 +1015,7 @@ namespace DbReader.LightInject
     /// This class is not for public use and is used internally
     /// to load runtime arguments onto the evaluation stack.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class RuntimeArgumentsLoader
     {
         /// <summary>
@@ -1027,7 +1024,7 @@ namespace DbReader.LightInject
         /// <param name="constants">A object array representing the dynamic method context.</param>
         /// <returns>An array containing the runtime arguments supplied when resolving the service.</returns>
         public static object[] Load(object[] constants)
-        {            
+        {
             object[] arguments = constants[constants.Length - 1] as object[];
             if (arguments == null)
             {
@@ -1042,7 +1039,7 @@ namespace DbReader.LightInject
     /// Contains a set of helper method related to validating
     /// user input.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class Ensure
     {
         /// <summary>
@@ -1063,7 +1060,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extends the <see cref="IServiceFactory"/> interface.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class ServiceFactoryExtensions
     {
         /// <summary>
@@ -1272,7 +1269,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extends the log delegate to simplify creating log entries.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class LogExtensions
     {
         /// <summary>
@@ -1299,7 +1296,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extends the <see cref="ImmutableHashTable{TKey,TValue}"/> class.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class ImmutableHashTableExtensions
     {
         /// <summary>
@@ -1311,28 +1308,71 @@ namespace DbReader.LightInject
         /// <param name="key">The key for which to search for a value.</param>
         /// <returns>If found, the <typeparamref name="TValue"/> with the given <paramref name="key"/>, otherwise the default <typeparamref name="TValue"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
+        // Excluded since this is a duplicate of the ImmutableHashTreeExtensions.Search method.
+        [ExcludeFromCodeCoverage]
         public static TValue Search<TKey, TValue>(this ImmutableHashTable<TKey, TValue> hashTable, TKey key)
         {
             var hashCode = key.GetHashCode();
             var bucketIndex = hashCode & (hashTable.Divisor - 1);
             ImmutableHashTree<TKey, TValue> tree = hashTable.Buckets[bucketIndex];
-            return tree.Search(key);
+
+            while (tree.Height != 0 && tree.HashCode != hashCode)
+            {
+                tree = hashCode < tree.HashCode ? tree.Left : tree.Right;
+            }
+
+            if (tree.Height != 0 && (ReferenceEquals(tree.Key, key) || Equals(tree.Key, key)))
+            {
+                return tree.Value;
+            }
+
+            if (tree.Duplicates.Items.Length > 0)
+            {
+                foreach (var keyValue in tree.Duplicates.Items)
+                {
+                    if (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key))
+                    {
+                        return keyValue.Value;
+                    }
+                }
+            }
+
+            return default(TValue);
         }
 
-        /// <summary>
-        /// Searches for a value using the given <paramref name="key"/>.
-        /// </summary>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
-        /// <param name="hashTable">The target <see cref="ImmutableHashTable{TKey,TValue}"/> instance.</param>
-        /// <param name="key">The key for which to search for a value.</param>
-        /// <returns>If found, the <typeparamref name="TValue"/> with the given <paramref name="key"/>, otherwise the default <typeparamref name="TValue"/>.</returns>
+        // Excluded from coverage since it is equal to the generic version.
+        [ExcludeFromCodeCoverage]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TValue Search<TValue>(this ImmutableHashTable<Type, TValue> hashTable, Type key)
+        internal static GetInstanceDelegate Search(this ImmutableHashTable<Type, GetInstanceDelegate> hashTable, Type key)
         {
             var hashCode = key.GetHashCode();
             var bucketIndex = hashCode & (hashTable.Divisor - 1);
-            ImmutableHashTree<Type, TValue> tree = hashTable.Buckets[bucketIndex];
-            return tree.Search(key);
+
+            ImmutableHashTree<Type, GetInstanceDelegate> tree = hashTable.Buckets[bucketIndex];
+
+            while (tree.Height != 0 && tree.HashCode != hashCode)
+            {
+                tree = hashCode < tree.HashCode ? tree.Left : tree.Right;
+            }
+
+            if (tree.Height != 0 && ReferenceEquals(tree.Key, key))
+            {
+                return tree.Value;
+            }
+
+            if (tree.Duplicates.Items.Length > 0)
+            {
+                foreach (var keyValue in tree.Duplicates.Items)
+                {
+                    if (ReferenceEquals(keyValue.Key, key))
+                    {
+                        return keyValue.Value;
+                    }
+                }
+            }
+
+            return default(GetInstanceDelegate);
         }
 
         /// <summary>
@@ -1353,7 +1393,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extends the <see cref="ImmutableHashTree{TKey,TValue}"/> class.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class ImmutableHashTreeExtensions
     {
         /// <summary>
@@ -1470,7 +1510,7 @@ namespace DbReader.LightInject
     /// Extends the <see cref="IEmitter"/> interface with a set of methods
     /// that optimizes and simplifies emitting MSIL instructions.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class EmitterExtensions
     {
         /// <summary>
@@ -1754,7 +1794,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a set of configurable options when creating a new instance of the container.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ContainerOptions
     {
         private static readonly Lazy<ContainerOptions> DefaultOptions =
@@ -1805,7 +1845,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a log entry.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class LogEntry
     {
         /// <summary>
@@ -1833,7 +1873,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// An ultra lightweight service container.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ServiceContainer : IServiceContainer
     {
         private const string UnresolvedDependencyError = "Unresolved dependency {0}";
@@ -1887,7 +1927,7 @@ namespace DbReader.LightInject
             var concreteTypeExtractor = new CachedTypeExtractor(new ConcreteTypeExtractor());
             CompositionRootTypeExtractor = new CachedTypeExtractor(new CompositionRootTypeExtractor(new CompositionRootAttributeExtractor()));
             CompositionRootExecutor = new CompositionRootExecutor(this, type => (ICompositionRoot)Activator.CreateInstance(type));
-            PropertyDependencySelector = options.EnablePropertyInjection 
+            PropertyDependencySelector = options.EnablePropertyInjection
                 ? (IPropertyDependencySelector)new PropertyDependencySelector(new PropertySelector())
                 : new PropertyDependencyDisabler();
             GenericArgumentMapper = new GenericArgumentMapper();
@@ -1897,9 +1937,29 @@ namespace DbReader.LightInject
             constructionInfoProvider = new Lazy<IConstructionInfoProvider>(CreateConstructionInfoProvider);
             methodSkeletonFactory = (returnType, parameterTypes) => new DynamicMethodSkeleton(returnType, parameterTypes);
             ScopeManagerProvider = new PerThreadScopeManagerProvider();
-#if NET45 || NET46 || NETSTANDARD16
+#if NET452 || NET46 || NETSTANDARD1_6
             AssemblyLoader = new AssemblyLoader();
 #endif
+        }
+
+        private ServiceContainer(
+            ContainerOptions options,
+            ServiceRegistry<Delegate> constructorDependencyFactories,
+            ServiceRegistry<Delegate> propertyDependencyFactories,
+            ServiceRegistry<ServiceRegistration> availableServices,
+            Storage<DecoratorRegistration> decorators,
+            Storage<ServiceOverride> overrides,
+            Storage<FactoryRule> factoryRules,
+            Storage<Initializer> initializers)
+        {
+            this.options = options;
+            this.constructorDependencyFactories = constructorDependencyFactories;
+            this.propertyDependencyFactories = propertyDependencyFactories;
+            this.availableServices = availableServices;
+            this.decorators = decorators;
+            this.overrides = overrides;
+            this.factoryRules = factoryRules;
+            this.initializers = initializers;
         }
 
         /// <summary>
@@ -1948,7 +2008,7 @@ namespace DbReader.LightInject
         /// Gets or sets the <see cref="IAssemblyScanner"/> instance that is responsible for scanning assemblies.
         /// </summary>
         public IAssemblyScanner AssemblyScanner { get; set; }
-#if NET45 || NETSTANDARD16 || NET46
+#if NET452 || NETSTANDARD1_6 || NET46
 
         /// <summary>
         /// Gets or sets the <see cref="IAssemblyLoader"/> instance that is responsible for loading assemblies during assembly scanning.
@@ -1977,6 +2037,11 @@ namespace DbReader.LightInject
         /// <returns><b>true</b> if the container can create the requested service, otherwise <b>false</b>.</returns>
         public bool CanGetInstance(Type serviceType, string serviceName)
         {
+            if (serviceType.IsFunc() || serviceType.IsFuncWithParameters() || serviceType.IsLazy())
+            {
+                var returnType = serviceType.GenericTypeArguments.Last();                
+                return GetEmitMethod(returnType, serviceName) != null || availableServices.ContainsKey(serviceType);
+            }
             return GetEmitMethod(serviceType, serviceName) != null;
         }
 
@@ -1988,7 +2053,7 @@ namespace DbReader.LightInject
         {
             return ScopeManagerProvider.GetScopeManager(this).BeginScope();
         }
-        
+
         /// <summary>
         /// Injects the property dependencies for a given <paramref name="instance"/>.
         /// </summary>
@@ -2032,8 +2097,7 @@ namespace DbReader.LightInject
         /// <returns>The <see cref="IServiceRegistry"/>, for chaining calls.</returns>
         public IServiceRegistry RegisterFallback(Func<Type, string, bool> predicate, Func<ServiceRequest, object> factory)
         {
-            factoryRules.Add(new FactoryRule { CanCreateInstance = predicate, Factory = factory });
-            return this;
+            return RegisterFallback(predicate, factory, DefaultLifetime);
         }
 
         /// <summary>
@@ -2163,7 +2227,7 @@ namespace DbReader.LightInject
             {
                 var message =
                     $"Attempt to register a constructor dependency {typeof(TDependency)} after the first call to GetInstance." +
-                    $"This might lead to incorrect behaviour if a service with a {typeof(TDependency)} dependency has already been resolved";                              
+                    $"This might lead to incorrect behaviour if a service with a {typeof(TDependency)} dependency has already been resolved";
 
                 log.Warning(message);
             }
@@ -2174,7 +2238,7 @@ namespace DbReader.LightInject
                 (s, e) => isLocked ? e : factory);
             return this;
         }
-      
+
         /// <summary>
         /// Registers a factory delegate to be used when resolving a constructor dependency for
         /// a implicitly registered service.
@@ -2199,7 +2263,7 @@ namespace DbReader.LightInject
                 (s, e) => isLocked ? e : factory);
             return this;
         }
-       
+
         /// <summary>
         /// Registers a factory delegate to be used when resolving a constructor dependency for
         /// a implicitly registered service.
@@ -2213,7 +2277,7 @@ namespace DbReader.LightInject
             {
                 var message =
                     $"Attempt to register a property dependency {typeof(TDependency)} after the first call to GetInstance." +
-                   $"This might lead to incorrect behaviour if a service with a {typeof(TDependency)} dependency has already been resolved";
+                    $"This might lead to incorrect behaviour if a service with a {typeof(TDependency)} dependency has already been resolved";
 
                 log.Warning(message);
             }
@@ -2225,7 +2289,7 @@ namespace DbReader.LightInject
             return this;
         }
 
-#if NET45 || NETSTANDARD16 || NET46
+#if NET452 || NETSTANDARD1_6 || NET46
         /// <summary>
         /// Registers composition roots from assemblies in the base directory that matches the <paramref name="searchPattern"/>.
         /// </summary>
@@ -2318,10 +2382,10 @@ namespace DbReader.LightInject
         public IServiceRegistry Override(Func<ServiceRegistration, bool> serviceSelector, Func<IServiceFactory, ServiceRegistration, ServiceRegistration> serviceRegistrationFactory)
         {
             var serviceOverride = new ServiceOverride
-                                      {
-                                          CanOverride = serviceSelector,
-                                          ServiceRegistrationFactory = serviceRegistrationFactory,
-                                      };
+            {
+                CanOverride = serviceSelector,
+                ServiceRegistrationFactory = serviceRegistrationFactory,
+            };
             overrides.Add(serviceOverride);
             return this;
         }
@@ -2856,20 +2920,43 @@ namespace DbReader.LightInject
         }
 
         /// <summary>
-        /// Disposes any services registered using the <see cref="PerContainerLifetime"/>.
+        /// Disposes any services registered using a disposable lifetime.
         /// </summary>
         public void Dispose()
         {
             var disposableLifetimeInstances = availableServices.Values.SelectMany(t => t.Values)
-                .Where(sr => sr.Lifetime != null)
+                .Where(sr => sr.Lifetime != null 
+                    && IsNotServiceFactory(sr.ServiceType))
                 .Select(sr => sr.Lifetime)
                 .Where(lt => lt is IDisposable).Cast<IDisposable>();
             foreach (var disposableLifetimeInstance in disposableLifetimeInstances)
             {
                 disposableLifetimeInstance.Dispose();
             }
-        }    
-           
+
+            bool IsNotServiceFactory(Type serviceType)
+            {
+                return !typeof(IServiceFactory).GetTypeInfo().IsAssignableFrom(serviceType.GetTypeInfo());
+            }
+        }
+
+        /// <summary>
+        /// Creates a clone of the current <see cref="ServiceContainer"/>.
+        /// </summary>
+        /// <returns>A new <see cref="ServiceContainer"/> instance.</returns>
+        public ServiceContainer Clone()
+        {
+            return new ServiceContainer(
+                options,
+                constructorDependencyFactories,
+                propertyDependencyFactories,
+                availableServices,
+                decorators,
+                overrides,
+                factoryRules,
+                initializers);
+        }
+
         private static void EmitNewArray(IList<Action<IEmitter>> emitMethods, Type elementType, IEmitter emitter)
         {
             LocalBuilder array = emitter.DeclareLocal(elementType.MakeArrayType());
@@ -2900,18 +2987,25 @@ namespace DbReader.LightInject
             var constructorDependency =
                 constructionInfo.ConstructorDependencies.FirstOrDefault(
                     cd =>
-                    cd.ServiceType == decoratorRegistration.ServiceType
-                    || (cd.ServiceType.IsLazy()
-                        && cd.ServiceType.GetTypeInfo().GenericTypeArguments[0] == decoratorRegistration.ServiceType));
+                        cd.ServiceType == decoratorRegistration.ServiceType
+                        || (cd.ServiceType.IsLazy()
+                            && cd.ServiceType.GetTypeInfo().GenericTypeArguments[0] == decoratorRegistration.ServiceType));
             return constructorDependency;
         }
 
-        private static DecoratorRegistration CreateClosedGenericDecoratorRegistration(
+        private DecoratorRegistration CreateClosedGenericDecoratorRegistration(
             ServiceRegistration serviceRegistration, DecoratorRegistration openGenericDecorator)
         {
             Type implementingType = openGenericDecorator.ImplementingType;
-            Type[] genericTypeArguments = serviceRegistration.ServiceType.GenericTypeArguments;
-            Type closedGenericDecoratorType = implementingType.MakeGenericType(genericTypeArguments);
+            Type serviceType = serviceRegistration.ServiceType;
+            Type[] genericTypeArguments = serviceType.GenericTypeArguments;
+
+            if (!TryCreateClosedGenericDecoratorType(serviceType, implementingType,
+                out var closedGenericDecoratorType))
+            {
+                log.Info($"Skipping decorator [{implementingType.FullName}] since it is incompatible with the service type [{serviceType.FullName}]");
+                return null;
+            }
 
             var decoratorInfo = new DecoratorRegistration
             {
@@ -2921,6 +3015,29 @@ namespace DbReader.LightInject
                 Index = openGenericDecorator.Index,
             };
             return decoratorInfo;
+        }
+
+        private bool TryCreateClosedGenericDecoratorType(Type serviceType, Type implementingType,
+            out Type closedGenericDecoratorType)
+        {
+            closedGenericDecoratorType = null;
+            var mapResult = GenericArgumentMapper.Map(serviceType, implementingType);
+            if (!mapResult.IsValid)
+            {
+                return false;
+            }
+
+            closedGenericDecoratorType = TryMakeGenericType(implementingType, mapResult.GetMappedArguments());
+            if (closedGenericDecoratorType == null)
+            {
+                return false;
+            }
+
+            if (!serviceType.GetTypeInfo().IsAssignableFrom(closedGenericDecoratorType.GetTypeInfo()))
+            {
+                return false;
+            }
+            return true;
         }
 
         private static Type TryMakeGenericType(Type implementingType, Type[] closedGenericArguments)
@@ -3066,7 +3183,7 @@ namespace DbReader.LightInject
             if (rule != null)
             {
                 emitMethod = CreateServiceEmitterBasedOnFactoryRule(rule, serviceType, serviceName);
-                
+
                 RegisterEmitMethod(serviceType, serviceName, emitMethod);
             }
 
@@ -3108,11 +3225,6 @@ namespace DbReader.LightInject
             Action<IEmitter> emitMethod;
             var registrations = GetEmitMethods(serviceType);
             registrations.TryGetValue(serviceName, out emitMethod);
-            if (emitMethod == null && serviceType.IsClosedGeneric())
-            {
-                emitMethod = CreateEmitMethodBasedOnClosedGenericServiceRequest(serviceType, serviceName);
-            }
-
             return emitMethod ?? CreateEmitMethodForUnknownService(serviceType, serviceName);
         }
 
@@ -3120,7 +3232,7 @@ namespace DbReader.LightInject
         {
             var emitMethod = ResolveEmitMethod(serviceRegistration);
             RegisterEmitMethod(serviceRegistration.ServiceType, serviceRegistration.ServiceName, emitMethod);
-            
+
             return serviceRegistration;
         }
 
@@ -3134,7 +3246,7 @@ namespace DbReader.LightInject
             if (isLocked)
             {
                 var message = $"Cannot overwrite existing serviceregistration {existingRegistration} after the first call to GetInstance.";
-                log.Warning(message);                                    
+                log.Warning(message);
                 return existingRegistration;
             }
 
@@ -3184,7 +3296,7 @@ namespace DbReader.LightInject
                 registrations.AddRange(
                     openGenericDecorators.Select(
                         openGenericDecorator =>
-                        CreateClosedGenericDecoratorRegistration(serviceRegistration, openGenericDecorator)));
+                            CreateClosedGenericDecoratorRegistration(serviceRegistration, openGenericDecorator)).Where(dr => dr != null));
             }
 
             return registrations;
@@ -3377,7 +3489,7 @@ namespace DbReader.LightInject
         // ReSharper disable UnusedMember.Local
         private Func<T> CreateGenericDynamicMethodDelegate<T>(Func<object> del)
 
-        // ReSharper restore UnusedMember.Local
+            // ReSharper restore UnusedMember.Local
         {
             return () => (T)del();
         }
@@ -3456,7 +3568,7 @@ namespace DbReader.LightInject
 
                 if (parameter.ParameterType == typeof(object[]))
                 {
-                   actions.Add(e => PushRuntimeArguments(e));
+                    actions.Add(e => PushRuntimeArguments(e));
                 }
             }
 
@@ -3507,25 +3619,39 @@ namespace DbReader.LightInject
             }
             else if (serviceType.IsEnumerableOfT())
             {
-                emitter = CreateEmitMethodForEnumerableServiceServiceRequest(serviceType);
+                emitter = CreateEmitMethodBasedOnClosedGenericServiceRequest(serviceType, serviceName);
+                if (emitter == null)
+                {
+                    emitter = CreateEmitMethodForEnumerableServiceServiceRequest(serviceType);
+                }
             }
             else if (serviceType.IsArray)
             {
                 emitter = CreateEmitMethodForArrayServiceRequest(serviceType);
             }
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || PCL_111 || NET46
             else if (serviceType.IsReadOnlyCollectionOfT() || serviceType.IsReadOnlyListOfT())
             {
-                emitter = CreateEmitMethodForReadOnlyCollectionServiceRequest(serviceType);
+                emitter = CreateEmitMethodBasedOnClosedGenericServiceRequest(serviceType, serviceName);
+                if (emitter == null)
+                {
+                    emitter = CreateEmitMethodForReadOnlyCollectionServiceRequest(serviceType);
+                }                
             }
-#endif
             else if (serviceType.IsListOfT())
             {
-                emitter = CreateEmitMethodForListServiceRequest(serviceType);
+                emitter = CreateEmitMethodBasedOnClosedGenericServiceRequest(serviceType, serviceName);
+                if (emitter == null)
+                {
+                    emitter = CreateEmitMethodForListServiceRequest(serviceType);
+                }
             }
             else if (serviceType.IsCollectionOfT())
             {
-                emitter = CreateEmitMethodForListServiceRequest(serviceType);
+                emitter = CreateEmitMethodBasedOnClosedGenericServiceRequest(serviceType, serviceName);
+                if (emitter == null)
+                {
+                    emitter = CreateEmitMethodForListServiceRequest(serviceType);
+                }
             }
             else if (CanRedirectRequestForDefaultServiceToSingleNamedService(serviceType, serviceName))
             {
@@ -3617,7 +3743,6 @@ namespace DbReader.LightInject
                 ms.Emit(OpCodes.Call, closedGenericToListMethod);
             };
         }
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || PCL_111 || NET46
 
         private Action<IEmitter> CreateEmitMethodForReadOnlyCollectionServiceRequest(Type serviceType)
         {
@@ -3634,7 +3759,6 @@ namespace DbReader.LightInject
                 emitter.New(constructorInfo);
             };
         }
-#endif
 
         private void EnsureEmitMethodsForOpenGenericTypesAreCreated(Type actualServiceType)
         {
@@ -3655,10 +3779,10 @@ namespace DbReader.LightInject
             var constantIndex = constants.Add(getInstanceDelegate);
 
             return emitter =>
-                {
-                    emitter.PushConstant(constantIndex, funcType);
-                    emitter.New(lazyConstructor);
-                };
+            {
+                emitter.PushConstant(constantIndex, funcType);
+                emitter.New(lazyConstructor);
+            };
         }
 
         private ServiceRegistration GetOpenGenericServiceRegistration(Type openGenericServiceType, string serviceName)
@@ -3842,7 +3966,7 @@ namespace DbReader.LightInject
                 emitter.Call(getInstanceMethod);
             }
         }
-      
+
         private int CreateScopeManagerIndex()
         {
             return constants.Add(ScopeManagerProvider.GetScopeManager(this));
@@ -4012,15 +4136,7 @@ namespace DbReader.LightInject
                 return dynamicMethod.CreateDelegate(delegateType);
             }
 
-#if NET40
-            private void CreateDynamicMethod(Type returnType, Type[] parameterTypes)
-            {
-                dynamicMethod = new DynamicMethod(
-                        "DynamicMethod", returnType, parameterTypes, typeof(ServiceContainer).Module, true);
-                emitter = new Emitter(dynamicMethod.GetILGenerator(), parameterTypes);
-            }
-#endif
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || NET46
+#if NET452 || NET46
             private void CreateDynamicMethod(Type returnType, Type[] parameterTypes)
             {
                 dynamicMethod = new DynamicMethod(
@@ -4028,7 +4144,7 @@ namespace DbReader.LightInject
                 emitter = new Emitter(dynamicMethod.GetILGenerator(), parameterTypes);
             }
 #endif
-#if PCL_111
+#if NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6
             private void CreateDynamicMethod(Type returnType, Type[] parameterTypes)
             {
                 dynamicMethod = new DynamicMethod(returnType, parameterTypes);
@@ -4069,7 +4185,7 @@ namespace DbReader.LightInject
     /// A base class for implementing <see cref="IScopeManagerProvider"/>
     /// that ensures that only one <see cref="IScopeManager"/> is created.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal abstract class ScopeManagerProvider : IScopeManagerProvider
     {
         private readonly object lockObject = new object();
@@ -4108,7 +4224,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// A <see cref="IScopeManagerProvider"/> that provides a <see cref="PerThreadScopeManager"/> per thread.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PerThreadScopeManagerProvider : ScopeManagerProvider
     {
         /// <summary>
@@ -4122,12 +4238,12 @@ namespace DbReader.LightInject
         }
     }
 
-#if NET45 || NETSTANDARD13 || NETSTANDARD16 || NET46
+#if NET452 || NETSTANDARD1_3 || NETSTANDARD1_6 || NET46
 
     /// <summary>
     /// Manages a set of <see cref="Scope"/> instances.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PerLogicalCallContextScopeManager : ScopeManager
     {
         private readonly LogicalThreadStorage<Scope> currentScope = new LogicalThreadStorage<Scope>();
@@ -4155,7 +4271,7 @@ namespace DbReader.LightInject
     /// A <see cref="IScopeManagerProvider"/> that creates an <see cref="IScopeManager"/>
     /// that is capable of managing scopes across async points.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PerLogicalCallContextScopeManagerProvider : ScopeManagerProvider
     {
         /// <summary>
@@ -4175,7 +4291,7 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ThreadSafeDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>
     {
         /// <summary>
@@ -4196,470 +4312,12 @@ namespace DbReader.LightInject
         }
     }
 
-#if PCL_111
-    /// <summary>
-    /// Represents the MSIL instructions.
-    /// </summary>
-    public enum OpCode
-	{
-        /// <summary>
-        /// Adds two values and pushes the result onto the evaluation stack.
-        /// </summary>
-        Add,
-
-        /// <summary>
-        /// Attempts to cast an object passed by reference to the specified class.
-        /// </summary>
-        Castclass,
-
-        /// <summary>
-        /// Converts the boxed representation of a type specified in the instruction to its unboxed form.
-        /// </summary>
-        Unbox_Any,
-
-        /// <summary>
-        /// Loads the element containing an object reference at a specified array index 
-        /// onto the top of the evaluation stack as type O (object reference).
-        /// </summary>
-		Ldelem_Ref,
-
-        /// <summary>
-        /// Loads an argument (referenced by a specified index value) onto the stack.
-        /// </summary>
-        Ldarg,
-       
-        /// <summary>
-        /// Loads the argument at index 0 onto the evaluation stack.
-        /// </summary>
-        Ldarg_0,
-
-        /// <summary>
-        /// Loads the argument at index 1 onto the evaluation stack.
-        /// </summary>
-        Ldarg_1,
-
-        /// <summary>
-        /// Loads the argument at index 2 onto the evaluation stack.
-        /// </summary>
-        Ldarg_2,
-
-        /// <summary>
-        /// Loads the argument at index 3 onto the evaluation stack.
-        /// </summary>
-        Ldarg_3,
-
-        /// <summary>
-        /// Loads the argument (referenced by a specified short form index) onto the evaluation stack.
-        /// </summary>
-        Ldarg_S,
-
-        /// <summary>
-        /// Pushes the number of elements of a zero-based, one-dimensional array onto the evaluation stack.
-        /// </summary>
-		Ldlen,
-
-        /// <summary>
-        /// Converts the value on top of the evaluation stack to int32.
-        /// </summary>
-        Conv_I4,
-
-        /// <summary>
-        /// Subtracts one value from another and pushes the result onto the evaluation stack.
-        /// </summary>
-        Sub,
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack 
-        /// and stores it in a the local variable list at a specified index.
-        /// </summary>
-        Stloc,
-
-        /// <summary>
-        /// Loads the local variable at a specific index onto the evaluation stack.
-        /// </summary>
-		Ldloc,
-
-        /// <summary>
-        /// Pushes a supplied value of type int32 onto the evaluation stack as an int32.
-        /// </summary>
-		Ldc_I4,
-
-        /// <summary>
-        /// Calls a late-bound method on an object, pushing the return value onto the evaluation stack.
-        /// </summary>
-        Callvirt,
-
-        /// <summary>
-        /// Creates a new object or a new instance of a value type, pushing an object reference (type O) onto the evaluation stack.
-        /// </summary>
-        Newobj,
-
-        /// <summary>
-        /// Loads the local variable at index 0 onto the evaluation stack.
-        /// </summary>
-		Ldloc_0,
-
-        /// <summary>
-        /// Loads the local variable at index 1 onto the evaluation stack.
-        /// </summary>
-        Ldloc_1,
-
-        /// <summary>
-        /// Loads the local variable at index 2 onto the evaluation stack.
-        /// </summary>
-		Ldloc_2,
-
-        /// <summary>
-        /// Loads the local variable at index 3 onto the evaluation stack.
-        /// </summary>
-		Ldloc_3,
-
-        /// <summary>
-        /// Loads the local variable at a specific index onto the evaluation stack, short form.
-        /// </summary>
-		Ldloc_S,
-
-        /// <summary>
-        /// Calls the method indicated by the passed method descriptor.
-        /// </summary>
-		Call,
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 0.
-        /// </summary>
-		Stloc_0,
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 1.
-        /// </summary>
-		Stloc_1,
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 2.
-        /// </summary>
-        Stloc_2,
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 3.
-        /// </summary>
-		Stloc_3,
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index (short form).
-        /// </summary>
-		Stloc_S,
-
-        /// <summary>
-        /// Pushes the integer value of 0 onto the evaluation stack as an int32.
-        /// </summary>
-        Ldc_I4_0,
-
-        /// <summary>
-        /// Pushes the integer value of 1 onto the evaluation stack as an int32.
-        /// </summary>
-		Ldc_I4_1,
-
-        /// <summary>
-        /// Pushes the integer value of 2 onto the evaluation stack as an int32.
-        /// </summary>
-		Ldc_I4_2,
-
-        /// <summary>
-        /// Pushes the integer value of 3 onto the evaluation stack as an int32.
-        /// </summary>
-        Ldc_I4_3,
-
-        /// <summary>
-        /// Pushes the integer value of 4 onto the evaluation stack as an int32.
-        /// </summary>
-		Ldc_I4_4,
-
-        /// <summary>
-        /// Pushes the integer value of 5 onto the evaluation stack as an int32.
-        /// </summary>
-        Ldc_I4_5,
-
-        /// <summary>
-        /// Pushes the integer value of 6 onto the evaluation stack as an int32.
-        /// </summary>
-		Ldc_I4_6,
-
-        /// <summary>
-        /// Pushes the integer value of 7 onto the evaluation stack as an int32.
-        /// </summary>
-        Ldc_I4_7,
-
-        /// <summary>
-        /// Pushes the integer value of 8 onto the evaluation stack as an int32.
-        /// </summary>
-		Ldc_I4_8,
-
-        /// <summary>
-        /// Pushes the supplied int8 value onto the evaluation stack as an int32, short form.
-        /// </summary>
-        Ldc_I4_S,
-
-        /// <summary>
-        /// Returns from the current method, pushing a return value (if present) from the callee's evaluation stack onto the caller's evaluation stack.
-        /// </summary>
-        Ret,
-
-        /// <summary>
-        /// Pushes an object reference to a new zero-based, one-dimensional array whose elements are of a specific type onto the evaluation stack.
-        /// </summary>
-		Newarr,
-
-        /// <summary>
-        /// Replaces the array element at a given index with the value on the evaluation stack, whose type is specified in the instruction.
-        /// </summary>
-		Stelem,
-
-        /// <summary>
-        /// Converts a value type to an object reference (type O).
-        /// </summary>
-		Box,
-
-        /// <summary>
-        /// Pushes a new object reference to a string literal stored in the metadata.
-        /// </summary>
-        Ldstr
-    }
-
-    /// <summary>
-    /// Provides field representations of the Microsoft Intermediate Language (MSIL) instructions.
-    /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    internal static class OpCodes
-	{
-        /// <summary>
-        /// Adds two values and pushes the result onto the evaluation stack.
-        /// </summary>
-        public static OpCode Add = OpCode.Add;
-        
-        /// <summary>
-        /// Attempts to cast an object passed by reference to the specified class.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        internal static OpCode Castclass = OpCode.Castclass;
-
-        /// <summary>
-        /// Converts the boxed representation of a type specified in the instruction to its unboxed form.
-        /// </summary>
-        public static OpCode Unbox_Any = OpCode.Unbox_Any;
-
-        /// <summary>
-        /// Loads the element containing an object reference at a specified array index 
-        /// onto the top of the evaluation stack as type O (object reference).
-        /// </summary>
-		public static OpCode Ldelem_Ref = OpCode.Ldelem_Ref;
-
-        /// <summary>
-        /// Loads an argument (referenced by a specified index value) onto the stack.
-        /// </summary>
-        public static OpCode Ldarg = OpCode.Ldarg;
-
-        /// <summary>
-        /// Loads the argument at index 0 onto the evaluation stack.
-        /// </summary>
-        public static OpCode Ldarg_0 = OpCode.Ldarg_0;
-
-        /// <summary>
-        /// Loads the argument at index 1 onto the evaluation stack.
-        /// </summary>
-		public static OpCode Ldarg_1 = OpCode.Ldarg_1;
-
-        /// <summary>
-        /// Loads the argument at index 2 onto the evaluation stack.
-        /// </summary>
-		public static OpCode Ldarg_2 = OpCode.Ldarg_2;
-
-        /// <summary>
-        /// Loads the argument at index 3 onto the evaluation stack.
-        /// </summary>
-		public static OpCode Ldarg_3 = OpCode.Ldarg_3;
-
-        /// <summary>
-        /// Loads the argument (referenced by a specified short form index) onto the evaluation stack.
-        /// </summary>
-		public static OpCode Ldarg_S = OpCode.Ldarg_S;
-
-        /// <summary>
-        /// Pushes the number of elements of a zero-based, one-dimensional array onto the evaluation stack.
-        /// </summary>
-		public static OpCode Ldlen = OpCode.Ldlen;
-
-        /// <summary>
-        /// Converts the value on top of the evaluation stack to int32.
-        /// </summary>
-		public static OpCode Conv_I4 = OpCode.Conv_I4;
-
-        /// <summary>
-        /// Subtracts one value from another and pushes the result onto the evaluation stack.
-        /// </summary>
-		public static OpCode Sub = OpCode.Sub;
-
-        /// <summary>
-        /// Pushes a supplied value of type int32 onto the evaluation stack as an int32.
-        /// </summary>
-		public static OpCode Ldc_I4 = OpCode.Ldc_I4;
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack 
-        /// and stores it in a the local variable list at a specified index.
-        /// </summary>
-		public static OpCode Stloc = OpCode.Stloc;
-
-        /// <summary>
-        /// Loads the local variable at a specific index onto the evaluation stack.
-        /// </summary>
-        public static OpCode Ldloc = OpCode.Ldloc;
-
-        /// <summary>
-        /// Calls a late-bound method on an object, pushing the return value onto the evaluation stack.
-        /// </summary>
-		public static OpCode Callvirt = OpCode.Callvirt;
-
-        /// <summary>
-        /// Creates a new object or a new instance of a value type, pushing an object reference (type O) onto the evaluation stack.
-        /// </summary>
-        public static OpCode Newobj = OpCode.Newobj;
-
-        /// <summary>
-        /// Loads the local variable at index 0 onto the evaluation stack.
-        /// </summary>
-		public static OpCode Ldloc_0 = OpCode.Ldloc_0;
-
-        /// <summary>
-        /// Loads the local variable at index 1 onto the evaluation stack.
-        /// </summary>
-        public static OpCode Ldloc_1 = OpCode.Ldloc_1;
-
-        /// <summary>
-        /// Loads the local variable at index 2 onto the evaluation stack.
-        /// </summary>
-		public static OpCode Ldloc_2 = OpCode.Ldloc_2;
-
-        /// <summary>
-        /// Loads the local variable at index 3 onto the evaluation stack.
-        /// </summary>
-        public static OpCode Ldloc_3 = OpCode.Ldloc_3;
-
-        /// <summary>
-        /// Loads the local variable at a specific index onto the evaluation stack, short form.
-        /// </summary>
-		public static OpCode Ldloc_S = OpCode.Ldloc_S;
-
-        /// <summary>
-        /// Calls the method indicated by the passed method descriptor.
-        /// </summary>
-		public static OpCode Call = OpCode.Call;
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 0.
-        /// </summary>
-		public static OpCode Stloc_0 = OpCode.Stloc_0;
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 1.
-        /// </summary>
-        public static OpCode Stloc_1 = OpCode.Stloc_1;
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 2.
-        /// </summary>
-        public static OpCode Stloc_2 = OpCode.Stloc_2;
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index 3.
-        /// </summary>
-        public static OpCode Stloc_3 = OpCode.Stloc_3;
-
-        /// <summary>
-        /// Pops the current value from the top of the evaluation stack and stores it in a the local variable list at index (short form).
-        /// </summary>
-        public static OpCode Stloc_S = OpCode.Stloc_S;
-
-        /// <summary>
-        /// Pushes the integer value of 0 onto the evaluation stack as an int32.
-        /// </summary>
-		public static OpCode Ldc_I4_0 = OpCode.Ldc_I4_0;
-
-        /// <summary>
-        /// Pushes the integer value of 1 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_1 = OpCode.Ldc_I4_1;
-
-        /// <summary>
-        /// Pushes the integer value of 2 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_2 = OpCode.Ldc_I4_2;
-
-        /// <summary>
-        /// Pushes the integer value of 3 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_3 = OpCode.Ldc_I4_3;
-
-        /// <summary>
-        /// Pushes the integer value of 4 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_4 = OpCode.Ldc_I4_4;
-
-        /// <summary>
-        /// Pushes the integer value of 5 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_5 = OpCode.Ldc_I4_5;
-
-        /// <summary>
-        /// Pushes the integer value of 6 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_6 = OpCode.Ldc_I4_6;
-
-        /// <summary>
-        /// Pushes the integer value of 7 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_7 = OpCode.Ldc_I4_7;
-
-        /// <summary>
-        /// Pushes the integer value of 8 onto the evaluation stack as an int32.
-        /// </summary>
-        public static OpCode Ldc_I4_8 = OpCode.Ldc_I4_8;
-
-        /// <summary>
-        /// Pushes the supplied int8 value onto the evaluation stack as an int32, short form.
-        /// </summary>
-        public static OpCode Ldc_I4_S = OpCode.Ldc_I4_S;
-
-        /// <summary>
-        /// Pushes an object reference to a new zero-based, one-dimensional array whose elements are of a specific type onto the evaluation stack.
-        /// </summary>
-		public static OpCode Newarr = OpCode.Newarr;
-
-        /// <summary>
-        /// Replaces the array element at a given index with the value on the evaluation stack, whose type is specified in the instruction.
-        /// </summary>
-        public static OpCode Stelem = OpCode.Stelem;
-
-        /// <summary>
-        /// Converts a value type to an object reference (type O).
-        /// </summary>
-        public static OpCode Box = OpCode.Box;
-
-        /// <summary>
-        /// Returns from the current method, pushing a return value (if present) from the callee's evaluation stack onto the caller's evaluation stack.
-        /// </summary>
-		public static OpCode Ret = OpCode.Ret;
-
-        /// <summary>
-        /// Pushes a new object reference to a string literal stored in the metadata.
-        /// </summary>
-		public static OpCode Ldstr = OpCode.Ldstr;
-
-	}
+#if NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6
     
     /// <summary>
     /// Defines and represents a dynamic method that can be compiled and executed.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class DynamicMethod
     {
         private readonly Type returnType;
@@ -4727,7 +4385,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// A generator that transforms <see cref="OpCodes"/> into an expression tree.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ILGenerator
     {
         private readonly ParameterExpression[] parameters;
@@ -5130,7 +4788,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a local variable within a method or constructor.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class LocalBuilder
     {
         /// <summary>
@@ -5165,7 +4823,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Selects the <see cref="ConstructionInfo"/> from a given type that represents the most resolvable constructor.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class MostResolvableConstructorSelector : IConstructorSelector
     {
         private readonly Func<Type, string, bool> canGetInstance;
@@ -5234,7 +4892,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Selects the constructor dependencies for a given <see cref="ConstructorInfo"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ConstructorDependencySelector : IConstructorDependencySelector
     {
         /// <summary>
@@ -5247,23 +4905,23 @@ namespace DbReader.LightInject
         {
             return
                 constructor.GetParameters()
-                           .OrderBy(p => p.Position)
-                           .Select(
-                               p =>
-                               new ConstructorDependency
-                                   {
-                                       ServiceName = string.Empty,
-                                       ServiceType = p.ParameterType,
-                                       Parameter = p,
-                                       IsRequired = true,
-                                   });
+                    .OrderBy(p => p.Position)
+                    .Select(
+                        p =>
+                            new ConstructorDependency
+                            {
+                                ServiceName = string.Empty,
+                                ServiceType = p.ParameterType,
+                                Parameter = p,
+                                IsRequired = true,
+                            });
         }
     }
 
     /// <summary>
     /// Selects the property dependencies for a given <see cref="Type"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PropertyDependencySelector : IPropertyDependencySelector
     {
         /// <summary>
@@ -5298,7 +4956,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Builds a <see cref="ConstructionInfo"/> instance based on the implementing <see cref="Type"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class TypeConstructionInfoBuilder : IConstructionInfoBuilder
     {
         private readonly IConstructorSelector constructorSelector;
@@ -5387,7 +5045,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Keeps track of a <see cref="ConstructionInfo"/> instance for each <see cref="Registration"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ConstructionInfoProvider : IConstructionInfoProvider
     {
         private readonly IConstructionInfoBuilder constructionInfoBuilder;
@@ -5417,7 +5075,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Contains information about a service request that originates from a rule based service registration.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ServiceRequest
     {
         /// <summary>
@@ -5452,7 +5110,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Base class for concrete registrations within the service container.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal abstract class Registration
     {
         /// <summary>
@@ -5474,7 +5132,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Contains information about a registered decorator.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class DecoratorRegistration : Registration
     {
         /// <summary>
@@ -5508,7 +5166,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Contains information about a registered service.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ServiceRegistration : Registration
     {
         /// <summary>
@@ -5567,11 +5225,11 @@ namespace DbReader.LightInject
             return $"ServiceType: '{ServiceType}', ServiceName: '{ServiceName}', ImplementingType: '{ImplementingType}', Lifetime: '{lifeTime}'";
         }
     }
-
+    
     /// <summary>
-    /// Represents the result from mappng generic arguments.
+    /// Represents the result from mapping generic arguments.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class GenericMappingResult
     {
         private readonly string[] genericParameterNames;
@@ -5634,7 +5292,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Contains information about how to create a service instance.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ConstructionInfo
     {
         /// <summary>
@@ -5677,7 +5335,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a class dependency.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal abstract class Dependency
     {
         /// <summary>
@@ -5719,7 +5377,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a property dependency.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PropertyDependency : Dependency
     {
         /// <summary>
@@ -5751,7 +5409,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a constructor dependency.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ConstructorDependency : Dependency
     {
         /// <summary>
@@ -5789,7 +5447,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Ensures that only one instance of a given service can exist within the current <see cref="IServiceContainer"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PerContainerLifetime : ILifetime, IDisposable
     {
         private readonly object syncRoot = new object();
@@ -5835,7 +5493,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Ensures that a new instance is created for each request in addition to tracking disposable instances.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PerRequestLifeTime : ILifetime
     {
         /// <summary>
@@ -5874,7 +5532,7 @@ namespace DbReader.LightInject
     /// If the service instance implements <see cref="IDisposable"/>,
     /// it will be disposed when the <see cref="Scope"/> ends.
     /// </remarks>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PerScopeLifetime : ILifetime
     {
         private readonly ThreadSafeDictionary<Scope, object> instances = new ThreadSafeDictionary<Scope, object>();
@@ -5926,7 +5584,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// A base class for implementing <see cref="IScopeManager"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal abstract class ScopeManager : IScopeManager
     {
         /// <summary>
@@ -5937,7 +5595,7 @@ namespace DbReader.LightInject
         {
             ServiceFactory = serviceFactory;
         }
-        
+
         /// <summary>
         /// Gets or sets the current <see cref="Scope"/>.
         /// </summary>
@@ -5955,7 +5613,7 @@ namespace DbReader.LightInject
         public Scope BeginScope()
         {
             var currentScope = CurrentScope;
-           
+
             var scope = new Scope(this, currentScope);
             if (currentScope != null)
             {
@@ -5965,7 +5623,7 @@ namespace DbReader.LightInject
             CurrentScope = scope;
             return scope;
         }
-    
+
         /// <summary>
         /// Ends the given <paramref name="scope"/>.
         /// </summary>
@@ -6017,7 +5675,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// A <see cref="IScopeManager"/> that manages scopes per thread.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PerThreadScopeManager : ScopeManager
     {
         private readonly ThreadLocal<Scope> threadLocalScope = new ThreadLocal<Scope>();
@@ -6044,11 +5702,11 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents a scope.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class Scope : IServiceFactory, IDisposable
     {
-        private readonly IList<IDisposable> disposableObjects = new List<IDisposable>();
-
+        private static readonly object disposableObjectsLock = new object();
+        private readonly HashSet<IDisposable> disposableObjects = new HashSet<IDisposable>(ReferenceEqualityComparer<IDisposable>.Default);
         private readonly IScopeManager scopeManager;
         private readonly IServiceFactory serviceFactory;
 
@@ -6058,7 +5716,7 @@ namespace DbReader.LightInject
         /// <param name="scopeManager">The <see cref="scopeManager"/> that manages this <see cref="Scope"/>.</param>
         /// <param name="parentScope">The parent <see cref="Scope"/>.</param>
         public Scope(IScopeManager scopeManager, Scope parentScope)
-        {
+        {            
             this.scopeManager = scopeManager;
             serviceFactory = scopeManager.ServiceFactory;
             ParentScope = parentScope;
@@ -6087,26 +5745,29 @@ namespace DbReader.LightInject
         /// <param name="disposable">The <see cref="IDisposable"/> object to register.</param>
         public void TrackInstance(IDisposable disposable)
         {
-            disposableObjects.Add(disposable);
+            lock (disposableObjectsLock)
+            {
+                disposableObjects.Add(disposable);
+            }
         }
 
         /// <summary>
         /// Disposes all instances tracked by this scope.
         /// </summary>
         public void Dispose()
-        {            
+        {
             DisposeTrackedInstances();
             OnCompleted();
             IsDisposed = true;
         }
-      
+
         /// <summary>
         /// Starts a new <see cref="Scope"/>.
         /// </summary>
         /// <returns><see cref="Scope"/></returns>
         public Scope BeginScope()
         {
-            return serviceFactory.BeginScope();            
+            return serviceFactory.BeginScope();
         }
 
         /// <summary>
@@ -6116,7 +5777,7 @@ namespace DbReader.LightInject
         /// <returns>The requested service instance.</returns>
         public object GetInstance(Type serviceType)
         {
-            return WithThisScope(() => serviceFactory.GetInstance(serviceType));            
+            return WithThisScope(() => serviceFactory.GetInstance(serviceType));
         }
 
         /// <summary>
@@ -6138,7 +5799,7 @@ namespace DbReader.LightInject
         /// <returns>The requested service instance.</returns>
         public object GetInstance(Type serviceType, object[] arguments)
         {
-            return WithThisScope(() => serviceFactory.GetInstance(serviceType, arguments));            
+            return WithThisScope(() => serviceFactory.GetInstance(serviceType, arguments));
         }
 
         /// <summary>
@@ -6222,13 +5883,29 @@ namespace DbReader.LightInject
             var completedHandler = Completed;
             completedHandler?.Invoke(this, new EventArgs());
         }
+
+        private class ReferenceEqualityComparer<T> : IEqualityComparer<T>
+        {
+            public static readonly ReferenceEqualityComparer<T> Default
+                = new ReferenceEqualityComparer<T>(); 
+
+            public bool Equals(T x, T y)
+            {
+                return ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(T obj)
+            {
+                return obj.GetHashCode();
+            }
+        }
     }
 
     /// <summary>
     /// Used at the assembly level to describe the composition root(s) for the target assembly.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class CompositionRootTypeAttribute : Attribute
     {
         /// <summary>
@@ -6250,7 +5927,7 @@ namespace DbReader.LightInject
     /// A class that is capable of extracting attributes of type
     /// <see cref="CompositionRootTypeAttribute"/> from an <see cref="Assembly"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class CompositionRootAttributeExtractor : ICompositionRootAttributeExtractor
     {
         /// <summary>
@@ -6263,14 +5940,14 @@ namespace DbReader.LightInject
         public CompositionRootTypeAttribute[] GetAttributes(Assembly assembly)
         {
             return assembly.GetCustomAttributes(typeof(CompositionRootTypeAttribute))
-                       .Cast<CompositionRootTypeAttribute>().ToArray();
+                .Cast<CompositionRootTypeAttribute>().ToArray();
         }
     }
 
     /// <summary>
     /// Extracts concrete <see cref="ICompositionRoot"/> implementations from an <see cref="Assembly"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class CompositionRootTypeExtractor : ITypeExtractor
     {
         private readonly ICompositionRootAttributeExtractor compositionRootAttributeExtractor;
@@ -6303,7 +5980,7 @@ namespace DbReader.LightInject
 
             return
                 assembly.DefinedTypes.Where(
-                    t => !t.IsAbstract && typeof(ICompositionRoot).GetTypeInfo().IsAssignableFrom(t))
+                        t => !t.IsAbstract && typeof(ICompositionRoot).GetTypeInfo().IsAssignableFrom(t))
                     .Cast<Type>()
                     .ToArray();
         }
@@ -6312,7 +5989,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// A <see cref="ITypeExtractor"/> cache decorator.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class CachedTypeExtractor : ITypeExtractor
     {
         private readonly ITypeExtractor typeExtractor;
@@ -6343,7 +6020,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Extracts concrete types from an <see cref="Assembly"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class ConcreteTypeExtractor : ITypeExtractor
     {
         private static readonly List<Type> InternalTypes = new List<Type>();
@@ -6362,14 +6039,12 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(Registration));
             InternalTypes.Add(typeof(ServiceContainer));
             InternalTypes.Add(typeof(ConstructionInfo));
-#if NET45 || NET46 || NETSTANDARD16
+#if NET452 || NET46 || NETSTANDARD1_6
             InternalTypes.Add(typeof(AssemblyLoader));
 #endif
             InternalTypes.Add(typeof(TypeConstructionInfoBuilder));
             InternalTypes.Add(typeof(ConstructionInfoProvider));
             InternalTypes.Add(typeof(MostResolvableConstructorSelector));
-            InternalTypes.Add(typeof(PerContainerLifetime));
-            InternalTypes.Add(typeof(PerContainerLifetime));
             InternalTypes.Add(typeof(PerRequestLifeTime));
             InternalTypes.Add(typeof(PropertySelector));
             InternalTypes.Add(typeof(AssemblyScanner));
@@ -6391,12 +6066,12 @@ namespace DbReader.LightInject
             InternalTypes.Add(typeof(GetInstanceDelegate));
             InternalTypes.Add(typeof(ContainerOptions));
             InternalTypes.Add(typeof(CompositionRootAttributeExtractor));
-#if NET45 || NET46 || NETSTANDARD13 || NETSTANDARD16
+#if NET452 || NET46 || NETSTANDARD1_3 || NETSTANDARD1_6
             InternalTypes.Add(typeof(PerLogicalCallContextScopeManagerProvider));
             InternalTypes.Add(typeof(PerLogicalCallContextScopeManager));
             InternalTypes.Add(typeof(LogicalThreadStorage<>));
 #endif
-#if PCL_111
+#if NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6
             InternalTypes.Add(typeof(DynamicMethod));
             InternalTypes.Add(typeof(ILGenerator));
             InternalTypes.Add(typeof(LocalBuilder));
@@ -6420,10 +6095,10 @@ namespace DbReader.LightInject
         private static bool IsConcreteType(TypeInfo typeInfo)
         {
             return typeInfo.IsClass
-                        && !typeInfo.IsNestedPrivate
-                        && !typeInfo.IsAbstract
-                        && !Equals(typeInfo.Assembly, typeof(string).GetTypeInfo().Assembly)
-                        && !IsCompilerGenerated(typeInfo);
+                   && !typeInfo.IsNestedPrivate
+                   && !typeInfo.IsAbstract
+                   && !Equals(typeInfo.Assembly, typeof(string).GetTypeInfo().Assembly)
+                   && !IsCompilerGenerated(typeInfo);
         }
 
         private static bool IsCompilerGenerated(TypeInfo typeInfo)
@@ -6435,7 +6110,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// A class that is responsible for instantiating and executing an <see cref="ICompositionRoot"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class CompositionRootExecutor : ICompositionRootExecutor
     {
         private readonly IServiceRegistry serviceRegistry;
@@ -6481,7 +6156,7 @@ namespace DbReader.LightInject
     /// A class that maps the generic arguments/parameters from a generic servicetype
     /// to a open generic implementing type.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class GenericArgumentMapper : IGenericArgumentMapper
     {
         /// <summary>
@@ -6497,7 +6172,7 @@ namespace DbReader.LightInject
                 openGenericImplementingType.GetTypeInfo().GenericTypeParameters.Select(t => t.Name).ToArray();
 
             var genericArgumentMap = CreateMap(genericServiceType, openGenericImplementingType, genericParameterNames);
-
+         
             return new GenericMappingResult(genericParameterNames, genericArgumentMap, genericServiceType, openGenericImplementingType);
         }
 
@@ -6506,7 +6181,7 @@ namespace DbReader.LightInject
             var genericArgumentMap = new Dictionary<string, Type>(genericParameterNames.Length);
 
             var genericArguments = GetGenericArgumentsOrParameters(genericServiceType);
-           
+
             if (genericArguments.Length > 0)
             {
                 genericServiceType = genericServiceType.GetTypeInfo().GetGenericTypeDefinition();
@@ -6521,7 +6196,7 @@ namespace DbReader.LightInject
                 genericServiceType);
 
             Type[] baseTypeGenericArguments = GetGenericArgumentsOrParameters(baseTypeImplementingOpenGenericServiceType);
-
+          
             MapGenericArguments(genericArguments, baseTypeGenericArguments, genericArgumentMap);
             return genericArgumentMap;
         }
@@ -6537,25 +6212,25 @@ namespace DbReader.LightInject
             return typeInfo.GenericTypeArguments;
         }
 
-        private static void MapGenericArguments(Type[] closedGenericArguments, Type[] baseTypeGenericArguments, IDictionary<string, Type> map)
+        private static void MapGenericArguments(Type[] serviceTypeGenericArguments, Type[] baseTypeGenericArguments, IDictionary<string, Type> map)
         {
             for (int index = 0; index < baseTypeGenericArguments.Length; index++)
             {
                 var baseTypeGenericArgument = baseTypeGenericArguments[index];
-                var closedGenericArgument = closedGenericArguments[index];
+                var serviceTypeGenericArgument = serviceTypeGenericArguments[index];
                 if (baseTypeGenericArgument.GetTypeInfo().IsGenericParameter)
                 {
-                    map[baseTypeGenericArgument.Name] = closedGenericArgument;
+                    map[baseTypeGenericArgument.Name] = serviceTypeGenericArgument;
                 }
                 else if (baseTypeGenericArgument.GetTypeInfo().IsGenericType)
                 {
-                    if (closedGenericArgument.GetTypeInfo().IsGenericType)
+                    if (serviceTypeGenericArgument.GetTypeInfo().IsGenericType)
                     {
-                        MapGenericArguments(closedGenericArgument.GetTypeInfo().GenericTypeArguments, baseTypeGenericArgument.GetTypeInfo().GenericTypeArguments, map);
+                        MapGenericArguments(serviceTypeGenericArgument.GetTypeInfo().GenericTypeArguments, baseTypeGenericArgument.GetTypeInfo().GenericTypeArguments, map);
                     }
                     else
                     {
-                        MapGenericArguments(closedGenericArguments, baseTypeGenericArgument.GetTypeInfo().GenericTypeArguments, map);
+                        MapGenericArguments(serviceTypeGenericArguments, baseTypeGenericArgument.GetTypeInfo().GenericTypeArguments, map);
                     }
                 }
             }
@@ -6602,7 +6277,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// An assembly scanner that registers services based on the types contained within an <see cref="Assembly"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class AssemblyScanner : IAssemblyScanner
     {
         private readonly ITypeExtractor concreteTypeExtractor;
@@ -6663,16 +6338,16 @@ namespace DbReader.LightInject
 
         private static string GetServiceName(Type serviceType, Type implementingType)
         {
-            string implementingTypeName = implementingType.Name;
-            string serviceTypeName = serviceType.Name;
+            string implementingTypeName = implementingType.FullName;
+            string serviceTypeName = serviceType.FullName;
             if (implementingType.GetTypeInfo().IsGenericTypeDefinition)
             {
-                var regex = new Regex("((?:[a-z][a-z]+))", RegexOptions.IgnoreCase);
+                var regex = new Regex("((?:[a-z][a-z.]+))", RegexOptions.IgnoreCase);
                 implementingTypeName = regex.Match(implementingTypeName).Groups[1].Value;
                 serviceTypeName = regex.Match(serviceTypeName).Groups[1].Value;
             }
 
-            if (serviceTypeName.Substring(1) == implementingTypeName)
+            if (serviceTypeName.Split('.').Last().Substring(1) == implementingTypeName.Split('.').Last())
             {
                 implementingTypeName = string.Empty;
             }
@@ -6751,7 +6426,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Selects the properties that represents a dependency to the target <see cref="Type"/>.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class PropertySelector : IPropertySelector
     {
         /// <summary>
@@ -6779,12 +6454,12 @@ namespace DbReader.LightInject
             return propertyInfo.SetMethod == null || propertyInfo.SetMethod.IsStatic || propertyInfo.SetMethod.IsPrivate || propertyInfo.GetIndexParameters().Length > 0;
         }
     }
-#if NET45 || NET46 
+#if NET452 || NET46 
 
     /// <summary>
     /// Loads all assemblies from the application base directory that matches the given search pattern.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class AssemblyLoader : IAssemblyLoader
     {
         /// <summary>
@@ -6836,11 +6511,11 @@ namespace DbReader.LightInject
     }
 #endif
 
-#if NETSTANDARD16
+#if NETSTANDARD1_6
     /// <summary>
     /// Loads all assemblies from the application base directory that matches the given search pattern.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class AssemblyLoader : IAssemblyLoader
     {
         /// <summary>
@@ -6899,7 +6574,7 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal sealed class KeyValue<TKey, TValue>
     {
         /// <summary>
@@ -6928,7 +6603,7 @@ namespace DbReader.LightInject
     /// Represents a simple "add only" immutable list.
     /// </summary>
     /// <typeparam name="T">The type of items contained in the list.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal sealed class ImmutableList<T>
     {
         /// <summary>
@@ -6980,7 +6655,7 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal sealed class ImmutableHashTable<TKey, TValue>
     {
         /// <summary>
@@ -7068,7 +6743,7 @@ namespace DbReader.LightInject
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal sealed class ImmutableHashTree<TKey, TValue>
     {
         /// <summary>
@@ -7228,7 +6903,7 @@ namespace DbReader.LightInject
     /// <summary>
     /// Represents an MSIL instruction to be emitted into a dynamic method.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class Instruction
     {
         /// <summary>
@@ -7268,7 +6943,7 @@ namespace DbReader.LightInject
     /// Represents an MSIL instruction to be emitted into a dynamic method.
     /// </summary>
     /// <typeparam name="T">The type of argument used in this instruction.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class Instruction<T> : Instruction
     {
         /// <summary>
@@ -7303,7 +6978,7 @@ namespace DbReader.LightInject
     /// An abstraction of the <see cref="ILGenerator"/> class that provides information
     /// about the <see cref="Type"/> currently on the stack.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class Emitter : IEmitter
     {
         private readonly ILGenerator generator;
@@ -7690,13 +7365,13 @@ namespace DbReader.LightInject
             return localBuilder;
         }
     }
-#if NET45
+#if NET452
 
     /// <summary>
     /// Provides storage per logical thread of execution.
     /// </summary>
     /// <typeparam name="T">The type of the value contained in this <see cref="LogicalThreadStorage{T}"/>.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class LogicalThreadStorage<T>
     {        
         private readonly string key = Guid.NewGuid().ToString();
@@ -7747,12 +7422,12 @@ namespace DbReader.LightInject
         }
     }
 #endif
-#if NETSTANDARD13 || NETSTANDARD16 || NET46
+#if NETSTANDARD1_3 || NETSTANDARD1_6 || NET46
     /// <summary>
     /// Provides storage per logical thread of execution.
     /// </summary>
     /// <typeparam name="T">The type of the value contained in this <see cref="LogicalThreadStorage{T}"/>.</typeparam>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal class LogicalThreadStorage<T>
     {
         private readonly AsyncLocal<T> asyncLocal = new AsyncLocal<T>();
@@ -7773,7 +7448,7 @@ namespace DbReader.LightInject
     }
 #endif
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class LifetimeHelper
     {
         static LifetimeHelper()
@@ -7787,7 +7462,7 @@ namespace DbReader.LightInject
         public static MethodInfo GetCurrentScopeMethod { get; private set; }
     }
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class DelegateTypeExtensions
     {
         private static readonly MethodInfo OpenGenericGetInstanceMethodInfo =
@@ -7809,7 +7484,7 @@ namespace DbReader.LightInject
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class NamedDelegateTypeExtensions
     {
         private static readonly MethodInfo CreateInstanceDelegateMethodInfo =
@@ -7835,13 +7510,13 @@ namespace DbReader.LightInject
         // ReSharper disable UnusedMember.Local
         private static Func<TService> CreateInstanceDelegate<TService>(IServiceFactory factory, string serviceName)
 
-        // ReSharper restore UnusedMember.Local
+            // ReSharper restore UnusedMember.Local
         {
             return () => factory.GetInstance<TService>(serviceName);
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class ReflectionHelper
     {
         private static readonly Lazy<ThreadSafeDictionary<Type, MethodInfo>> GetInstanceWithParametersMethods;
@@ -7863,8 +7538,8 @@ namespace DbReader.LightInject
                 typeof(ReflectionHelper).GetTypeInfo().DeclaredMethods
                     .Single(
                         m =>
-                        m.GetGenericArguments().Length == genericTypeArguments.Length
-                        && m.Name == "CreateGenericGetNamedParameterizedInstanceDelegate");
+                            m.GetGenericArguments().Length == genericTypeArguments.Length
+                            && m.Name == "CreateGenericGetNamedParameterizedInstanceDelegate");
             var closedGenericMethod = openGenericMethod.MakeGenericMethod(genericTypeArguments);
             return (Delegate)closedGenericMethod.Invoke(null, new object[] { factory, serviceName });
         }
@@ -7880,7 +7555,7 @@ namespace DbReader.LightInject
             Type[] genericTypeArguments = serviceType.GetTypeInfo().GenericTypeArguments;
             MethodInfo openGenericMethod =
                 typeof(ServiceFactoryExtensions).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "GetInstance"
-                    && m.GetGenericArguments().Length == genericTypeArguments.Length && m.GetParameters().All(p => p.Name != "serviceName"));
+                                                                                           && m.GetGenericArguments().Length == genericTypeArguments.Length && m.GetParameters().All(p => p.Name != "serviceName"));
 
             MethodInfo closedGenericMethod = openGenericMethod.MakeGenericMethod(genericTypeArguments);
 
@@ -7890,7 +7565,7 @@ namespace DbReader.LightInject
         // ReSharper disable UnusedMember.Local
         private static Func<TArg, TService> CreateGenericGetNamedParameterizedInstanceDelegate<TArg, TService>(IServiceFactory factory, string serviceName)
 
-        // ReSharper restore UnusedMember.Local
+            // ReSharper restore UnusedMember.Local
         {
             return arg => factory.GetInstance<TArg, TService>(arg, serviceName);
         }
@@ -7898,7 +7573,7 @@ namespace DbReader.LightInject
         // ReSharper disable UnusedMember.Local
         private static Func<TArg1, TArg2, TService> CreateGenericGetNamedParameterizedInstanceDelegate<TArg1, TArg2, TService>(IServiceFactory factory, string serviceName)
 
-        // ReSharper restore UnusedMember.Local
+            // ReSharper restore UnusedMember.Local
         {
             return (arg1, arg2) => factory.GetInstance<TArg1, TArg2, TService>(arg1, arg2, serviceName);
         }
@@ -7906,7 +7581,7 @@ namespace DbReader.LightInject
         // ReSharper disable UnusedMember.Local
         private static Func<TArg1, TArg2, TArg3, TService> CreateGenericGetNamedParameterizedInstanceDelegate<TArg1, TArg2, TArg3, TService>(IServiceFactory factory, string serviceName)
 
-        // ReSharper restore UnusedMember.Local
+            // ReSharper restore UnusedMember.Local
         {
             return (arg1, arg2, arg3) => factory.GetInstance<TArg1, TArg2, TArg3, TService>(arg1, arg2, arg3, serviceName);
         }
@@ -7914,7 +7589,7 @@ namespace DbReader.LightInject
         // ReSharper disable UnusedMember.Local
         private static Func<TArg1, TArg2, TArg3, TArg4, TService> CreateGenericGetNamedParameterizedInstanceDelegate<TArg1, TArg2, TArg3, TArg4, TService>(IServiceFactory factory, string serviceName)
 
-        // ReSharper restore UnusedMember.Local
+            // ReSharper restore UnusedMember.Local
         {
             return (arg1, arg2, arg3, arg4) => factory.GetInstance<TArg1, TArg2, TArg3, TArg4, TService>(arg1, arg2, arg3, arg4, serviceName);
         }
@@ -7924,10 +7599,10 @@ namespace DbReader.LightInject
     /// Contains a set of extension method that represents
     /// a compability layer for reflection methods.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class TypeHelper
     {
-#if NET45 || NET46
+#if NET452 || NET46
 
         /// <summary>
         /// Gets the method represented by the delegate.
@@ -7983,7 +7658,6 @@ namespace DbReader.LightInject
             var typeInfo = type.GetTypeInfo();
             return typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(ICollection<>);
         }
-#if NET45 || NETSTANDARD11 || NETSTANDARD13 || NETSTANDARD16 || PCL_111 || NET46
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="Type"/> is an <see cref="IReadOnlyCollection{T}"/> type.
@@ -8006,7 +7680,6 @@ namespace DbReader.LightInject
             var typeInfo = type.GetTypeInfo();
             return typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IReadOnlyList<>);
         }
-#endif
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="Type"/> is an <see cref="Lazy{T}"/> type.
@@ -8047,7 +7720,7 @@ namespace DbReader.LightInject
             Type genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
 
             return genericTypeDefinition == typeof(Func<,>) || genericTypeDefinition == typeof(Func<,,>)
-                || genericTypeDefinition == typeof(Func<,,,>) || genericTypeDefinition == typeof(Func<,,,,>);
+                   || genericTypeDefinition == typeof(Func<,,,>) || genericTypeDefinition == typeof(Func<,,,,>);
         }
 
         /// <summary>
@@ -8081,7 +7754,7 @@ namespace DbReader.LightInject
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class LazyTypeExtensions
     {
         private static readonly ThreadSafeDictionary<Type, ConstructorInfo> Constructors = new ThreadSafeDictionary<Type, ConstructorInfo>();
@@ -8098,7 +7771,7 @@ namespace DbReader.LightInject
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class EnumerableTypeExtensions
     {
         private static readonly ThreadSafeDictionary<Type, Type> EnumerableTypes = new ThreadSafeDictionary<Type, Type>();
@@ -8114,7 +7787,7 @@ namespace DbReader.LightInject
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class FuncTypeExtensions
     {
         private static readonly ThreadSafeDictionary<Type, Type> FuncTypes = new ThreadSafeDictionary<Type, Type>();
@@ -8129,4 +7802,12 @@ namespace DbReader.LightInject
             return typeof(Func<>).MakeGenericType(type);
         }
     }
+
+#if NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6
+    [ExcludeFromCodeCoverage]
+    internal class ExcludeFromCodeCoverageAttribute : Attribute
+    {
+        
+    }
+#endif
 }
