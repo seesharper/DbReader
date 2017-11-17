@@ -39,7 +39,7 @@ private void CreateNugetPackages()
 
 private void CopyBinaryFilesToNuGetLibDirectory()
 {
-	CopyBinaryFile("NET45", "net45");
+	CopyBinaryFile("NET452", "net452");
 	CopyBinaryFile("NET46", "net46");		
 	CopyBinaryFile("NETSTANDARD16", "netstandard1.6");       		
 }
@@ -70,7 +70,7 @@ private string ResolvePathToBinaryFile(string frameworkMoniker)
 
 private void BuildAllFrameworks()
 {	
-	Build("Net45");
+	Build("Net452");
 	Build("Net46");	    	
 	BuildDotNet();
 }
@@ -90,7 +90,7 @@ private void BuildDotNet()
 
 private void RestoreNuGetPackages()
 {	
-	RestoreNuGetPackages("net45");
+	RestoreNuGetPackages("net452");
 	RestoreNuGetPackages("net46");    			
 }
 
@@ -106,7 +106,7 @@ private void RestoreNuGetPackages(string frameworkMoniker)
 private void RunAllUnitTests()
 {	
 	DirectoryUtils.Delete("TestResults");
-	Execute(() => RunUnitTests("Net45"), "Running unit tests for Net45");
+	Execute(() => RunUnitTests("Net452"), "Running unit tests for Net45");
 	Execute(() => RunUnitTests("Net46"), "Running unit tests for Net46");		
 }
 
@@ -120,7 +120,7 @@ private void RunUnitTests(string frameworkMoniker)
 
 private void AnalyzeTestCoverage()
 {	
-	Execute(() => AnalyzeTestCoverage("NET45"), "Analyzing test coverage for NET45");
+	Execute(() => AnalyzeTestCoverage("NET452"), "Analyzing test coverage for NET45");
 	Execute(() => AnalyzeTestCoverage("NET46"), "Analyzing test coverage for NET46");
 }
 
@@ -135,7 +135,7 @@ private void AnalyzeTestCoverage(string frameworkMoniker)
 private void InitializBuildDirectories()
 {
 	DirectoryUtils.Delete(pathToBuildDirectory);	
-	Execute(() => InitializeNugetBuildDirectory("NET45"), "Preparing Net45");
+	Execute(() => InitializeNugetBuildDirectory("NET452"), "Preparing Net452");
 	Execute(() => InitializeNugetBuildDirectory("NET46"), "Preparing Net46");	
 	Execute(() => InitializeNugetBuildDirectory("NETSTANDARD16"), "Preparing NetStandard1.6");	    						
 }
@@ -169,14 +169,14 @@ private void RenameSolutionFile(string frameworkMoniker)
 
 private void RenameSolutionFiles()
 {	
-	RenameSolutionFile("NET45");
+	RenameSolutionFile("NET452");
 	RenameSolutionFile("NET46");	
 	RenameSolutionFile("NETSTANDARD16");	    
 }
 
 private void PatchAssemblyInfo()
 {
-	Execute(() => PatchAssemblyInfo("Net45"), "Patching AssemblyInfo (Net45)");
+	Execute(() => PatchAssemblyInfo("Net452"), "Patching AssemblyInfo (Net45)");
 	Execute(() => PatchAssemblyInfo("Net46"), "Patching AssemblyInfo (Net46)");	
 	Execute(() => PatchAssemblyInfo("NETSTANDARD16"), "Patching AssemblyInfo (NetStandard1.6)");	    
 }
@@ -189,7 +189,7 @@ private void PatchAssemblyInfo(string framework)
 
 private void PatchProjectFiles()
 {
-	Execute(() => PatchProjectFile("NET45", "4.5"), "Patching project file (NET45)");
+	Execute(() => PatchProjectFile("NET452", "4.5"), "Patching project file (NET45)");
 	Execute(() => PatchProjectFile("NET46", "4.6"), "Patching project file (NET46)");    		
 }
 
