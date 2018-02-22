@@ -56,7 +56,7 @@ namespace DbReader.Construction
         /// <param name="sql">The sql statement for which to create the method.</param>
         /// <param name="argumentsType">The arguments type for which to create the method.</param>
         /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
-        public Func<object, Func<IDataParameter> ,IDataParameter[]> CreateMethod(string sql, Type argumentsType)
+        public Func<object, Func<IDataParameter> ,IDataParameter[]> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters)
         {
             
             var processDelegates = new List<Action<IDataParameter, object>>();
@@ -66,7 +66,7 @@ namespace DbReader.Construction
             if (parameterNames.Length > 0)
             {
                 properties = properties.Where(p => parameterNames.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray();
-                ValidateParameters(parameterNames, properties);
+                //ValidateParameters(parameterNames, properties);
             }
             else
             {

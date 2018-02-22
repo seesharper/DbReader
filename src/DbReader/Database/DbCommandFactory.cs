@@ -29,15 +29,16 @@
         /// <returns></returns>
         public IDbCommand CreateCommand(IDbConnection dbConnection, string sql, object arguments)
         {
-            var command = dbConnection.CreateCommand();            
-            command.CommandText = sql;
-            var parameters = argumentParser.Parse(sql, arguments, () => command.CreateParameter());
+            //var command = dbConnection.CreateCommand();            
+            //command.CommandText = sql;
+            //var parameters = argumentParser.Parse(sql, arguments, () => command.CreateParameter());
             
-            foreach (var parameter in parameters)
-            {                                
-                command.Parameters.Add(parameter);
-            }
-            return command;
+            //foreach (var parameter in parameters)
+            //{                                
+            //    command.Parameters.Add(parameter);
+            //}
+            //return command;
+            return null;
         }
     }
 }
