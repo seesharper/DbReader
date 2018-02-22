@@ -1,147 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{02759164-70F2-49DD-8C1A-4179582851B9}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DbReader</RootNamespace>
-    <AssemblyName>DbReader</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+      <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+      <Version>2.0.0</Version>
+      <Authors>Bernhard Richter</Authors>
+      <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
+      <RepositoryType>git</RepositoryType>
+      <RepositoryUrl>https://github.com/seesharper/DbReader</RepositoryUrl>
+      <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+      <Copyright>Bernhard Richter</Copyright>
+      <PackageTags>data-access orm sql micro-orm</PackageTags>
+      <Description>A simple and fast database reader for the .Net framework.</Description>
+      <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+      <DebugType>Full</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET46</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\DbReader.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NET46</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\DbReader.XML</DocumentationFile>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ArgumentProcessor.cs" />
-    <Compile Include="Construction\ArgumentParserMethodBuilder.cs" />
-    <Compile Include="Construction\CachedArgumentParserMethodBuilder.cs" />
-    <Compile Include="Construction\DataParameterHelper.cs" />
-    <Compile Include="Construction\IArgumentParserMethodBuilder.cs" />
-    <Compile Include="Construction\PropertyReaderDelegate.cs" />
-    <Compile Include="Construction\PropertyReaderDelegateCache.cs" />
-    <Compile Include="Construction\StaticCache.cs" />
-    <Compile Include="Construction\CachedInstanceReaderMethodBuilder.cs" />
-    <Compile Include="Construction\CachedKeyReaderMethodBuilder.cs" />
-    <Compile Include="Construction\CachedOneToManyMethodBuilder.cs" />
-    <Compile Include="Construction\CachedReaderMethodBuilder.cs" />
-    <Compile Include="Construction\ConstructorReaderMethodBuilder.cs" />
-    <Compile Include="Construction\DynamicMethodSkeleton.cs" />
-    <Compile Include="Construction\Cache.cs" />
-    <Compile Include="Construction\IKeyReaderMethodBuilder.cs" />
-    <Compile Include="Construction\IManyToOneMethodBuilder.cs" />
-    <Compile Include="Construction\IMethodSkeleton.cs" />
-    <Compile Include="Construction\IMethodSkeletonFactory.cs" />
-    <Compile Include="Construction\InstanceReaderMethodBuilder.cs" />
-    <Compile Include="Construction\IOneToManyMethodBuilder.cs" />
-    <Compile Include="Construction\IPrefixResolver.cs" />
-    <Compile Include="Construction\IReaderMethodBuilder.cs" />
-    <Compile Include="Construction\KeyReaderMethodBuilder.cs" />
-    <Compile Include="Construction\ManyToOneMethodBuilder.cs" />
-    <Compile Include="Construction\MethodSkeletonFactory.cs" />
-    <Compile Include="Construction\OneToManyMethodBuilder.cs" />
-    <Compile Include="Construction\PrefixResolver.cs" />
-    <Compile Include="Construction\PropertyReaderMethodBuilder.cs" />
-    <Compile Include="Construction\ReaderMethodBuilder.cs" />
-    <Compile Include="ContainerExtensions.cs" />
-    <Compile Include="Database\ArgumentParser.cs" />
-    <Compile Include="Database\DbCommandFactory.cs" />
-    <Compile Include="Database\IArgumentParser.cs" />
-    <Compile Include="Database\IDbCommandFactory.cs" />
-    <Compile Include="Database\IParameterParser.cs" />
-    <Compile Include="Database\RegExParameterParser.cs" />
-    <Compile Include="DataReaderExtensions.cs" />
-    <Compile Include="DbConnectionExtensions.cs" />
-    <Compile Include="DbReaderOptions.cs" />
-    <Compile Include="Extensions\CollectionExtensions.cs" />
-    <Compile Include="Extensions\GeneratorExtensions.cs" />
-    <Compile Include="Extensions\PropertyInfoEnumerableExtensions.cs" />
-    <Compile Include="Extensions\PropertyReflectionExtensions.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Extensions\TypeReflectionExtensions.cs" />
-    <Compile Include="ErrorMessages.cs" />
-    <Compile Include="LightInject\LightInject.cs" />
-    <Compile Include="Mapping\CachedPropertyMapper.cs" />
-    <Compile Include="Mapping\IKeyPropertyMapper.cs" />
-    <Compile Include="Mapping\IPropertyMapper.cs" />
-    <Compile Include="Mapping\KeyPropertyMapper.cs" />
-    <Compile Include="Mapping\KeyPropertyMapperValidator.cs" />
-    <Compile Include="Mapping\MappingInfo.cs" />
-    <Compile Include="Mapping\PropertyMapper.cs" />
-    <Compile Include="Mapping\PropertyTypeValidator.cs" />
-    <Compile Include="Interfaces\IInstanceReaderMethodBuilder.cs" />
-    <Compile Include="CompositionRoot.cs" />
-    <Compile Include="DataRecordExtensions.cs" />
-    <Compile Include="Guard.cs" />
-    <Compile Include="PassDelegate.cs" />
-    <Compile Include="ReadDelegate.cs" />
-    <Compile Include="Readers\CachedInstanceReader.cs" />
-    <Compile Include="Readers\IInstanceReader.cs" />
-    <Compile Include="Readers\IInstanceReaderFactory.cs" />
-    <Compile Include="Readers\IKeyReader.cs" />
-    <Compile Include="Readers\KeyReader.cs" />
-    <Compile Include="Readers\InstanceReader.cs" />
-    <Compile Include="Readers\IReader.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Selectors\CachedFieldSelector.cs" />
-    <Compile Include="Selectors\CachedPropertySelector.cs" />
-    <Compile Include="Selectors\ColumnInfo.cs" />
-    <Compile Include="Selectors\ConstructorValidator.cs" />
-    <Compile Include="Selectors\FieldSelector.cs" />
-    <Compile Include="Selectors\FirstConstructorSelector.cs" />
-    <Compile Include="Selectors\IConstructorSelector.cs" />
-    <Compile Include="Selectors\IFieldSelector.cs" />
-    <Compile Include="Selectors\IMethodSelector.cs" />
-    <Compile Include="Selectors\IOrdinalSelector.cs" />
-    <Compile Include="Selectors\IPropertySelector.cs" />
-    <Compile Include="Selectors\ManyToOnePropertySelector.cs" />
-    <Compile Include="Selectors\MethodSelector.cs" />
-    <Compile Include="Selectors\OneToManyPropertySelector.cs" />
-    <Compile Include="Selectors\OneToManyPropertyValidator.cs" />
-    <Compile Include="Selectors\OrdinalSelector.cs" />
-    <Compile Include="Selectors\ParameterlessConstructorSelector.cs" />
-    <Compile Include="Selectors\ReadablePropertySelector.cs" />
-    <Compile Include="Selectors\SimplePropertySelector.cs" />
-    <Compile Include="SqlStatement.cs" />
-    <Compile Include="TypeEvaluator.cs" />
-    <Compile Include="ValueConverter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
