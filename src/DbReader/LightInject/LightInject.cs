@@ -4136,21 +4136,13 @@ namespace DbReader.LightInject
                 return dynamicMethod.CreateDelegate(delegateType);
             }
 
-#if NET452 || NET46
             private void CreateDynamicMethod(Type returnType, Type[] parameterTypes)
             {
                 dynamicMethod = new DynamicMethod(
                     "DynamicMethod", returnType, parameterTypes, typeof(ServiceContainer).GetTypeInfo().Module, true);
                 emitter = new Emitter(dynamicMethod.GetILGenerator(), parameterTypes);
             }
-#endif
-#if NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6
-            private void CreateDynamicMethod(Type returnType, Type[] parameterTypes)
-            {
-                dynamicMethod = new DynamicMethod(returnType, parameterTypes);
-                emitter = new Emitter(dynamicMethod.GetILGenerator(), parameterTypes);
-            }
-#endif
+
         }
 
         private class ServiceRegistry<T> : ThreadSafeDictionary<Type, ThreadSafeDictionary<string, T>>

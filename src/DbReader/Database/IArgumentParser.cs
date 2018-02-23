@@ -17,6 +17,6 @@
         /// <param name="arguments">An object that represent the argument values for each parameter.</param>
         /// <param name="parameterFactory">A factory delegate used to create an <see cref="IDataParameter"/> instance.</param>
         /// <returns></returns>
-        IDataParameter[] Parse(string sql, object arguments, Func<IDataParameter> parameterFactory);
+        IDataParameter[] Parse(string sql, object arguments, Func<IDataParameter> parameterFactory, IDataParameter[] existingParameters);
     }
 }

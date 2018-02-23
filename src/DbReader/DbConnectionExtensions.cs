@@ -1,4 +1,6 @@
-﻿namespace DbReader
+﻿using System.Linq;
+
+namespace DbReader
 {
     using System;
     using System.Collections.Generic;
@@ -16,12 +18,15 @@
     {
         private static readonly IServiceContainer Container = new ServiceContainer();
         private static readonly IDbCommandFactory DbCommandFactory;
+        private static readonly IArgumentParser ArgumentParser;
+
 
         static DbConnectionExtensions()
         {
             Container.RegisterFrom<CompositionRoot>();
             DataReaderExtensions.SetContainer(Container);
             DbCommandFactory = Container.GetInstance<IDbCommandFactory>();
+            ArgumentParser = Container.GetInstance<IArgumentParser>();
         }
 
         /// <summary>
@@ -98,8 +103,14 @@
         public static IDbCommand CreateCommand(this IDbConnection dbConnection, string query, object arguments = null)
         {
             SqlStatement.Current = query;
-            var command = DbCommandFactory.CreateCommand(dbConnection, query, arguments);
+            var command = dbConnection.CreateCommand();
+            command.CommandText = query;
             CommandInitializer?.Invoke(command);
+            var parameters = ArgumentParser.Parse(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
+            foreach (var dataParameter in parameters)
+            {
+                command.Parameters.Add(dataParameter);
+            }
             return command;
         }
              
