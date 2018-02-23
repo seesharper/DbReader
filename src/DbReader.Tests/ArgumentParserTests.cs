@@ -31,7 +31,34 @@
 
             exception.Message.ShouldStartWith("Unable to resolve an argument value for parameter");
         }
-       
+
+        public void Parse_MissingArgument_DoesNotThrowIfExistingParametersContainsArgument(IArgumentParser argumentParser)
+        {
+            var existingParameterMock = new Mock<IDataParameter>();
+            existingParameterMock.SetupAllProperties();
+            existingParameterMock.Object.ParameterName = "secondParameter";
+
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
+                new {FirstParameter = 1, InvalidParameter = 2},
+                () => new Mock<IDataParameter>().SetupAllProperties().Object, new[]{existingParameterMock.Object});
+
+            result.Length.ShouldBe(1);
+        }
+
+        public void Parse_ArgumentAlreadyExists_ThrowsException(IArgumentParser argumentParser)
+        {
+            var existingParameterMock = new Mock<IDataParameter>();
+            existingParameterMock.SetupAllProperties();
+            existingParameterMock.Object.ParameterName = "secondParameter";
+
+            Should.Throw<InvalidOperationException>(
+                () => argumentParser.Parse(FakeSql.Create(":firstParameter, :secondParameter"),
+                    new { FirstParameter = 1, SecondParameter = 2 },
+                    () => new Mock<IDataParameter>().SetupAllProperties().Object, new[] { existingParameterMock.Object }
+                ));
+        }
+
+
         public void Parse_MissingParameters_ReturnsParametersFromArguments(IArgumentParser argumentParser)
         {
             var result = argumentParser.Parse(FakeSql.Create(),
