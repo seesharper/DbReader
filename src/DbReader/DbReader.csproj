@@ -23,6 +23,14 @@
     <DocumentationFile>bin\Release\netstandard2.0\DbReader.xml</DocumentationFile>
   </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
+        <DocumentationFile>bin\Debug\net46\DbReader.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46.0|AnyCPU'">
+        <DocumentationFile>bin\Release\net46\DbReader.xml</DocumentationFile>
+    </PropertyGroup>  
+    
   <ItemGroup>
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
   </ItemGroup>
