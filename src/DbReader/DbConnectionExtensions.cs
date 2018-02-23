@@ -16,16 +16,14 @@ namespace DbReader
     /// </summary>
     public static class DbConnectionExtensions
     {
-        private static readonly IServiceContainer Container = new ServiceContainer();
-        private static readonly IDbCommandFactory DbCommandFactory;
+        private static readonly IServiceContainer Container = new ServiceContainer();        
         private static readonly IArgumentParser ArgumentParser;
 
 
         static DbConnectionExtensions()
         {
             Container.RegisterFrom<CompositionRoot>();
-            DataReaderExtensions.SetContainer(Container);
-            DbCommandFactory = Container.GetInstance<IDbCommandFactory>();
+            DataReaderExtensions.SetContainer(Container);            
             ArgumentParser = Container.GetInstance<IArgumentParser>();
         }
 

@@ -14,6 +14,7 @@
         /// </summary>
         /// <param name="sql">The sql statement for which to create the method.</param>
         /// <param name="argumentsType">The arguments type for which to create the method.</param>
+        /// <param name="existingParameters">A list of already existing parameters.</param>
         /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
         Func<object, Func<IDataParameter> ,  IDataParameter[]> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters);
     }   

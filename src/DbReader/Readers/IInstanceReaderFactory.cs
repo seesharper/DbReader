@@ -5,7 +5,7 @@
 
     public interface IInstanceReaderFactory
     {
-        object GetInstanceReader(Type type, string name);
+        object GetInstanceReader(Type type, string prefix);
     }
 
     public class InstanceReaderFactory : IInstanceReaderFactory
