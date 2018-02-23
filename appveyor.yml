@@ -8,7 +8,7 @@ build_script:
 - cmd: >-
     cd build
     refreshenv
-    dotnet script build.csx
+    dotnet script Build.csx
 artifacts:
 - path: /**/*.nupkg
   name: NuGet Packages
