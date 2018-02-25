@@ -573,3 +573,62 @@ public class Employee
 
 > Note: The *ReportsTo* property might not actually be needed later on and we could for instance in a Web application decorate this property with the *JsonIgnoreAttribute* to avoid that this property is exposed to the client. 
 
+
+
+## Command Initialization
+
+The `DbReaderOptions` class exposes a `CommandInitializer` property that can be used to initialize an `IDbCommand` after it has been created by `DbReader`.  
+
+The following example uses an anonymous PL/SQL block to retrieve a list of employees from the SCOTT schema.
+
+> The SCOTT schema contains a few simple tables that if often used as examples when working with Oracle. 
+
+
+
+````plsql
+BEGIN
+	OPEN :p_cursor FOR
+	SELECT 
+		e.EMPNO,
+		e.ENAME
+	FROM 
+		SCOTT.EMP e
+	WHERE 
+    	e.ENAME LIKE :p_name;
+END;	
+````
+
+In order to return a result set from a PL/SQL block, the first parameter needs to be a `OracleDbType.RefCursor` and its direction has to be `ParameterDirection.ReturnValue`. 
+
+We could do this by adding the cursor parameter to the arguments object like this.
+
+```c#
+connection.ReadAsync<Employee>(sql, new {p_cursor = new OracleParameter{OracleDbType = OracleDbType.RefCursor, Direction = ParameterDirection.ReturnValue}, p_name = "A%"});
+```
+
+If we have multiple queries such as this one, it might make more sense to define a convention that always adds the needed cursor parameter. 
+
+```c#
+DbReaderOptions.CommandInitializer = (command) => {
+    if (command.CommandText.Contains("p_cursor"))
+    {
+         command.Parameters.Insert(0, new OracleParameter
+         {
+         	OracleDbType = OracleDbType.RefCursor,
+         	Direction = ParameterDirection.ReturnValue,
+         	ParameterName = "p_cursor"                        
+         });
+    }
+} 	
+```
+
+We can now execute the query without specifying the `p_cursor` parameter.
+
+```c#
+connection.ReadAsync<Employee>(SQL.emp, new {p_name = "A%"});
+```
+
+
+
+
+
