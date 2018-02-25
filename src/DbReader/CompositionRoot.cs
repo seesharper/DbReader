@@ -40,9 +40,7 @@
                 .Register(typeof (IReaderMethodBuilder<>), typeof (ConstructorReaderMethodBuilder<>),
                     "ConstructorReaderMethodBuilder", new PerContainerLifetime())
                 .Decorate(typeof (IReaderMethodBuilder<>), typeof (CachedReaderMethodBuilder<>))
-
-                .Register<IDbCommandFactory, DbCommandFactory>(new PerContainerLifetime())
-                //.Register<IArgumentMapper, ArgumentMapper>(new PerContainerLifetime())
+                                
                 .Register<IArgumentParser, ArgumentParser>(new PerContainerLifetime())
                 .Register<IArgumentParserMethodBuilder, ArgumentParserMethodBuilder>(new PerContainerLifetime())
                 .Decorate<IArgumentParserMethodBuilder, CachedArgumentParserMethodBuilder>()
@@ -53,9 +51,7 @@
                 .Register<IPropertySelector, OneToManyPropertySelector>("OneToManyPropertySelector", new PerContainerLifetime())
                 .Decorate(typeof(IPropertySelector), typeof(OneToManyPropertyValidator), sr => sr.ImplementingType == typeof(OneToManyPropertySelector))
                 .Decorate<IPropertySelector, CachedPropertySelector>()
-
-                //// This might need to inlude the prefix for hierachical queries.
-                //.Register<Func<Type, string,object>>(factory => (type, prefix) => factory.GetInstance(type, prefix), new PerContainerLifetime())
+                
                 .Register<Func<Type, IReaderMethodBuilder<IStructuralEquatable>>>(
                     factory => type => CreateConstructorReaderMethodBuilder(type, factory), new PerContainerLifetime())
 

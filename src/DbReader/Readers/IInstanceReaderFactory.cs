@@ -1,27 +1,19 @@
 ﻿namespace DbReader.Readers
 {
     using System;
-    using System.Collections.Concurrent;
 
+    /// <summary>
+    /// Represents a class that is capable of 
+    /// producing an <see cref="IInstanceReader{T}"/> based on a given <see cref="Type"/> and prefix.
+    /// </summary>
     public interface IInstanceReaderFactory
     {
-        object GetInstanceReader(Type type, string name);
-    }
-
-    public class InstanceReaderFactory : IInstanceReaderFactory
-    {
-        private readonly Func<Type, object> createReader;
-
-        public InstanceReaderFactory(Func<Type, object> createReader)
-        {
-            this.createReader = createReader;
-        }
-
-        private readonly ConcurrentDictionary<Tuple<Type, string>, object> readers = new ConcurrentDictionary<Tuple<Type, string>, object>();
-
-        public object GetInstanceReader(Type type, string prefix)
-        {
-            return readers.GetOrAdd(Tuple.Create(type, prefix), t => createReader(t.Item1));
-        }
+        /// <summary>
+        /// Gets an <see cref="IInstanceReader{T}"/> for the given <paramref name="type"/> and <paramref name="prefix"/>.
+        /// </summary>
+        /// <param name="type">The type for which to get an <see cref="IInstanceReader{T}"/>.</param>
+        /// <param name="prefix">The prefix for which to get an <see cref="IInstanceReader{T}"/>.</param>
+        /// <returns></returns>
+        object GetInstanceReader(Type type, string prefix);
     }
 }
