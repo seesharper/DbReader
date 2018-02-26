@@ -25,4 +25,6 @@ if (BuildEnvironment.IsSecure)
         var releaseManager = ReleaseManagerFor(context.Owner, context.ProjectName, BuildEnvironment.GitHubAccessToken);        
         await releaseManager.CreateRelease(Git.Default.GetLatestTag(),context.PathToReleaseNotes, Array.Empty<ReleaseAsset>());
     }
+
+    NuGet.Push(context.NuGetArtifactsFolder);
 }
