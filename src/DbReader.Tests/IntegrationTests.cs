@@ -73,6 +73,18 @@
             }
         }
 
+        public async Task ShouldHandleRunningInParallel()
+        {
+            var task1 = ShouldReadCustomersAndOrdersAsync();
+            var task2 = ShouldReadCustomersAndOrdersAsync();
+            var task3 = ShouldReadCustomersAndOrdersAsync();
+            var task4 = ShouldReadCustomersAndOrdersAsync();
+
+            await Task.WhenAll(task1, task2, task3, task4);
+        }
+
+
+
         public async Task ShouldReadCustomersAsync()
         {
             using (var connection = CreateConnection())
@@ -89,6 +101,17 @@
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<CustomerWithOrders>(SQL.CustomersAndOrders);
+                customers.Count().ShouldBe(89);
+                customers.SelectMany(c => c.Orders).Count().ShouldBe(830);
+            }
+        }
+
+        public async Task ShouldReadCustomersAndOrdersAsync()
+        {
+            using (var connection = CreateConnection())
+            {
+                await Task.Delay(10);
+                var customers = await connection.ReadAsync<CustomerWithOrders>(SQL.CustomersAndOrders);
                 customers.Count().ShouldBe(89);
                 customers.SelectMany(c => c.Orders).Count().ShouldBe(830);
             }

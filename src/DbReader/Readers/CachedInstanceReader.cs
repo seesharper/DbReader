@@ -19,7 +19,7 @@ namespace DbReader.Readers
 
         private readonly IOneToManyMethodBuilder<T> oneToManyMethodBuilder;
         
-        private readonly Dictionary<IStructuralEquatable, T> queryCache = new Dictionary<IStructuralEquatable, T>(); 
+        private readonly ConcurrentDictionary<IStructuralEquatable, T> queryCache = new ConcurrentDictionary<IStructuralEquatable, T>(); 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedInstanceReader{T}"/> class.
@@ -60,7 +60,7 @@ namespace DbReader.Readers
             if (!queryCache.TryGetValue(key, out instance))
             {
                 instance = instanceReader.Read(dataRecord, currentPrefix);
-                queryCache.Add(key, instance);
+                queryCache.TryAdd(key, instance);
             }
             return instance;
             
