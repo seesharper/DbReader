@@ -142,5 +142,15 @@
 
             result.Length.ShouldBe(1);
         }
+
+        public void Parse_ParameterWithParantheses_ReturnsParameter(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+
+            var result = argumentParser.Parse(":firstParameter, :SecondParameter(1)",
+               new { FirstParameter = 1, SecondParameter = parameterMock.Object },
+               () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
+            result.Length.ShouldBe(2);
+        }
     }
 }
