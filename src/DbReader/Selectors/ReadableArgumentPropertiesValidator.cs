@@ -31,13 +31,13 @@ namespace DbReader.Selectors
 
             foreach (var property in properties)
             {
-                EnsureIsSimpleProperty(property);
+                EnsureIsPassable(property);
             }
 
             return properties;
         }
 
-        private static void EnsureIsSimpleProperty(PropertyInfo property)
+        private static void EnsureIsPassable(PropertyInfo property)
         {
             if (!IsPassable(property))
             {
