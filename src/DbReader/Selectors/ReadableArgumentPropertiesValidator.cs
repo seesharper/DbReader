@@ -20,6 +20,11 @@ namespace DbReader.Selectors
         public ReadableArgumentPropertiesValidator(IPropertySelector readablePropertySelector) 
             => this.readablePropertySelector = readablePropertySelector;
 
+        /// <summary>
+        /// Executes the selector and returns a list of readable properties that are passable as arguments.
+        /// </summary>
+        /// <param name="type">The target <see cref="Type"/>.</param>
+        /// <returns>An array of <see cref="PropertyInfo"/> instances.</returns>
         public PropertyInfo[] Execute(Type type)
         {
             var properties = readablePropertySelector.Execute(type);
