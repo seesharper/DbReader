@@ -1,6 +1,6 @@
 #! "netcoreapp2.0"
 #load "BuildContext.csx"
-#load "nuget:Dotnet.Build, 0.2.1"
+#load "nuget:Dotnet.Build, 0.3.2"
 #load "nuget:github-changelog, 0.1.2"
 
 using static ChangeLog;
@@ -22,9 +22,11 @@ if (BuildEnvironment.IsSecure)
 
     if (Git.Default.IsTagCommit())
     {
+        Git.Default.RequreCleanWorkingTree();
         var releaseManager = ReleaseManagerFor(context.Owner, context.ProjectName, BuildEnvironment.GitHubAccessToken);        
         await releaseManager.CreateRelease(Git.Default.GetLatestTag(),context.PathToReleaseNotes, Array.Empty<ReleaseAsset>());
+        NuGet.Push(context.NuGetArtifactsFolder);
     }
 
-    NuGet.Push(context.NuGetArtifactsFolder);
+    
 }

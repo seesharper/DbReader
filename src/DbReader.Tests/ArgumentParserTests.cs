@@ -142,5 +142,23 @@
 
             result.Length.ShouldBe(1);
         }
+
+        public void Parse_ParameterWithParantheses_ReturnsParameter(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+
+            var result = argumentParser.Parse(":firstParameter, :secondParameter(1)",
+               new { FirstParameter = 1, SecondParameter = parameterMock.Object },
+               () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
+            result.Length.ShouldBe(2);
+        }
+
+        public void Parse_ArgumentWithUnknownDataType_ThrowsMeaningfulException(IArgumentParser argumentParser)
+        {
+            var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
+            Should.Throw<InvalidOperationException>(() => argumentParser.Parse(":firstParameter",
+               new { FirstParameter = new[] { 1, 2 } },
+               () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>()));                         
+        }
     }
 }

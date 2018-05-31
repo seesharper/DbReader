@@ -35,12 +35,12 @@
         {
             registry
                 .Register<IMethodSkeletonFactory, DynamicMethodSkeletonFactory>(new PerContainerLifetime())
-                .Register(typeof (IReaderMethodBuilder<>), typeof (PropertyReaderMethodBuilder<>),
+                .Register(typeof(IReaderMethodBuilder<>), typeof(PropertyReaderMethodBuilder<>),
                     "PropertyReaderMethodBuilder", new PerContainerLifetime())
-                .Register(typeof (IReaderMethodBuilder<>), typeof (ConstructorReaderMethodBuilder<>),
+                .Register(typeof(IReaderMethodBuilder<>), typeof(ConstructorReaderMethodBuilder<>),
                     "ConstructorReaderMethodBuilder", new PerContainerLifetime())
-                .Decorate(typeof (IReaderMethodBuilder<>), typeof (CachedReaderMethodBuilder<>))
-                                
+                .Decorate(typeof(IReaderMethodBuilder<>), typeof(CachedReaderMethodBuilder<>))
+
                 .Register<IArgumentParser, ArgumentParser>(new PerContainerLifetime())
                 .Register<IArgumentParserMethodBuilder, ArgumentParserMethodBuilder>(new PerContainerLifetime())
                 .Decorate<IArgumentParserMethodBuilder, CachedArgumentParserMethodBuilder>()
@@ -50,6 +50,7 @@
                 .Register<IPropertySelector, ManyToOnePropertySelector>("ManyToOnePropertySelector", new PerContainerLifetime())
                 .Register<IPropertySelector, OneToManyPropertySelector>("OneToManyPropertySelector", new PerContainerLifetime())
                 .Decorate(typeof(IPropertySelector), typeof(OneToManyPropertyValidator), sr => sr.ImplementingType == typeof(OneToManyPropertySelector))
+                .Decorate(typeof(IPropertySelector), typeof(ReadableArgumentPropertiesValidator), sr => sr.ImplementingType == typeof(ReadablePropertySelector))
                 .Decorate<IPropertySelector, CachedPropertySelector>()
                 
                 .Register<Func<Type, IReaderMethodBuilder<IStructuralEquatable>>>(
