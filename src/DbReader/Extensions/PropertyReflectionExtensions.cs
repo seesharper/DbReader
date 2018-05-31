@@ -1,5 +1,6 @@
 namespace DbReader.Extensions
 {
+    using System.Data;
     using System.Reflection;
 
     /// <summary>
@@ -27,6 +28,16 @@ namespace DbReader.Extensions
         {
             MethodInfo getMethod = property.GetGetMethod();
             return getMethod != null && !getMethod.IsStatic && getMethod.IsPublic;            
+        }
+
+        /// <summary>
+        /// Determines if the <paramref name="property"/> is an <see cref="IDataParameter"/>.
+        /// </summary>
+        /// <param name="property">The target <see cref="PropertyInfo"/>.</param>
+        /// <returns>true, if the <paramref name="property"/> is an <see cref="IDataParameter"/> , otherwise, false.</returns>
+        public static bool IsDataParameter(this PropertyInfo property)
+        {
+            return typeof(IDataParameter).GetTypeInfo().IsAssignableFrom(property.PropertyType);
         }
 
         /// <summary>

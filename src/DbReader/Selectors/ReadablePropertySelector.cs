@@ -7,8 +7,7 @@
     using Extensions;
 
     /// <summary>
-    /// A <see cref="IPropertySelector"/> that selects readable properties that is considered
-    /// a "simple" property. 
+    /// A <see cref="IPropertySelector"/> that selects readable properties.
     /// </summary>
     public class ReadablePropertySelector : IPropertySelector
     {
@@ -18,14 +17,8 @@
         /// <param name="type">The target <see cref="Type"/>.</param>
         /// <returns>An array of <see cref="PropertyInfo"/> instances.</returns>
         public PropertyInfo[] Execute(Type type)
-        {
-            PropertyInfo[] properties = type.GetProperties();
-            return
-                properties.Where(
-                    p =>
-                        (p.PropertyType.IsSimpleType() ||
-                         typeof (IDataParameter).GetTypeInfo().IsAssignableFrom(p.PropertyType)) && p.IsReadable())
-                    .ToArray();
+        {            
+            return type.GetProperties().Where(p => p.IsReadable()).ToArray();
         }        
     }
 }
