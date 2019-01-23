@@ -4,18 +4,22 @@
     using System.Data;
     using System.Text;
     using DbReader.Interfaces;
+    using DbReader.LightInject;
     using Selectors;
     using Shouldly;
-    
+    using Xunit;
+
     public class MethodSelectorTests
     {
         private readonly IMethodSelector methodSelector;
 
-        public MethodSelectorTests(IMethodSelector methodSelector)
+        public MethodSelectorTests()
         {
-            this.methodSelector = methodSelector;
+            var container = new ServiceContainer();
+            this.methodSelector = container.GetInstance<IMethodSelector>();
         }
-       
+
+        [Fact]
         public void ShouldReadBoolean()
         {
             var dataRecord = new { SomeColumn = true }.ToDataRecord();
@@ -23,6 +27,7 @@
             result.ShouldBeTrue();
         }
 
+        [Fact]
         public void ShouldReadNullableBoolean()
         {
             var dataRecord = new { SomeColumn = true }.ToDataRecord();
@@ -30,6 +35,7 @@
             result.Value.ShouldBeTrue();
         }
 
+        [Fact]
         public void ShouldReadByte()
         {
             var dataRecord = new { SomeColumn = (byte)42 }.ToDataRecord();
@@ -37,6 +43,7 @@
             result.ShouldBe((byte)42);
         }
 
+        [Fact]
         public void ShouldNullableReadByte()
         {
             var dataRecord = new { SomeColumn = (byte?)42 }.ToDataRecord();
@@ -44,6 +51,7 @@
             result.ShouldBe((byte?)42);
         }
 
+        [Fact]
         public void ShouldReadChar()
         {
             var dataRecord = new { SomeColumn = 'A' }.ToDataRecord();
@@ -51,6 +59,7 @@
             result.ShouldBe('A');
         }
 
+        [Fact]
         public void ShouldReadNullableChar()
         {
             var dataRecord = new { SomeColumn = (char?)'A' }.ToDataRecord();
@@ -58,6 +67,7 @@
             result.ShouldBe('A');
         }
 
+        [Fact]
         public void ShouldReadCharArray_ReadsValue()
         {
             var dataRecord = new { SomeColumn = new[] { 'A' } }.ToDataRecord();
@@ -65,6 +75,7 @@
             result[0].ShouldBe('A');
         }
 
+        [Fact]
         public void Invoke_DateTime_ReadsValue()
         {
             var dataRecord = new { SomeColumn = new DateTime(2014, 2, 5) }.ToDataRecord();
@@ -72,6 +83,7 @@
             result.ShouldBe(new DateTime(2014, 2, 5));
         }
 
+        [Fact]
         public void Invoke_NullableDateTime_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (DateTime?)new DateTime(2014, 2, 5) }.ToDataRecord();
@@ -79,6 +91,7 @@
             result.ShouldBe(new DateTime(2014, 2, 5));
         }
 
+        [Fact]
         public void Invoke_Decimal_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (decimal)42 }.ToDataRecord();
@@ -86,6 +99,7 @@
             result.ShouldBe(42);
         }
 
+        [Fact]
         public void Invoke_NullableDecimal_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (decimal?)42 }.ToDataRecord();
@@ -93,6 +107,7 @@
             result.ShouldBe(42);
         }
 
+        [Fact]
         public void Invoke_Double_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (double)42 }.ToDataRecord();
@@ -100,6 +115,7 @@
             result.ShouldBe(42);
         }
 
+        [Fact]
         public void Invoke_NullableDouble_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (double?)42 }.ToDataRecord();
@@ -107,6 +123,7 @@
             result.ShouldBe(42);
         }
 
+        [Fact]
         public void Invoke_Float_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (float)42 }.ToDataRecord();
@@ -114,6 +131,7 @@
             result.ShouldBe(42);
         }
 
+        [Fact]
         public void Invoke_NullableFloat_ReadsValue()
         {
             var dataRecord = new { SomeColumn = (float?)42 }.ToDataRecord();
@@ -121,10 +139,11 @@
             result.ShouldBe(42);
         }
 
+        [Fact]
         public void Invoke_UnknownDatatype_ThrowsException()
         {
             var dataRecord = new { SomeColumn = (StringBuilder)null }.ToDataRecord();
-            Should.Throw<ArgumentOutOfRangeException>(() => InvokeMethod<StringBuilder>(dataRecord));            
+            Should.Throw<ArgumentOutOfRangeException>(() => InvokeMethod<StringBuilder>(dataRecord));
         }
 
         private T InvokeMethod<T>(IDataRecord dataRecord)

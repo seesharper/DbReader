@@ -24,9 +24,10 @@ namespace DbReader.Construction
         private static readonly MethodInfo DataParameterSetValueMethod;
         private static readonly MethodInfo ProcessDelegateInvokeMethod;
         private static readonly MethodInfo SetNameMethod;
+        private static readonly MethodInfo ToDbNullIfNullMethod;
 
         static ArgumentParserMethodBuilder()
-        {            
+        {
             ParameterFactoryInvokeMethod = typeof (Func<IDataParameter>).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "Invoke");
             DataParameterSetParameterNameMethod =
                 typeof (IDataParameter).GetTypeInfo().GetProperty("ParameterName").SetMethod;
@@ -34,6 +35,7 @@ namespace DbReader.Construction
                 typeof(IDataParameter).GetTypeInfo().GetProperty("Value").SetMethod;
             ProcessDelegateInvokeMethod = typeof(Action<IDataParameter, object>).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "Invoke");
             SetNameMethod = typeof (DataParameterHelper).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "SetName");
+            ToDbNullIfNullMethod = typeof(DbNullConverter).GetMethod("ToDbNullIfNull", BindingFlags.Static | BindingFlags.Public);
         }
 
         /// <summary>
@@ -59,10 +61,10 @@ namespace DbReader.Construction
         /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
         public Func<object, Func<IDataParameter> ,IDataParameter[]> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters)
         {
-            
+
             var processDelegates = new List<Action<IDataParameter, object>>();
 
-            var parameterNames = parameterParser.GetParameters(sql);            
+            var parameterNames = parameterParser.GetParameters(sql);
             var properties = readablePropertySelector.Execute(argumentsType).OrderByDeclaration().ToArray();
             if (parameterNames.Length > 0)
             {
@@ -79,8 +81,8 @@ namespace DbReader.Construction
 
             var dm = methodSkeletonFactory.GetMethodSkeleton("ParseArguments", typeof(IDataParameter[]),
                 new[] { typeof(object), typeof(Func<IDataParameter>) ,typeof(Action<IDataParameter, object>[]) }, argumentsType);
-           
-            
+
+
             var generator = dm.GetGenerator();
 
             LocalBuilder arguments = generator.DeclareLocal(argumentsType);
@@ -163,6 +165,10 @@ namespace DbReader.Construction
                         {
                             generator.Emit(OpCodes.Box, properties[i].PropertyType);
                         }
+                        else
+                        {
+                            generator.Emit(OpCodes.Call, ToDbNullIfNullMethod);
+                        }
                         generator.Emit(OpCodes.Callvirt, DataParameterSetValueMethod);
 
                         //Duplicate the topmost value on the stack (IDataParameter[])
@@ -171,21 +177,21 @@ namespace DbReader.Construction
                         generator.Emit(OpCodes.Ldloc, dataParameter);
                         generator.Emit(OpCodes.Stelem_Ref);
                     }
-                }                                
+                }
             }
-                                  
+
             generator.Emit(OpCodes.Ret);
-            
+
             var method =
                 (Func<object, Func<IDataParameter>, Action<IDataParameter, object>[], IDataParameter[]>)
                     dm.CreateDelegate(typeof (Func<object, Func<IDataParameter>, Action<IDataParameter, object>[], IDataParameter[]>));
 
-            return (args, parameterFactory) =>  method(args, parameterFactory, processDelegates.ToArray());            
+            return (args, parameterFactory) =>  method(args, parameterFactory, processDelegates.ToArray());
         }
 
         private void ValidateParameters(string[] parameterNames, PropertyInfo[] properties, IDataParameter[] existingParameters)
         {
-            var propertyNames = new HashSet<string>(properties.Select(p => p.Name), StringComparer.OrdinalIgnoreCase);            
+            var propertyNames = new HashSet<string>(properties.Select(p => p.Name), StringComparer.OrdinalIgnoreCase);
             var existingParameterNames = new HashSet<string>(existingParameters.Select(p => p.ParameterName), StringComparer.OrdinalIgnoreCase);
 
             var firstDuplicateParameterName = propertyNames.Intersect(existingParameterNames, StringComparer.OrdinalIgnoreCase).FirstOrDefault();
@@ -199,12 +205,20 @@ namespace DbReader.Construction
                 if (!propertyNames.Contains(parameterName) && !existingParameterNames.Contains(parameterName))
                 {
                     throw new InvalidOperationException(ErrorMessages.MissingArgument.FormatWith(parameterName));
-                }                
+                }
             }
 
 
         }
 
-        
+
+    }
+
+    public static class DbNullConverter
+    {
+        public static object ToDbNullIfNull(object value)
+        {
+            return value ?? DBNull.Value;
+        }
     }
 }

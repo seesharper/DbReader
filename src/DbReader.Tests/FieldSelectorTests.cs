@@ -7,28 +7,31 @@
     using DbReader.Interfaces;
     using Selectors;
     using Shouldly;
+    using Xunit;
 
-
-    public class FieldSelectorTests
+    public class FieldSelectorTests : ContainerFixture
     {
-       
-        public void ShouldReturnSameInstanceWithinScope(Func<IFieldSelector> factory)
+
+        public readonly IFieldSelector fieldSelector;
+
+        [Fact]
+        public void ShouldReturnSameInstanceWithinScope()
         {
-            var first = factory();
-            var second = factory();
+            var first = GetInstance<IFieldSelector>();
+            var second = GetInstance<IFieldSelector>();
             first.ShouldBeSameAs(second);
         }
 
-       
-       
-        public void Execute_ValidColumnns_ReturnsDictionary(IFieldSelector fieldSelector)
+         [Fact]
+        public void Execute_ValidColumnns_ReturnsDictionary()
         {
             IDataRecord dataRecord = new { SomeColumn = 42 }.ToDataRecord();
             IReadOnlyDictionary<string, ColumnInfo> result = fieldSelector.Execute(dataRecord);
             result["SomeColumn"].Ordinal.ShouldBe(0);
         }
-        
-        public void Execute_DuplicateFieldNames_ThrowsArgumentOutOfRangeException(IFieldSelector fieldSelector)
+
+         [Fact]
+        public void Execute_DuplicateFieldNames_ThrowsArgumentOutOfRangeException()
         {
             IDataRecord dataRecord = new { SomeColumn = 42, somecolumn = 42 }.ToDataRecord();
             Should.Throw<ArgumentOutOfRangeException>(() => fieldSelector.Execute(dataRecord));

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="../mono.props"/>
   <PropertyGroup>
-      <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+      <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
       <Version>2.0.3</Version>
       <Authors>Bernhard Richter</Authors>
       <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
@@ -29,8 +29,8 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46.0|AnyCPU'">
         <DocumentationFile>bin\Release\net46\DbReader.xml</DocumentationFile>
-    </PropertyGroup>  
-    
+    </PropertyGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
   </ItemGroup>

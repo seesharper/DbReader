@@ -3,25 +3,37 @@
     using System;
 
     using DbReader.Interfaces;
-
-    using Fixie;
     using Selectors;
     using Shouldly;
+    using Xunit;
+    using DbReader.LightInject;
 
-    public class ConstructorSelectorTests 
-    {        
-        public void Execute_PublicParameterLess_ReturnsConstructor(IConstructorSelector parameterlessConstructorSelector)
-        {            
+    public class ConstructorSelectorTests : ContainerFixture
+    {
+        private readonly Selectors.IConstructorSelector parameterlessConstructorSelector;
+        private readonly Selectors.IConstructorSelector firstConstructorSelector;
+
+        public ConstructorSelectorTests()
+        {
+            parameterlessConstructorSelector = ServiceFactory.GetInstance<Selectors.IConstructorSelector>("ParameterlessConstructorSelector");
+            firstConstructorSelector = ServiceFactory.GetInstance<Selectors.IConstructorSelector>("firstConstructorSelector");
+        }
+
+        [Fact]
+        public void Execute_PublicParameterLess_ReturnsConstructor()
+        {
             parameterlessConstructorSelector.Execute(typeof(ClassWithPublicParameteressConstructor)).ShouldNotBeNull();
         }
-        
-        public void Execute_PrivateParameterLess_ThrowsException(IConstructorSelector parameterlessConstructorSelector)
+
+        [Fact]
+        public void Execute_PrivateParameterLess_ThrowsException()
         {
             Should.Throw<InvalidOperationException>(
                 () => parameterlessConstructorSelector.Execute(typeof(ClassWithPrivateParameterlessConstructor)));
         }
-       
-        public void Execute_TupleClass_ReturnsConstructor(IConstructorSelector firstConstructorSelector)
+
+        [Fact]
+        public void Execute_TupleClass_ReturnsConstructor()
         {
             firstConstructorSelector.Execute(typeof(Tuple<int>)).ShouldNotBeNull();
         }

@@ -2,24 +2,31 @@
 {
     using Database;
     using Shouldly;
+    using Xunit;
+    using DbReader.LightInject;
 
-    public class RegExParameterParserTests
+    public class RegExParameterParserTests : ContainerFixture
     {
-        public void ShouldParseParametersWithAtSymbol(IParameterParser parameterParser)
+        public readonly IParameterParser parameterParser;
+
+        [Fact]
+        public void ShouldParseParametersWithAtSymbol()
         {
             string source = "Id = @Parameter";
             var parameters = parameterParser.GetParameters(source);
             parameters.ShouldContain("Parameter");
         }
 
-        public void ShouldParseParametersWithColonSymbol(IParameterParser parameterParser)
+        [Fact]
+        public void ShouldParseParametersWithColonSymbol()
         {
             string source = "Id = :Parameter";
             var parameters = parameterParser.GetParameters(source);
             parameters.ShouldContain("Parameter");
         }
 
-        public void ShouldParseMultipleParameters(IParameterParser parameterParser)
+        [Fact]
+        public void ShouldParseMultipleParameters()
         {
             string source = "Id = @Parameter, AnotherId = @AnotherParameter";
             var parameters = parameterParser.GetParameters(source);
@@ -28,7 +35,8 @@
             parameters.ShouldContain("AnotherParameter");
         }
 
-        public void ShouldParseDuplicateParametersOnlyOnce(IParameterParser parameterParser)
+        [Fact]
+        public void ShouldParseDuplicateParametersOnlyOnce()
         {
             string source = "Id = @Parameter, AnotherId = @Parameter";
             var parameters = parameterParser.GetParameters(source);

@@ -8,20 +8,34 @@
     using Interfaces;
     using Moq;
     using Shouldly;
+    using Xunit;
 
-    public class ArgumentParserTests
+    public class ArgumentParserTests : ContainerFixture
     {
-        public void Parse_ValidArguments_ReturnsParameters(IArgumentParser argumentParser)
+        public readonly IArgumentParser argumentParser;
+
+        [Fact]
+        public void Parse_ValidArguments_ReturnsParameters()
         {
             var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new {FirstParameter = 1, SecondParameter = 2},
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
-            
+
             result[0].Value.ShouldBe(1);
             result[1].Value.ShouldBe(2);
         }
-        
-        public void Parse_MissingArgument_ThrowsException(IArgumentParser argumentParser)
+
+        [Fact]
+        public void Parse_Null_ShouldCreateDbNull()
+        {
+            var result = argumentParser.Parse(":firstParameter",
+                new {FirstParameter = (string)null},
+                () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
+            result[0].Value.ShouldBe(DBNull.Value);
+        }
+
+        [Fact]
+        public void Parse_MissingArgument_ThrowsException()
         {
             var exception = Should.Throw<InvalidOperationException>(
                 () =>
@@ -32,7 +46,8 @@
             exception.Message.ShouldStartWith("Unable to resolve an argument value for parameter");
         }
 
-        public void Parse_MissingArgument_DoesNotThrowIfExistingParametersContainsArgument(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_MissingArgument_DoesNotThrowIfExistingParametersContainsArgument()
         {
             var existingParameterMock = new Mock<IDataParameter>();
             existingParameterMock.SetupAllProperties();
@@ -45,7 +60,8 @@
             result.Length.ShouldBe(1);
         }
 
-        public void Parse_ArgumentAlreadyExists_ThrowsException(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_ArgumentAlreadyExists_ThrowsException()
         {
             var existingParameterMock = new Mock<IDataParameter>();
             existingParameterMock.SetupAllProperties();
@@ -58,8 +74,8 @@
                 ));
         }
 
-
-        public void Parse_MissingParameters_ReturnsParametersFromArguments(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_MissingParameters_ReturnsParametersFromArguments()
         {
             var result = argumentParser.Parse(FakeSql.Create(),
               new { FirstParameter = 1, SecondParameter = 2 },
@@ -67,8 +83,9 @@
             result.First().Value.ShouldBe(1);
             result.Last().Value.ShouldBe(2);
         }
-        
-        public void Parse_WithDifferentCasing_FavorsParameterNames(IArgumentParser argumentParser)
+
+        [Fact]
+        public void Parse_WithDifferentCasing_FavorsParameterNames()
         {
             var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new { FirstParameter = 1, SecondParameter = 2 },
@@ -77,17 +94,18 @@
             result[0].ParameterName.ShouldBe("firstParameter");
             result[1].ParameterName.ShouldBe("secondParameter");
         }
-            
 
-        public void ShouldReturnEmptyArrayWhenArgumentObjectIsNull(IArgumentParser argumentParser)
+        [Fact]
+        public void ShouldReturnEmptyArrayWhenArgumentObjectIsNull()
         {
             var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 null,
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
-            result.ShouldBeEmpty();            
+            result.ShouldBeEmpty();
         }
 
-        public void Parse_WithDataParameter_ReturnsParameter(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_WithDataParameter_ReturnsParameter()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
@@ -98,7 +116,8 @@
             result[1].ShouldBeSameAs(parameterMock.Object);
         }
 
-        public void Parse_DataParameterWithNoName_SetParameterNameToPropertyName(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_DataParameterWithNoName_SetParameterNameToPropertyName()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
@@ -109,7 +128,8 @@
             parameterMock.Object.ParameterName.ShouldBe("SecondParameter");
         }
 
-        public void Parse_DataParameterWithName_DoesNotSetParameterNameToPropertyName(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_DataParameterWithName_DoesNotSetParameterNameToPropertyName()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
             parameterMock.Object.ParameterName = "SomeValue";
@@ -121,7 +141,8 @@
             parameterMock.Object.ParameterName.ShouldBe("SomeValue");
         }
 
-        public void Parse_DuplicateParameterName_ReturnsOnlyOneParameter(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_DuplicateParameterName_ReturnsOnlyOneParameter()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
@@ -132,7 +153,8 @@
             result.Length.ShouldBe(1);
         }
 
-        public void Parse_DuplicateParameterNameWithDifferentCasing_ReturnsOnlyOneParameter(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_DuplicateParameterNameWithDifferentCasing_ReturnsOnlyOneParameter()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
@@ -143,7 +165,8 @@
             result.Length.ShouldBe(1);
         }
 
-        public void Parse_ParameterWithParantheses_ReturnsParameter(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_ParameterWithParantheses_ReturnsParameter()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
@@ -153,12 +176,13 @@
             result.Length.ShouldBe(2);
         }
 
-        public void Parse_ArgumentWithUnknownDataType_ThrowsMeaningfulException(IArgumentParser argumentParser)
+        [Fact]
+        public void Parse_ArgumentWithUnknownDataType_ThrowsMeaningfulException()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
             Should.Throw<InvalidOperationException>(() => argumentParser.Parse(":firstParameter",
                new { FirstParameter = new[] { 1, 2 } },
-               () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>()));                         
+               () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>()));
         }
     }
 }
