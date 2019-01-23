@@ -1,4 +1,5 @@
-﻿namespace DbReader.Tests
+﻿#if NET462
+namespace DbReader.Tests
 {
     using System;
     using System.IO;
@@ -11,7 +12,8 @@
     {
         internal static void Configure(IServiceContainer container)
         {
-            container.Register<IMethodSkeletonFactory, MethodBuilderMethodSkeletonFactory>(new PerContainerLifetime());            
+            container.Register<IMethodSkeletonFactory, MethodBuilderMethodSkeletonFactory>(new PerContainerLifetime());
         }
     }
 }
+#endif

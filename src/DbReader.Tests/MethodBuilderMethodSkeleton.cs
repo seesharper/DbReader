@@ -1,5 +1,5 @@
 ﻿using DbReader.Construction;
-
+#if NET462
 namespace DbReader.Tests
 {
     using System;
@@ -54,7 +54,7 @@ namespace DbReader.Tests
         {
             methodBuilder = typeBuilder.DefineMethod(
                 "DynamicMethod", MethodAttributes.Public | MethodAttributes.Static, returnType, parameterTypes);
-            methodBuilder.InitLocals = true;         
+            methodBuilder.InitLocals = true;
         }
 
         public ILGenerator GetGenerator()
@@ -73,3 +73,4 @@ namespace DbReader.Tests
         }
     }
 }
+#endif

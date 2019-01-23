@@ -1,10 +1,10 @@
-﻿namespace DbReader.Tests
+﻿#if !NET462
+namespace DbReader.Tests
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Data;
-    using System.Data.SQLite;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -17,6 +17,9 @@
     using DbReader.LightInject;
     using DbReader;
     using Readers;
+    using Xunit;
+    using System.Text;
+    using System.Data.SQLite;
 
     public class IntegrationTests
     {
@@ -33,13 +36,13 @@
 
         public IntegrationTests()
         {
-
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine("Hold your horses..creating database...");
                 SQLiteConnection.CreateFile(dbFile);
                 using (var connection = new SQLiteConnection("Data Source = " + dbFile))
                 {
+
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText = ReadScript();
@@ -50,10 +53,10 @@
 
         private string ReadScript()
         {
-            using (StreamReader reader = new StreamReader(@"..\..\db\northwind.sql"))
-            {
-                return reader.ReadToEnd();
-            }
+            var pathToScript = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db" , "your_sqlite_text.txt");
+            var script = File.ReadAllText(pathToScript, Encoding.UTF8);
+            return script;
+
         }
 
         private IDbConnection CreateConnection()
@@ -63,7 +66,7 @@
             return connection;
         }
 
-
+        [Fact]
         public void ShouldReadCustomers()
         {
             using (var connection = CreateConnection())
@@ -84,7 +87,7 @@
         }
 
 
-
+        [Fact]
         public async Task ShouldReadCustomersAsync()
         {
             using (var connection = CreateConnection())
@@ -95,17 +98,19 @@
         }
 
 
-
+        [Fact]
         public void ShouldReadCustomersAndOrders()
         {
             using (var connection = CreateConnection())
             {
+                var test = SQL.CustomersAndOrders;
                 var customers = connection.Read<CustomerWithOrders>(SQL.CustomersAndOrders);
                 customers.Count().ShouldBe(89);
                 customers.SelectMany(c => c.Orders).Count().ShouldBe(830);
             }
         }
 
+        [Fact]
         public async Task ShouldReadCustomersAndOrdersAsync()
         {
             using (var connection = CreateConnection())
@@ -117,7 +122,7 @@
             }
         }
 
-
+        [Fact]
         public void ShouldReadCustomerById()
         {
             using (var connection = CreateConnection())
@@ -128,17 +133,18 @@
             }
         }
 
+        [Fact]
         public void ShouldReadCustomerByIdUsingDataParameter()
         {
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
-                    new { CustomerId = new SQLiteParameter(DbType.String) {Value = "ALFKI"} });
+                    new { CustomerId = new SQLiteParameter("@CustomerId", "ALFKI")});
                 customers.Count().ShouldBe(1);
             }
         }
 
-
+        [Fact]
         public void ShouldReadEmployeesWithOrdersAndTerritories()
         {
             using (var connection = CreateConnection())
@@ -148,6 +154,7 @@
             }
         }
 
+        [Fact]
         public void ShouldThrowExceptionWhenArgumentNotFound()
         {
             using (var connection = CreateConnection())
@@ -160,6 +167,7 @@
             }
         }
 
+        [Fact]
         public void ShouldBeAbleToConvertArgument()
         {
             using (var connection = CreateConnection())
@@ -171,6 +179,7 @@
 
         }
 
+        [Fact]
         public void ShouldInvokeCommandInitializer()
         {
             bool invoked = false;
@@ -185,14 +194,15 @@
             DbReaderOptions.CommandInitializer = null;
         }
 
+        [Fact]
         public void ShouldReadEmployeeHierarchy()
         {
             using (var connection = CreateConnection())
-            {                
+            {
                 var employees = connection.Read<Employee>(SQL.EmployeesHierarchy).ToArray();
                 Dictionary<long?, Employee> map = new Dictionary<long?, Employee>();
                 foreach (var employee in employees)
-                {                    
+                {
                     if (employee.ReportsTo != null)
                     {
                         map[employee.ReportsTo].Employees.Add(employee);
@@ -205,12 +215,17 @@
             }
         }
 
+        private string LoadSql(string name)
+        {
+            var provider = new SqlProvider();
+            return provider.Load(name);
+        }
 
-       
 
-    
 
-              
+
+
+
         //public void ShouldOutPerformDapperForListWithoutParameter(
         //    IReaderMethodBuilder<CustomerWithOrders> propertyReaderMethodBuilder, IOrdinalSelector ordinalSelector)
         //{
@@ -238,10 +253,11 @@
 
 
 
+        [Fact]
         public void GetAllCustomersUsingDbReader()
         {
             using (var connection = CreateConnection())
-            {               
+            {
                 var dbReaderResult = Measure.Run(() => connection.Read<Customer>(SQL.Customers), 10,
                     "DbReader (All Customers)");
                 Console.WriteLine(dbReaderResult);
@@ -267,11 +283,11 @@
                 var dbReaderResult = Measure.Run(() =>
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = SQL.Customers;
+                    command.CommandText = LoadSql("Customers");
                     var reader = command.ExecuteReader();
                     List<Customer> result = new List<Customer>();
                     while (reader.Read())
-                    { 
+                    {
                         Customer c = new Customer();
                         c.CustomerId = reader.GetString(0);
                         result.TryAdd(c);
@@ -292,7 +308,7 @@
         //    int[] ordinals = new[] {0,1,2,3};
         //    using (var connection = CreateConnection())
         //    {
-                
+
 
         //        var dbReaderResult = Measure.Run(() =>
         //        {
@@ -307,7 +323,7 @@
         //                    var customer = method(reader, ordinals);
         //                    result.Add(customer);
         //                }
-                        
+
         //            }
 
         //        }, 10,
@@ -320,3 +336,4 @@
 
     }
 }
+#endif

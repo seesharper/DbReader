@@ -3,10 +3,15 @@
     using Construction;
     using DbReader.Interfaces;
     using Shouldly;
+    using Xunit;
 
-    public class PrefixResolverTests
+    public class PrefixResolverTests : ContainerFixture
     {
-        public void GetPrefix_NoPrefix_Null(IPrefixResolver prefixResolver)
+
+        public readonly IPrefixResolver prefixResolver;
+
+        [Fact]
+        public void GetPrefix_NoPrefix_Null()
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
             var dataRecord = new { OrderId = 42L }.ToDataRecord();
@@ -14,7 +19,8 @@
             prefix.ShouldBeNull();
         }
 
-        public void GetPrefix_FullPrefix_ReturnsPrefix(IPrefixResolver prefixResolver)
+        [Fact]
+        public void GetPrefix_FullPrefix_ReturnsPrefix()
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
             var dataRecord = new { Orders_OrderId = 42L }.ToDataRecord();
@@ -24,7 +30,8 @@
             prefix.ShouldBe("Orders");
         }
 
-        public void GetPrefix_UpperCasePrefix_ReturnsPrefix(IPrefixResolver prefixResolver)
+        [Fact]
+        public void GetPrefix_UpperCasePrefix_ReturnsPrefix()
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
             var dataRecord = new { O_OrderId = 42L }.ToDataRecord();
@@ -34,7 +41,8 @@
             prefix.ShouldBe("O");
         }
 
-        public void GetPrefix_ExistingPrefix_AppendsToExistingPrefix(IPrefixResolver prefixResolver)
+        [Fact]
+        public void GetPrefix_ExistingPrefix_AppendsToExistingPrefix()
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
             var dataRecord = new { CustomerWithOrders_Orders_OrderId = 42L }.ToDataRecord();
@@ -44,7 +52,8 @@
             prefix.ShouldBe("CustomerWithOrders_Orders");
         }
 
-        public void GetPrefix_UnknownPrefix_ReturnsNull(IPrefixResolver prefixResolver)
+        [Fact]
+        public void GetPrefix_UnknownPrefix_ReturnsNull()
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
             var dataRecord = new { UnknownPrefix_OrderId = 42L }.ToDataRecord();
@@ -54,7 +63,8 @@
             prefix.ShouldBeNull();
         }
 
-        public void GetPrefix_UnknownField_ReturnsNull(IPrefixResolver prefixResolver)
+        [Fact]
+        public void GetPrefix_UnknownField_ReturnsNull()
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
 
@@ -65,8 +75,8 @@
             prefix.ShouldBeNull();
         }
 
-        
-        public void GetPrefix_UnknownFieldWithPrefix_ReturnsNull(IPrefixResolver prefixResolver)
+        [Fact]
+        public void GetPrefix_UnknownFieldWithPrefix_ReturnsNull()
         {
             var property = typeof(CustomerWithOrders).GetProperty("Orders");
 

@@ -6,40 +6,50 @@
     using System.Linq;
     using Selectors;
     using Shouldly;
+    using Xunit;
 
-    public class OneToManyPropertySelectorTests
+    public class OneToManyPropertySelectorTests : ContainerFixture
     {
-        public void ShouldAllowIEnumerable(IPropertySelector oneToManyPropertySelector)
+        public IPropertySelector oneToManyPropertySelector;
+
+
+        [Fact]
+        public void ShouldAllowIEnumerable()
         {
             var properties = oneToManyPropertySelector.Execute(typeof (ClassWithProperty<IEnumerable<SampleClass>>));
             properties.ShouldNotBeEmpty();
         }
 
-        public void ShouldAllowICollection(IPropertySelector oneToManyPropertySelector)
+        [Fact]
+        public void ShouldAllowICollection()
         {
             var properties = oneToManyPropertySelector.Execute(typeof(ClassWithProperty<ICollection<SampleClass>>));
             properties.ShouldNotBeEmpty();
         }
 
-        public void ShouldAllowCollection(IPropertySelector oneToManyPropertySelector)
+        [Fact]
+        public void ShouldAllowCollection()
         {
             var properties = oneToManyPropertySelector.Execute(typeof(ClassWithProperty<Collection<SampleClass>>));
             properties.ShouldNotBeEmpty();
         }
 
-        public void ShotNotAllowReadOnlyCollection(IPropertySelector oneToManyPropertySelector)
+        [Fact]
+        public void ShotNotAllowReadOnlyCollection()
         {
             var exception = Should.Throw<InvalidOperationException>(() => oneToManyPropertySelector.Execute(typeof(ClassWithProperty<SampleClass[]>)));
             exception.Message.ShouldStartWith("The navigation property (one-to-many)");
         }
 
-        public void ShouldNotAllowNonGenericCollection(IPropertySelector oneToManyPropertySelector)
+        [Fact]
+        public void ShouldNotAllowNonGenericCollection()
         {
             var exception = Should.Throw<InvalidOperationException>(() => oneToManyPropertySelector.Execute(typeof(ClassWithProperty<SampleClassCollection>)));
             exception.Message.ShouldStartWith("The navigation property (one-to-many)");
         }
 
-        public void ShouldNotAllowSimpleTypesAsProjectionType(IPropertySelector oneToManyPropertySelector)
+        [Fact]
+        public void ShouldNotAllowSimpleTypesAsProjectionType()
         {
             var exception = Should.Throw<InvalidOperationException>(() => oneToManyPropertySelector.Execute(typeof(ClassWithProperty<IEnumerable<int>>)));
             exception.Message.ShouldContain("Simple types such as string and int");

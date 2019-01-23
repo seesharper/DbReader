@@ -4,6 +4,7 @@
     using Extensions;
     using Moq;
     using Shouldly;
+    using Xunit;
 
     public class ArgumentProcessorTests
     {
@@ -12,6 +13,7 @@
             ArgumentProcessor.RegisterProcessDelegate<CustomValueType>((parameter, argument) => parameter.Value = argument.Value);
         }
 
+        [Fact]
         public void ShouldProcessArgument()
         {
             Mock<IDataParameter> dataParameterMock = new Mock<IDataParameter>();
@@ -22,6 +24,7 @@
             dataParameterMock.Object.Value.ShouldBe(42);
         }
 
+        [Fact]
         public void ShouldRecognizeCustomArgumentTypeAsSimpleType()
         {
             typeof(CustomValueType).IsSimpleType().ShouldBeTrue();

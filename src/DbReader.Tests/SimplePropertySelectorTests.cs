@@ -3,48 +3,51 @@
     using System;
     using System.Collections.Generic;
     using System.Text;
-    using LightInject;
+    using DbReader.LightInject;
     using Shouldly;
+    using Xunit;
     using IPropertySelector = Selectors.IPropertySelector;
 
 
-    public class SimplePropertySelectorTests
+    public class SimplePropertySelectorTests : ContainerFixture
     {
-        public void ShouldReturnSameInstance(Func<string, IPropertySelector> factory)
+        public readonly IPropertySelector simplePropertySelector;
+
+        public void ShouldReturnSameInstance()
         {
-            var firstInstance = factory("SimplePropertySelector");
-            var secondInstance = factory("SimplePropertySelector");
+            var firstInstance = ServiceFactory.GetInstance<IPropertySelector>("SimplePropertySelector");
+            var secondInstance = ServiceFactory.GetInstance<IPropertySelector>("SimplePropertySelector");
             firstInstance.ShouldBeSameAs(secondInstance);
         }
 
-        public void Execute_PublicWriteableProperty_ReturnsProperty(IPropertySelector simplePropertySelector)
+        [Fact]
+        public void Execute_PublicWriteableProperty_ReturnsProperty()
         {
             simplePropertySelector.Execute(typeof(ClassWithPublicProperty)).ShouldNotBeEmpty();
         }
 
-        public void Execute_NonPublicWriteableProperty_ReturnsEmptyList(IPropertySelector simplePropertySelector)
+        [Fact]
+        public void Execute_NonPublicWriteableProperty_ReturnsEmptyList()
         {
             simplePropertySelector.Execute(typeof(ClassWithNonPublicProperty)).ShouldBeEmpty();
         }
 
-        public void Execute_ReadOnlyProperty_ReturnsEmptyList(IPropertySelector simplePropertySelector)
+        [Fact]
+        public void Execute_ReadOnlyProperty_ReturnsEmptyList()
         {
             simplePropertySelector.Execute(typeof(ClassWithPublicReadOnlyProperty)).ShouldBeEmpty();
         }
 
-        public void Execute_StaticProperty_ReturnsEmptyList(IPropertySelector simplePropertySelector)
+        [Fact]
+        public void Execute_StaticProperty_ReturnsEmptyList()
         {
             simplePropertySelector.Execute(typeof(ClassWithStaticProperty)).ShouldBeEmpty();
         }
 
-        public void Execute_ComplexProperty_ReturnsEmptyList(IPropertySelector simplePropertySelector)
+        [Fact]
+        public void Execute_ComplexProperty_ReturnsEmptyList()
         {
             simplePropertySelector.Execute(typeof(ClassWithComplexProperty)).ShouldBeEmpty();
-        }
-
-        internal static void Configure(IServiceContainer container)
-        {
-            container.Register<Func<string, IPropertySelector>>((factory) => s => factory.GetInstance<IPropertySelector>(s));
         }
     }
 
@@ -118,6 +121,6 @@
 
 
     public class GuruMeditationException : Exception
-    {                
+    {
     }
 }

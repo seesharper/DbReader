@@ -1,4 +1,5 @@
-﻿namespace DbReader.Tests
+﻿#if NET462
+namespace DbReader.Tests
 {
     using System;
     using Construction;
@@ -15,3 +16,4 @@
         }
     }
 }
+#endif
