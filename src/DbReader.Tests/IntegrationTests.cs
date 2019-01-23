@@ -215,6 +215,35 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldReturnRowsAffected()
+        {
+            using (var connection = CreateConnection())
+            {
+                using (var transaction = connection.BeginTransaction())
+                {
+                    var rowsAffected = connection.Execute("UPDATE Regions SET RegionDescription = @description", new {Description = "SomeDescription"});
+                    transaction.Rollback();
+                    rowsAffected.ShouldBe(4);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task ShouldReturnRowsAffectedAsync()
+        {
+            using (var connection = CreateConnection())
+            {
+                using (var transaction = connection.BeginTransaction())
+                {
+                    var rowsAffected = await connection.ExecuteAsync("UPDATE Regions SET RegionDescription = @description", new {Description = "SomeDescription"});
+                    transaction.Rollback();
+                    rowsAffected.ShouldBe(4);
+                }
+            }
+        }
+
+
         private string LoadSql(string name)
         {
             var provider = new SqlProvider();

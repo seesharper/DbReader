@@ -4,16 +4,19 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Data;
+    using System.Data.Common;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Net;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Database;
     using Interfaces;
     using Selectors;
 
     /// <summary>
-    /// Allows custom behavior to be specified 
+    /// Allows custom behavior to be specified
     /// </summary>
     public static class DbReaderOptions
     {
@@ -33,9 +36,9 @@
             KeyConvention = p =>
                 p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase);
-            ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");            
+            ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");
         }
-        
+
         /// <summary>
         /// Allows a custom conversion specified when reading a property of type <typeparamref name="TProperty"/>.
         /// </summary>
@@ -54,7 +57,7 @@
         public static PassDelegate<TArgument> WhenPassing<TArgument>()
         {
             return new PassDelegate<TArgument>();
-        }        
+        }
 
         /// <summary>
         /// Gets or sets the convention to be used for determining if a given property is a key property.
@@ -76,12 +79,12 @@
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IParameterParser"/> that is 
-        /// reponsible for parsing the parameter names from a given sql statement.
+        /// Gets or sets the <see cref="IParameterParser"/> that is
+        /// responsible for parsing the parameter names from a given sql statement.
         /// </summary>
         public static IParameterParser ParameterParser { get; set; }
 
-               
+
         /// <summary>
         /// Specifies the key properties for a the type of <typeparamref name="T"/>.
         /// </summary>
@@ -101,7 +104,5 @@
 
             KeyProperties.AddOrUpdate(typeof(T), type => properties, (type, infos) => properties);
         }
-
-
     }
 }
