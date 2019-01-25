@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Database;
+    using DbReader.Construction;
     using DbReader.Interfaces;
 
     using Readers;
@@ -17,6 +18,7 @@
             DbReaderOptions.WhenReading<CustomValueType>().Use((record, ordinal) => new CustomValueType(record.GetInt32(ordinal)));
         }
 
+        private IReaderMethodBuilder<ClassWithProperty<string>> propertyReaderMethodBuilder;
         private IInstanceReader<T> GetReader<T>()
         {
             return GetInstance<IInstanceReader<T>>();
