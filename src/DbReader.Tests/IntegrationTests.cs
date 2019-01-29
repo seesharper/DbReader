@@ -243,6 +243,46 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldGetScalarValue()
+        {
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Customers");
+                count.ShouldBe(93);
+            }
+        }
+
+        [Fact]
+        public async Task ShouldGetScalarValueAsync()
+        {
+            using (var connection = CreateConnection())
+            {
+                var count = await connection.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM Customers WHERE CustomerID");
+                count.ShouldBe(93);
+            }
+        }
+
+        [Fact]
+        public async Task ShouldReturnDefaultValueForNonExistingScalarValue()
+        {
+            using (var connection = CreateConnection())
+            {
+                var id = await connection.ExecuteScalarAsync<string>("SELECT CustomerId FROM Customers WHERE CustomerID = 'InvalidCustomerID'");
+                id.ShouldBeNull();
+            }
+        }
+
+        [Fact]
+        public async Task ShouldReturnDefaultValueWhenValueIsDbNull()
+        {
+            using (var connection = CreateConnection())
+            {
+                var id = await connection.ExecuteScalarAsync<string>("SELECT Region FROM Customers WHERE CustomerID = 'ALFKI'");
+                id.ShouldBeNull();
+            }
+        }
+
 
         private string LoadSql(string name)
         {
