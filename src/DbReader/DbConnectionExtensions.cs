@@ -20,7 +20,6 @@ namespace DbReader
         private static readonly IServiceContainer Container = new ServiceContainer();
         private static readonly IArgumentParser ArgumentParser;
 
-
         static DbConnectionExtensions()
         {
             Container.RegisterFrom<CompositionRoot>();
@@ -182,6 +181,49 @@ namespace DbReader
         {
             var command = (DbCommand)CreateCommand(dbConnection, query, arguments);
             return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Executes the query asynchronously , and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>The type of value to be returned.</returns>
+        public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, string query, object arguments = null)
+        {
+            var command = (DbCommand)CreateCommand(dbConnection, query, arguments);
+            var value =  await command.ExecuteScalarAsync();
+            return ConvertFromDbValue<T>(value);
+
+        }
+
+        /// <summary>
+        /// Executes the query, and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>The type of value to be returned.</returns>
+        public static T ExecuteScalar<T>(this IDbConnection dbConnection, string query, object arguments = null)
+        {
+            var command = CreateCommand(dbConnection, query, arguments);
+            var value =  command.ExecuteScalar();
+            return ConvertFromDbValue<T>(value);
+        }
+
+        private static T ConvertFromDbValue<T>(object value)
+        {
+            if (value == null || value == DBNull.Value)
+            {
+                return default(T);
+            }
+            else
+            {
+                return (T)value;
+            }
         }
     }
 }
