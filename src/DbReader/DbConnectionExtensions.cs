@@ -153,8 +153,8 @@ namespace DbReader
         /// <returns>The number of rows affected.</returns>
         public static int Execute(this IDbConnection dbConnection, string query, object arguments = null)
         {
-             var command = CreateCommand(dbConnection, query, arguments);
-             return command.ExecuteNonQuery();
+            var command = CreateCommand(dbConnection, query, arguments);
+            return command.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace DbReader
         public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, string query, object arguments = null)
         {
             var command = (DbCommand)CreateCommand(dbConnection, query, arguments);
-            var value =  await command.ExecuteScalarAsync();
+            var value = await command.ExecuteScalarAsync();
             return ConvertFromDbValue<T>(value);
 
         }
@@ -210,7 +210,7 @@ namespace DbReader
         public static T ExecuteScalar<T>(this IDbConnection dbConnection, string query, object arguments = null)
         {
             var command = CreateCommand(dbConnection, query, arguments);
-            var value =  command.ExecuteScalar();
+            var value = command.ExecuteScalar();
             return ConvertFromDbValue<T>(value);
         }
 
@@ -222,7 +222,7 @@ namespace DbReader
             }
             else
             {
-                return (T)value;
+                return (T)Convert.ChangeType(value, typeof(T));
             }
         }
     }
