@@ -53,7 +53,7 @@ namespace DbReader.Tests
 
         private string ReadScript()
         {
-            var pathToScript = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db" , "your_sqlite_text.txt");
+            var pathToScript = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db", "your_sqlite_text.txt");
             var script = File.ReadAllText(pathToScript, Encoding.UTF8);
             return script;
 
@@ -128,7 +128,7 @@ namespace DbReader.Tests
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
-                    new {CustomerId = "ALFKI"});
+                    new { CustomerId = "ALFKI" });
                 customers.Count().ShouldBe(1);
             }
         }
@@ -139,7 +139,7 @@ namespace DbReader.Tests
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
-                    new { CustomerId = new SQLiteParameter("@CustomerId", "ALFKI")});
+                    new { CustomerId = new SQLiteParameter("@CustomerId", "ALFKI") });
                 customers.Count().ShouldBe(1);
             }
         }
@@ -149,7 +149,7 @@ namespace DbReader.Tests
         {
             using (var connection = CreateConnection())
             {
-                var customers = connection.Read<Employee>(SQL.EmployeesWithOrdersAndTerritories, new {EmployeeId = 7});
+                var customers = connection.Read<Employee>(SQL.EmployeesWithOrdersAndTerritories, new { EmployeeId = 7 });
                 customers.Count().ShouldBe(1);
             }
         }
@@ -162,7 +162,7 @@ namespace DbReader.Tests
                 Should.Throw<InvalidOperationException>(
                     () =>
                         connection.Read<CustomerWithOrders>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
-                            new {InvalidArgument = "ALFKI"}))
+                            new { InvalidArgument = "ALFKI" }))
                     .Message.ShouldStartWith("Unable to resolve an argument value for parameter");
             }
         }
@@ -173,7 +173,7 @@ namespace DbReader.Tests
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Employee>(SQL.EmployeesWithOrdersAndTerritories,
-                    new {EmployeeId = new CustomValueType(7)});
+                    new { EmployeeId = new CustomValueType(7) });
                 customers.Count().ShouldBe(1);
             }
 
@@ -222,7 +222,7 @@ namespace DbReader.Tests
             {
                 using (var transaction = connection.BeginTransaction())
                 {
-                    var rowsAffected = connection.Execute("UPDATE Regions SET RegionDescription = @description", new {Description = "SomeDescription"});
+                    var rowsAffected = connection.Execute("UPDATE Regions SET RegionDescription = @description", new { Description = "SomeDescription" });
                     transaction.Rollback();
                     rowsAffected.ShouldBe(4);
                 }
@@ -236,7 +236,7 @@ namespace DbReader.Tests
             {
                 using (var transaction = connection.BeginTransaction())
                 {
-                    var rowsAffected = await connection.ExecuteAsync("UPDATE Regions SET RegionDescription = @description", new {Description = "SomeDescription"});
+                    var rowsAffected = await connection.ExecuteAsync("UPDATE Regions SET RegionDescription = @description", new { Description = "SomeDescription" });
                     transaction.Rollback();
                     rowsAffected.ShouldBe(4);
                 }
@@ -254,11 +254,22 @@ namespace DbReader.Tests
         }
 
         [Fact]
+        public void ShouldConvertScalarValue()
+        {
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT '42' FROM Customers WHERE CustomerID = 'ALFKI'");
+                count.ShouldBe(42);
+            }
+        }
+
+
+        [Fact]
         public async Task ShouldGetScalarValueAsync()
         {
             using (var connection = CreateConnection())
             {
-                var count = await connection.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM Customers WHERE CustomerID");
+                var count = await connection.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM Customers");
                 count.ShouldBe(93);
             }
         }
