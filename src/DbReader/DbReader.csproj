@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../mono.props" />
   <PropertyGroup>
-      <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
-      <Version>2.0.4</Version>
-      <Authors>Bernhard Richter</Authors>
-      <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
-      <RepositoryType>git</RepositoryType>
-      <RepositoryUrl>https://github.com/seesharper/DbReader</RepositoryUrl>
-      <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
-      <Copyright>Bernhard Richter</Copyright>
-      <PackageTags>data-access orm sql micro-orm</PackageTags>
-      <Description>A simple and fast database reader for the .Net framework.</Description>
-      <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-      <DebugType>Full</DebugType>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <Version>2.0.5</Version>
+    <Authors>Bernhard Richter</Authors>
+    <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/seesharper/DbReader</RepositoryUrl>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <Copyright>Bernhard Richter</Copyright>
+    <PackageTags>data-access orm sql micro-orm</PackageTags>
+    <Description>A simple and fast database reader for the .Net framework.</Description>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
@@ -23,13 +23,13 @@
     <DocumentationFile>bin\Release\netstandard2.0\DbReader.xml</DocumentationFile>
   </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
-        <DocumentationFile>bin\Debug\net46\DbReader.xml</DocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
+    <DocumentationFile>bin\Debug\net46\DbReader.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46.0|AnyCPU'">
-        <DocumentationFile>bin\Release\net46\DbReader.xml</DocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46.0|AnyCPU'">
+    <DocumentationFile>bin\Release\net46\DbReader.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
