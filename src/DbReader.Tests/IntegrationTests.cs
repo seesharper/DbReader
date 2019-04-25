@@ -269,7 +269,7 @@ namespace DbReader.Tests
         {
             using (var connection = CreateConnection())
             {
-                var count = await connection.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM Customers WHERE CustomerID");
+                var count = await connection.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM Customers");
                 count.ShouldBe(93);
             }
         }
