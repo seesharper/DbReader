@@ -28,13 +28,13 @@ namespace DbReader.Construction
 
         static ArgumentParserMethodBuilder()
         {
-            ParameterFactoryInvokeMethod = typeof (Func<IDataParameter>).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "Invoke");
+            ParameterFactoryInvokeMethod = typeof(Func<IDataParameter>).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "Invoke");
             DataParameterSetParameterNameMethod =
-                typeof (IDataParameter).GetTypeInfo().GetProperty("ParameterName").SetMethod;
+                typeof(IDataParameter).GetTypeInfo().GetProperty("ParameterName").SetMethod;
             DataParameterSetValueMethod =
                 typeof(IDataParameter).GetTypeInfo().GetProperty("Value").SetMethod;
             ProcessDelegateInvokeMethod = typeof(Action<IDataParameter, object>).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "Invoke");
-            SetNameMethod = typeof (DataParameterHelper).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "SetName");
+            SetNameMethod = typeof(DataParameterHelper).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "SetName");
             ToDbNullIfNullMethod = typeof(DbNullConverter).GetMethod("ToDbNullIfNull", BindingFlags.Static | BindingFlags.Public);
         }
 
@@ -59,7 +59,7 @@ namespace DbReader.Construction
         /// <param name="argumentsType">The arguments type for which to create the method.</param>
         /// <param name="existingParameters">A list of already existing parameters.</param>
         /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
-        public Func<object, Func<IDataParameter> ,IDataParameter[]> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters)
+        public Func<object, Func<IDataParameter>, IDataParameter[]> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters)
         {
 
             var processDelegates = new List<Action<IDataParameter, object>>();
@@ -80,13 +80,13 @@ namespace DbReader.Construction
             var parameters = parameterNames.ToDictionary(n => n, StringComparer.OrdinalIgnoreCase);
 
             var dm = methodSkeletonFactory.GetMethodSkeleton("ParseArguments", typeof(IDataParameter[]),
-                new[] { typeof(object), typeof(Func<IDataParameter>) ,typeof(Action<IDataParameter, object>[]) }, argumentsType);
+                new[] { typeof(object), typeof(Func<IDataParameter>), typeof(Action<IDataParameter, object>[]) }, argumentsType);
 
 
             var generator = dm.GetGenerator();
 
             LocalBuilder arguments = generator.DeclareLocal(argumentsType);
-            LocalBuilder dataParameter = generator.DeclareLocal(typeof (IDataParameter));
+            LocalBuilder dataParameter = generator.DeclareLocal(typeof(IDataParameter));
 
             //Create the result array
             generator.EmitFastInt(properties.Length);
@@ -184,9 +184,9 @@ namespace DbReader.Construction
 
             var method =
                 (Func<object, Func<IDataParameter>, Action<IDataParameter, object>[], IDataParameter[]>)
-                    dm.CreateDelegate(typeof (Func<object, Func<IDataParameter>, Action<IDataParameter, object>[], IDataParameter[]>));
+                    dm.CreateDelegate(typeof(Func<object, Func<IDataParameter>, Action<IDataParameter, object>[], IDataParameter[]>));
 
-            return (args, parameterFactory) =>  method(args, parameterFactory, processDelegates.ToArray());
+            return (args, parameterFactory) => method(args, parameterFactory, processDelegates.ToArray());
         }
 
         private void ValidateParameters(string[] parameterNames, PropertyInfo[] properties, IDataParameter[] existingParameters)
@@ -207,8 +207,6 @@ namespace DbReader.Construction
                     throw new InvalidOperationException(ErrorMessages.MissingArgument.FormatWith(parameterName));
                 }
             }
-
-
         }
 
 

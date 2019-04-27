@@ -5,7 +5,7 @@ using DbReader.Extensions;
 namespace DbReader.Selectors
 {
     /// <summary>
-    /// An <see cref="IPropertySelector"/> decorator that ensures that 
+    /// An <see cref="IPropertySelector"/> decorator that ensures that
     /// a given argument type only contains properties that can be passed as arguments.
     /// </summary>
     public class ReadableArgumentPropertiesValidator : IPropertySelector
@@ -17,7 +17,7 @@ namespace DbReader.Selectors
         /// </summary>
         /// <param name="readablePropertySelector">The <see cref="IPropertySelector"/> that is
         /// responsible for selecting readable properties.</param>
-        public ReadableArgumentPropertiesValidator(IPropertySelector readablePropertySelector) 
+        public ReadableArgumentPropertiesValidator(IPropertySelector readablePropertySelector)
             => this.readablePropertySelector = readablePropertySelector;
 
         /// <summary>
@@ -41,13 +41,13 @@ namespace DbReader.Selectors
         {
             if (!IsPassable(property))
             {
-                throw new InvalidOperationException(ErrorMessages.UnknownArgumentType.FormatWith(property,property.PropertyType));
+                throw new InvalidOperationException(ErrorMessages.UnknownArgumentType.FormatWith(property, property.PropertyType));
             }
         }
 
         private static bool IsPassable(PropertyInfo property)
         {
-            return property.PropertyType.IsSimpleType() || property.IsDataParameter();
+            return property.PropertyType.IsSimpleType() || property.IsDataParameter() || property.PropertyType.IsEnumerableOfSimpleType(); ;
         }
     }
 }

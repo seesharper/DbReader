@@ -37,6 +37,7 @@
                 p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase);
             ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");
+            ListParameterParser = new RegExParameterParser(@"IN\s*\(((?:@|:)\w+)\)");
         }
 
         /// <summary>
@@ -84,6 +85,11 @@
         /// </summary>
         public static IParameterParser ParameterParser { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IParameterParser"/> that is
+        /// responsible for parsing list parameters like IN (@ids)
+        /// </summary>
+        public static IParameterParser ListParameterParser { get; set; }
 
         /// <summary>
         /// Specifies the key properties for a the type of <typeparamref name="T"/>.

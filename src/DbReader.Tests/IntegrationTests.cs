@@ -294,6 +294,17 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldHandleList()
+        {
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Customers WHERE CustomerID IN (@Ids)", new { Ids = new[] { "ALFKI", "BLAUS" } });
+                count.ShouldBe(2);
+            }
+        }
+
+
 
         private string LoadSql(string name)
         {
