@@ -19,6 +19,7 @@ namespace DbReader.Construction
         private readonly IPropertySelector readablePropertySelector;
         private readonly IParameterParser parameterParser;
         private readonly IMethodSkeletonFactory methodSkeletonFactory;
+        private readonly IParameterValidator parameterValidator;
         private static readonly MethodInfo ParameterFactoryInvokeMethod;
         private static readonly MethodInfo DataParameterSetParameterNameMethod;
         private static readonly MethodInfo DataParameterSetValueMethod;
@@ -44,11 +45,12 @@ namespace DbReader.Construction
         /// <param name="readablePropertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting readable properties from a given type.</param>
         /// <param name="parameterParser">The <see cref="IParameterParser"/> that is responsible for parsing parameters from a SQL statement.</param>
         /// <param name="methodSkeletonFactory">The <see cref="IMethodSkeletonFactory"/> that is responsible for providing a <see cref="IMethodSkeleton"/>.</param>
-        public ArgumentParserMethodBuilder(IPropertySelector readablePropertySelector, IParameterParser parameterParser, IMethodSkeletonFactory methodSkeletonFactory)
+        public ArgumentParserMethodBuilder(IPropertySelector readablePropertySelector, IParameterParser parameterParser, IMethodSkeletonFactory methodSkeletonFactory, IParameterValidator parameterValidator)
         {
             this.readablePropertySelector = readablePropertySelector;
             this.parameterParser = parameterParser;
             this.methodSkeletonFactory = methodSkeletonFactory;
+            this.parameterValidator = parameterValidator;
         }
 
 
@@ -69,7 +71,7 @@ namespace DbReader.Construction
             if (parameterNames.Length > 0)
             {
                 properties = properties.Where(p => parameterNames.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray();
-                ValidateParameters(parameterNames, properties, existingParameters);
+                parameterValidator.ValidateParameters(parameterNames, properties.Select(p => p.Name).ToArray(), existingParameters);
             }
             else
             {
@@ -188,28 +190,6 @@ namespace DbReader.Construction
 
             return (args, parameterFactory) => method(args, parameterFactory, processDelegates.ToArray());
         }
-
-        private void ValidateParameters(string[] parameterNames, PropertyInfo[] properties, IDataParameter[] existingParameters)
-        {
-            var propertyNames = new HashSet<string>(properties.Select(p => p.Name), StringComparer.OrdinalIgnoreCase);
-            var existingParameterNames = new HashSet<string>(existingParameters.Select(p => p.ParameterName), StringComparer.OrdinalIgnoreCase);
-
-            var firstDuplicateParameterName = propertyNames.Intersect(existingParameterNames, StringComparer.OrdinalIgnoreCase).FirstOrDefault();
-            if (firstDuplicateParameterName != null)
-            {
-                throw new InvalidOperationException(ErrorMessages.DuplicateParameter.FormatWith(firstDuplicateParameterName));
-            }
-
-            foreach (var parameterName in parameterNames)
-            {
-                if (!propertyNames.Contains(parameterName) && !existingParameterNames.Contains(parameterName))
-                {
-                    throw new InvalidOperationException(ErrorMessages.MissingArgument.FormatWith(parameterName));
-                }
-            }
-        }
-
-
     }
 
     public static class DbNullConverter
