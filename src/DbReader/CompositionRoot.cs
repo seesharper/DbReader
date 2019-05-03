@@ -19,7 +19,6 @@
         {
             RegisterSingletonServices(serviceRegistry);
             RegisterScopedServices(serviceRegistry);
-            // ((ServiceContainer)serviceRegistry).Validate(message => { Trace.TraceWarning(message);});
         }
 
         private static IReaderMethodBuilder<IStructuralEquatable> CreateConstructorReaderMethodBuilder(Type type, IServiceFactory factory)
@@ -65,10 +64,6 @@
                 .Decorate(typeof(IConstructorSelector), typeof(ConstructorValidator), sr => sr.ImplementingType == typeof(ParameterlessConstructorSelector))
 
                 .Register(factory => DbReaderOptions.ParameterParser, new PerContainerLifetime())
-                .Register<IParameterValidator, ParameterValidator>(new PerContainerLifetime())
-                .RegisterSingleton<IObjectConverterMethodBuilder, ObjectConverterMethodBuilder>()
-                .Decorate<IObjectConverterMethodBuilder, CachedObjectConverterMethodBuilder>()
-                .RegisterSingleton<IObjectConverter, ObjectConverter>()
                 .RegisterSingleton<IParameterMatcher, ParameterMatcher>();
         }
 

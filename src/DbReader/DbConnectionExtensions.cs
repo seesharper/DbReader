@@ -24,14 +24,11 @@ namespace DbReader
         private static readonly IArgumentParser ArgumentParser;
         private static readonly IParameterParser ListParameterParser;
 
-        private static readonly IObjectConverter ObjectConverter;
-
         static DbConnectionExtensions()
         {
             Container.RegisterFrom<CompositionRoot>();
             DataReaderExtensions.SetContainer(Container);
             ArgumentParser = Container.GetInstance<IArgumentParser>();
-            ObjectConverter = Container.GetInstance<IObjectConverter>();
         }
 
         /// <summary>

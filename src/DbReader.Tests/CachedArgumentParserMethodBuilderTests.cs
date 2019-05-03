@@ -17,10 +17,10 @@ namespace DbReader.Tests
             var methodBuilderMock = CreateMethodBuilderMock();
             var methodBuilder = new CachedArgumentParserMethodBuilder(methodBuilderMock.Object);
 
-            methodBuilder.CreateMethod(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
-            methodBuilder.CreateMethod(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
 
-            methodBuilderMock.Verify(m => m.CreateMethod(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Once);
+            methodBuilderMock.Verify(m => m.CreateMethod2(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Once);
         }
 
         [Fact]
@@ -29,10 +29,10 @@ namespace DbReader.Tests
             var methodBuilderMock = CreateMethodBuilderMock();
             var methodBuilder = new CachedArgumentParserMethodBuilder(methodBuilderMock.Object);
 
-            methodBuilder.CreateMethod(FakeSql.Create("1"), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
-            methodBuilder.CreateMethod(FakeSql.Create("2"), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create("1"), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create("2"), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
 
-            methodBuilderMock.Verify(m => m.CreateMethod(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Exactly(2));
+            methodBuilderMock.Verify(m => m.CreateMethod2(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -42,10 +42,10 @@ namespace DbReader.Tests
             var methodBuilder = new CachedArgumentParserMethodBuilder(methodBuilderMock.Object);
 
 
-            methodBuilder.CreateMethod(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
-            methodBuilder.CreateMethod(FakeSql.Create(), new { B = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create(), new { B = 1 }.GetType(), Array.Empty<IDataParameter>());
 
-            methodBuilderMock.Verify(m => m.CreateMethod(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Exactly(2));
+            methodBuilderMock.Verify(m => m.CreateMethod2(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -54,17 +54,17 @@ namespace DbReader.Tests
             var methodBuilderMock = CreateMethodBuilderMock();
             var methodBuilder = new CachedArgumentParserMethodBuilder(methodBuilderMock.Object);
 
-            methodBuilder.CreateMethod(FakeSql.Create("1"), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
-            methodBuilder.CreateMethod(FakeSql.Create("2"), new { B = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create("1"), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod2(FakeSql.Create("2"), new { B = 1 }.GetType(), Array.Empty<IDataParameter>());
 
-            methodBuilderMock.Verify(m => m.CreateMethod(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Exactly(2));
+            methodBuilderMock.Verify(m => m.CreateMethod2(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Exactly(2));
         }
 
         private static Mock<IArgumentParserMethodBuilder> CreateMethodBuilderMock()
         {
             var methodBuilderMock = new Mock<IArgumentParserMethodBuilder>();
-            methodBuilderMock.Setup(m => m.CreateMethod(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()))
-                .Returns((o, func) => null);
+            methodBuilderMock.Setup(m => m.CreateMethod2(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()))
+                .Returns((s, o, func) => null);
             return methodBuilderMock;
         }
     }

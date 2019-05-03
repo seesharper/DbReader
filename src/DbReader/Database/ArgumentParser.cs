@@ -22,24 +22,24 @@
             this.argumentParserMethodBuilder = argumentParserMethodBuilder;
         }
 
-        /// <summary>
-        /// Parses the given <paramref name="sql"/> and maps each
-        /// parameter to the corresponding property of the <paramref name="arguments"/> object.
-        /// </summary>
-        /// <param name="sql">The sql statement containing the parameters to be parsed.</param>
-        /// <param name="arguments">An object that represent the argument values for each parameter.</param>
-        /// <param name="parameterFactory">A factory delegate used to create an <see cref="IDataParameter"/> instance.</param>
-        /// <param name="existingParameters">A list of already existing parameters.</param>
-        /// <returns></returns>
-        public IDataParameter[] Parse(string sql, object arguments, Func<IDataParameter> parameterFactory, IDataParameter[] existingParameters)
-        {
-            if (arguments == null)
-            {
-                return new IDataParameter[] { };
-            }
-            var argumentParseMethod = argumentParserMethodBuilder.CreateMethod(sql, arguments.GetType(), existingParameters);
-            return argumentParseMethod(arguments, parameterFactory);
-        }
+        // /// <summary>
+        // /// Parses the given <paramref name="sql"/> and maps each
+        // /// parameter to the corresponding property of the <paramref name="arguments"/> object.
+        // /// </summary>
+        // /// <param name="sql">The sql statement containing the parameters to be parsed.</param>
+        // /// <param name="arguments">An object that represent the argument values for each parameter.</param>
+        // /// <param name="parameterFactory">A factory delegate used to create an <see cref="IDataParameter"/> instance.</param>
+        // /// <param name="existingParameters">A list of already existing parameters.</param>
+        // /// <returns></returns>
+        // public IDataParameter[] Parse(string sql, object arguments, Func<IDataParameter> parameterFactory, IDataParameter[] existingParameters)
+        // {
+        //     if (arguments == null)
+        //     {
+        //         return new IDataParameter[] { };
+        //     }
+        //     var argumentParseMethod = argumentParserMethodBuilder.CreateMethod(sql, arguments.GetType(), existingParameters);
+        //     return argumentParseMethod(arguments, parameterFactory);
+        // }
 
         public QueryInfo Parse2(string sql, object arguments, Func<IDataParameter> parameterFactory, IDataParameter[] existingParameters)
         {
