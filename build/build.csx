@@ -1,4 +1,3 @@
-#! "netcoreapp2.0"
 #load "BuildContext.csx"
 #load "nuget:dotnet-steps, 0.0.1"
 #load "nuget:Dotnet.Build, 0.3.9"
@@ -7,33 +6,66 @@
 using static ChangeLog;
 using static ReleaseManagement;
 
-var context = new BuildContext("seesharper", "DbReader");
 
+[StepDescription("Runs all tests")]
 Step test = () =>
 {
-    DotNet.Test(context.PathToTestProjectFolder);
+    DotNet.Test(PathToTestProjectFolder);
 };
+
+[StepDescription("Runs the tests with test coverage")]
+Step testcoverage = () =>
+{
+    Command.Execute("dotnet", $"test -c release -f netcoreapp2.0  /property:CollectCoverage=true /property:Include=\"[DbReader*]*\" /property:Exclude=\"[*Tests*]*\" /property:CoverletOutputFormat=\\\"opencover,lcov\\\" /property:CoverletOutput={CodeCoverageArtifactsFolder}/coverage", PathToTestProjectFolder);
+    var pathToOpenCoverResult = Path.Combine(CodeCoverageArtifactsFolder, "coverage.opencover.xml");
+    Command.Execute("dotnet", $"reportgenerator \"-reports:{pathToOpenCoverResult}\"  \"-targetdir:{CodeCoverageArtifactsFolder}/Report\" \"-reportTypes:Html;XmlSummary;Xml\" \"--verbosity:warning\"", PathToTestProjectFolder);
+};
+
+[StepDescription("Runs the tests with test coverage")]
+Step pack = () =>
+{
+    DotNet.Pack(PathToProjectFolder, NuGetArtifactsFolder);
+};
+
+[DefaultStep]
+[StepDescription("Builds and creates a release")]
+Step release = () =>
+{
+    DotNet.Pack(PathToProjectFolder, NuGetArtifactsFolder);
+};
+
 
 await StepRunner.Execute(Args);
 return;
 
-DotNet.Build(context.PathToProjectFolder);
-DotNet.Pack(context.PathToProjectFolder, context.NuGetArtifactsFolder);
-
-if (BuildEnvironment.IsSecure)
+private async Task PublishRelease()
 {
-    var generator = ChangeLogFrom(context.Owner, context.ProjectName, BuildEnvironment.GitHubAccessToken).SinceLatestTag();
-    if (!Git.Default.IsTagCommit())
+    if (!BuildEnvironment.IsSecure)
     {
-        generator = generator.IncludeUnreleased();
+        Logger.Log("Pushing a new release can only be done in a secure build environment");
+        return;
     }
-    await generator.Generate(context.PathToReleaseNotes);
+
+    await CreateReleaseNotes();
 
     if (Git.Default.IsTagCommit())
     {
         Git.Default.RequreCleanWorkingTree();
-        var releaseManager = ReleaseManagerFor(context.Owner, context.ProjectName, BuildEnvironment.GitHubAccessToken);
-        await releaseManager.CreateRelease(Git.Default.GetLatestTag(), context.PathToReleaseNotes, Array.Empty<ReleaseAsset>());
-        NuGet.Push(context.NuGetArtifactsFolder);
+        var releaseManager = ReleaseManagerFor(Owner, ProjectName, BuildEnvironment.GitHubAccessToken);
+        await releaseManager.CreateRelease(Git.Default.GetLatestTag(), PathToReleaseNotes, Array.Empty<ReleaseAsset>());
+        NuGet.Push(NuGetArtifactsFolder);
     }
 }
+
+private async Task CreateReleaseNotes()
+{
+    Logger.Log("Creating release notes");
+    var generator = ChangeLogFrom(Owner, ProjectName, BuildEnvironment.GitHubAccessToken).SinceLatestTag();
+    if (!Git.Default.IsTagCommit())
+    {
+        generator = generator.IncludeUnreleased();
+    }
+    await generator.Generate(PathToReleaseNotes);
+}
+
+

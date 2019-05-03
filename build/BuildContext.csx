@@ -3,32 +3,21 @@
 using System.Runtime.CompilerServices;
 using static FileUtils;
 
-public class BuildContext
-{
-    public BuildContext(string owner, string projectName)
-    {
-        Root = FileUtils.GetScriptFolder();
-        var artifactsFolder = CreateDirectory(Root, "Artifacts");
-        GitHubArtifactsFolder = CreateDirectory(artifactsFolder, "GitHub");
-        NuGetArtifactsFolder = CreateDirectory(artifactsFolder, "NuGet");
-        PathToReleaseNotes = Path.Combine(GitHubArtifactsFolder, "ReleaseNotes.md");
-        PathToProjectFolder = Path.Combine(Root, "..", "src", projectName);
-        PathToTestProjectFolder = Path.Combine(Root, "..", "src", $"{projectName}.Tests");
-        Owner = owner;
-        ProjectName = projectName;
-    }
+var Owner = "seesharper";
+var ProjectName = "DbReader";
 
-    public string GitHubArtifactsFolder { get; }
+var RootFolder = FileUtils.GetScriptFolder();
 
-    public string NuGetArtifactsFolder { get; }
+var ArtifactsFolder = CreateDirectory(RootFolder, "Artifacts");
 
-    public string Root { get; }
+var GitHubArtifactsFolder = CreateDirectory(ArtifactsFolder, "GitHub");
 
-    public string PathToProjectFolder { get; }
+var NuGetArtifactsFolder = CreateDirectory(ArtifactsFolder, "NuGet");
 
-    public string PathToTestProjectFolder { get; }
+var PathToReleaseNotes = Path.Combine(GitHubArtifactsFolder, "ReleaseNotes.md");
 
-    public string PathToReleaseNotes { get; }
-    public string Owner { get; }
-    public string ProjectName { get; }
-}
+var PathToTestProjectFolder = Path.Combine(RootFolder, "..", "src", $"{ProjectName}.Tests");
+
+var PathToProjectFolder = Path.Combine(RootFolder, "..", "src", ProjectName);
+
+var CodeCoverageArtifactsFolder = CreateDirectory(ArtifactsFolder, "CodeCoverage");

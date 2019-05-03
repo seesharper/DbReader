@@ -76,6 +76,27 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldReturnEmptyListWithoutNavigationProperties()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE 1 = 2");
+                customers.Count().ShouldBe(0);
+            }
+        }
+
+        [Fact]
+        public void ShouldReturnEmptyListWithNavigationProperties()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<CustomerWithOrders>("SELECT CustomerId as CustomerWithOrdersId FROM Customers WHERE 1 = 2");
+                customers.Count().ShouldBe(0);
+            }
+        }
+
+
         public async Task ShouldHandleRunningInParallel()
         {
             var task1 = ShouldReadCustomersAndOrdersAsync();
@@ -305,7 +326,15 @@ namespace DbReader.Tests
             }
         }
 
-
+        [Fact]
+        public void ShouldHandleListWithCustomType()
+        {
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Suppliers WHERE SupplierId IN (@Ids)", new { Ids = new[] { new CustomValueType(1), new CustomValueType(2) } });
+                count.ShouldBe(2);
+            }
+        }
 
         private string LoadSql(string name)
         {
