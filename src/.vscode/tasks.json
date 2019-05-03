@@ -19,7 +19,8 @@
       "type": "shell",
       "group": "build",
       "presentation": {
-        "reveal": "always"
+        "reveal": "always",
+        "clear": true
       },
       "problemMatcher": "$msCompile"
     },

@@ -5,7 +5,7 @@
     using Construction;
 
     /// <summary>
-    /// A class that parses an SQL statement and 
+    /// A class that parses an SQL statement and
     /// maps each parameter to the properties of an arguments object.
     /// </summary>
     public class ArgumentParser : IArgumentParser
@@ -23,7 +23,7 @@
         }
 
         /// <summary>
-        /// Parses the given <paramref name="sql"/> and maps each 
+        /// Parses the given <paramref name="sql"/> and maps each
         /// parameter to the corresponding property of the <paramref name="arguments"/> object.
         /// </summary>
         /// <param name="sql">The sql statement containing the parameters to be parsed.</param>
@@ -35,10 +35,20 @@
         {
             if (arguments == null)
             {
-                return new IDataParameter[] {};
+                return new IDataParameter[] { };
             }
             var argumentParseMethod = argumentParserMethodBuilder.CreateMethod(sql, arguments.GetType(), existingParameters);
             return argumentParseMethod(arguments, parameterFactory);
-        }       
+        }
+
+        public QueryInfo Parse2(string sql, object arguments, Func<IDataParameter> parameterFactory, IDataParameter[] existingParameters)
+        {
+            if (arguments == null)
+            {
+                return new QueryInfo(sql, new IDataParameter[] { });
+            }
+            var argumentParseMethod = argumentParserMethodBuilder.CreateMethod2(sql, arguments.GetType(), existingParameters);
+            return argumentParseMethod(sql, arguments, parameterFactory);
+        }
     }
 }

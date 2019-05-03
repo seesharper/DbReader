@@ -3,9 +3,10 @@
 namespace DbReader.Construction
 {
     using System.Data;
+    using DbReader.Database;
 
     /// <summary>
-    /// An <see cref="IArgumentParserMethodBuilder"/> decorator that caches 
+    /// An <see cref="IArgumentParserMethodBuilder"/> decorator that caches
     /// the method created at runtime that is used to parse argument from an argument object.
     /// </summary>
     public class CachedArgumentParserMethodBuilder : IArgumentParserMethodBuilder
@@ -30,7 +31,7 @@ namespace DbReader.Construction
         /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
         public Func<object, Func<IDataParameter>, IDataParameter[]> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters)
         {
-            var key = new CacheKey {Sql = sql, ArgumentsType = argumentsType};
+            var key = new CacheKey { Sql = sql, ArgumentsType = argumentsType };
             var method = Cache<CacheKey, Func<object, Func<IDataParameter>, IDataParameter[]>>.Get(key);
             if (method == null)
             {
@@ -40,6 +41,17 @@ namespace DbReader.Construction
             return method;
         }
 
+        public Func<string, object, Func<IDataParameter>, QueryInfo> CreateMethod2(string sql, Type argumentsType, IDataParameter[] existingParameters)
+        {
+            var key = new CacheKey { Sql = sql, ArgumentsType = argumentsType };
+            var method = Cache<CacheKey, Func<string, object, Func<IDataParameter>, QueryInfo>>.Get(key);
+            if (method == null)
+            {
+                method = argumentParserMethodBuilder.CreateMethod2(sql, argumentsType, existingParameters);
+                Cache<CacheKey, Func<string, object, Func<IDataParameter>, QueryInfo>>.Put(key, method);
+            }
+            return method;
+        }
 
         private class CacheKey
         {
@@ -53,12 +65,12 @@ namespace DbReader.Construction
 
             public override bool Equals(object obj)
             {
-                var other = (CacheKey) obj;
+                var other = (CacheKey)obj;
                 return (other.Sql == Sql) && (other.ArgumentsType == ArgumentsType);
             }
         }
     }
 
-    
-    
+
+
 }

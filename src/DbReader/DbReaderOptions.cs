@@ -36,8 +36,8 @@
             KeyConvention = p =>
                 p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase);
-            ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");
-            ListParameterParser = new RegExParameterParser(@"IN\s*\(((?:@|:)\w+)\)");
+            ParameterParser = new RegExParameterParser(@"(:\w+)|(@\w+)", @"IN\s*\((\s*(?:@|:)\w+)\s*\)");
+
         }
 
         /// <summary>

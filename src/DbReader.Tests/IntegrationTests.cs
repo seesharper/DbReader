@@ -155,7 +155,8 @@ namespace DbReader.Tests
         }
 
         [Fact]
-        public void ShouldThrowExceptionWhenArgumentNotFound()
+        public void
+        ShouldThrowExceptionWhenArgumentNotFound()
         {
             using (var connection = CreateConnection())
             {

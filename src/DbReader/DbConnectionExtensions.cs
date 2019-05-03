@@ -10,6 +10,7 @@ namespace DbReader
     using System.Threading;
     using System.Threading.Tasks;
     using Database;
+    using DbReader.Construction;
     using DbReader.Extensions;
     using LightInject;
     using static DbReaderOptions;
@@ -21,15 +22,16 @@ namespace DbReader
     {
         private static readonly IServiceContainer Container = new ServiceContainer();
         private static readonly IArgumentParser ArgumentParser;
-
         private static readonly IParameterParser ListParameterParser;
+
+        private static readonly IObjectConverter ObjectConverter;
 
         static DbConnectionExtensions()
         {
             Container.RegisterFrom<CompositionRoot>();
             DataReaderExtensions.SetContainer(Container);
             ArgumentParser = Container.GetInstance<IArgumentParser>();
-            ListParameterParser = Container.GetInstance<IParameterParser>("ListParameterParser");
+            ObjectConverter = Container.GetInstance<IObjectConverter>();
         }
 
         /// <summary>
@@ -138,63 +140,21 @@ namespace DbReader
         public static IDbCommand CreateCommand(this IDbConnection dbConnection, string query, object arguments = null)
         {
             var command = dbConnection.CreateCommand();
-            IDataParameter[] parameters;
-            var listParameters = ListParameterParser.GetParameters(query);
-            if (listParameters.Length > 0)
-            {
-                var result = PreProcessQuery(query, arguments, () => command.CreateParameter());
-                query = result.query;
-                parameters = result.parameters;
-            }
-            else
-            {
-                parameters = ArgumentParser.Parse(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
-            }
 
-            SqlStatement.Current = query;
-            command.CommandText = query;
+            var queryInfo = ArgumentParser.Parse2(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
+
+            SqlStatement.Current = queryInfo.Query;
+            command.CommandText = queryInfo.Query;
             CommandInitializer?.Invoke(command);
 
-            foreach (var dataParameter in parameters)
+            foreach (var dataParameter in queryInfo.Parameters)
             {
                 command.Parameters.Add(dataParameter);
             }
             return command;
         }
 
-        private static (string query, IDataParameter[] parameters) PreProcessQuery(string query, object arguments, Func<IDataParameter> parameterFactory)
-        {
-            var result = new List<IDataParameter>();
-            var expandedQuery = query;
-            var readableProperties = Container.GetInstance<DbReader.Selectors.IPropertySelector>("ReadablePropertySelector").Execute(arguments.GetType());
-            var propertyMap = readableProperties.ToDictionary(p => p.Name, p => p, StringComparer.InvariantCultureIgnoreCase);
-            var enumerableProperties = readableProperties.Where(p => p.PropertyType.IsEnumerable()).Where(p => !p.PropertyType.IsSimpleType()).ToArray();
-            var parameterParser = new RegExParameterParser(@"IN\s*\(((?:@|:)\w+)\)");
-            var listParameters = parameterParser.GetParameters(query);
 
-            foreach (var listParameter in listParameters)
-            {
-                var propertyName = listParameter.Substring(1);
-                if (propertyMap.TryGetValue(propertyName, out var property))
-                {
-                    List<string> expandedParameterList = new List<string>();
-                    var propertyValues = ((IEnumerable<object>)property.GetValue(arguments)).ToArray();
-                    for (int i = 0; i < propertyValues.Count(); i++)
-                    {
-                        var parameterName = $"{listParameter}{i}";
-                        expandedParameterList.Add(parameterName);
-                        var dataParameter = parameterFactory();
-                        dataParameter.ParameterName = parameterName;
-                        dataParameter.Value = propertyValues[i];
-                        result.Add(dataParameter);
-                    }
-                    var expandedParameterFragment = expandedParameterList.Aggregate((current, next) => $"{current}, {next}");
-                    expandedQuery = expandedQuery.Replace(listParameter, expandedParameterFragment);
-                }
-            }
-
-            return (expandedQuery, result.ToArray());
-        }
 
         /// <summary>
         /// Executes the given <paramref name="query"/> and returns the number of rows affected.
