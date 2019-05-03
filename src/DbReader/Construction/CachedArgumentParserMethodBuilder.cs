@@ -60,7 +60,7 @@ namespace DbReader.Construction
 
             public override int GetHashCode()
             {
-                return Sql.GetHashCode();
+                return (Sql, ArgumentsType).GetHashCode();
             }
 
             public override bool Equals(object obj)
