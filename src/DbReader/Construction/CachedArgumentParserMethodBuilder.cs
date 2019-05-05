@@ -43,31 +43,14 @@ namespace DbReader.Construction
 
         public Func<string, object, Func<IDataParameter>, QueryInfo> CreateMethod2(string sql, Type argumentsType, IDataParameter[] existingParameters)
         {
-            var key = new CacheKey { Sql = sql, ArgumentsType = argumentsType };
-            var method = Cache<CacheKey, Func<string, object, Func<IDataParameter>, QueryInfo>>.Get(key);
+            var key = (sql, argumentsType);
+            var method = Cache<(string, Type), Func<string, object, Func<IDataParameter>, QueryInfo>>.Get(key);
             if (method == null)
             {
                 method = argumentParserMethodBuilder.CreateMethod2(sql, argumentsType, existingParameters);
-                Cache<CacheKey, Func<string, object, Func<IDataParameter>, QueryInfo>>.Put(key, method);
+                Cache<(string, Type), Func<string, object, Func<IDataParameter>, QueryInfo>>.Put(key, method);
             }
             return method;
-        }
-
-        private class CacheKey
-        {
-            public string Sql;
-            public Type ArgumentsType;
-
-            public override int GetHashCode()
-            {
-                return (Sql, ArgumentsType).GetHashCode();
-            }
-
-            public override bool Equals(object obj)
-            {
-                var other = (CacheKey)obj;
-                return (other.Sql == Sql) && (other.ArgumentsType == ArgumentsType);
-            }
         }
     }
 

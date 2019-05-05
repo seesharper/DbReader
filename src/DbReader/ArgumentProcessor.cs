@@ -13,19 +13,19 @@ namespace DbReader
             new ConcurrentDictionary<Type, Action<IDataParameter, object>>();
 
         internal static readonly MethodInfo ConvertMethod;
-        
+
 
         static ArgumentProcessor()
         {
-            ConvertMethod = typeof (ArgumentProcessor).GetTypeInfo().DeclaredMethods
+            ConvertMethod = typeof(ArgumentProcessor).GetTypeInfo().DeclaredMethods
                 .Single(m => m.Name == "Process");
-          
+
         }
 
         public static void RegisterProcessDelegate<TArgument>(Action<IDataParameter, TArgument> convertFunction)
         {
             Action<IDataParameter, object> processDelegate =
-                (parameter, argument) => convertFunction(parameter, (TArgument) argument);
+                (parameter, argument) => convertFunction(parameter, (TArgument)argument);
 
 
             Type argumentType = typeof(TArgument);
@@ -38,17 +38,10 @@ namespace DbReader
                 ProcessDelegates.TryAdd(argumentType, processDelegate);
             }
         }
-        
+
         public static void Process(Type argumentType, IDataParameter dataParameter, object argument)
         {
             ProcessDelegates[argumentType](dataParameter, argument);
-        }
-
-        public static Action<IDataParameter, object> GetProcessDelegate(Type propertyType)
-        {
-            Action<IDataParameter, object> processDelegate;
-            ProcessDelegates.TryGetValue(propertyType, out processDelegate);
-            return processDelegate;            
         }
 
         public static bool CanProcess(Type type)

@@ -118,6 +118,17 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public async Task ShouldReadCustomersAsyncWithCustomKeySelector()
+        {
+            DbReaderOptions.KeySelector<CustomerWithCustomKeySelector>(c => c.CustomerId);
+            using (var connection = CreateConnection())
+            {
+                var customers = await connection.ReadAsync<Customer>(SQL.Customers);
+                customers.Count().ShouldBe(93);
+            }
+        }
+
 
         [Fact]
         public void ShouldReadCustomersAndOrders()
@@ -317,6 +328,19 @@ namespace DbReader.Tests
         }
 
         [Fact]
+        public async Task ShouldExecuteReaderAsyncWithoutCancellationToken()
+        {
+            using (var connection = CreateConnection())
+            {
+                var reader = await connection.ExecuteReaderAsync("SELECT City FROM Customers WHERE CustomerID = 'ALFKI'");
+                reader.Read();
+                var city = reader.GetString(0);
+                city.ShouldBe("Berlin");
+            }
+        }
+
+
+        [Fact]
         public void ShouldHandleList()
         {
             using (var connection = CreateConnection())
@@ -336,16 +360,22 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldThrowMeaningfulExpectionWhenArgumentIsNotEnumerable()
+        {
+            using (var connection = CreateConnection())
+            {
+                var exception = Should.Throw<InvalidOperationException>(() => connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Suppliers WHERE SupplierId IN (@Ids)", new { Ids = 10 }));
+                exception.Message.ShouldBe("The parameter @Ids is defined a list parameter, but the property Ids is not IEnumerable<T>");
+            }
+        }
+
+
         private string LoadSql(string name)
         {
             var provider = new SqlProvider();
             return provider.Load(name);
         }
-
-
-
-
-
 
         //public void ShouldOutPerformDapperForListWithoutParameter(
         //    IReaderMethodBuilder<CustomerWithOrders> propertyReaderMethodBuilder, IOrdinalSelector ordinalSelector)
@@ -453,7 +483,6 @@ namespace DbReader.Tests
         //    }
 
         //}
-
 
     }
 }

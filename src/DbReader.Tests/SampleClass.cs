@@ -19,9 +19,9 @@
     public class Order
     {
         [Key]
-        public long OrderId { get; set; }   
-        
-        public DateTime? OrderDate { get; set; }     
+        public long OrderId { get; set; }
+
+        public DateTime? OrderDate { get; set; }
     }
 
 
@@ -61,7 +61,7 @@
 
 
 
-   
+
 
 
     public class Employee
@@ -71,7 +71,7 @@
         public string LastName { get; set; }
 
         public string FirstName { get; set; }
-        
+
         public long? ReportsTo { get; set; }
 
         public ICollection<Order> Orders { get; set; }
@@ -98,5 +98,19 @@
     {
         public string Id { get; set; }
         public string TerritoryDescription { get; set; }
+    }
+
+    public class CustomerWithCustomKeySelector : Customer
+    {
+
+    }
+
+
+    public enum SampleEnum
+    {
+        Zero,
+        One,
+
+        Two
     }
 }

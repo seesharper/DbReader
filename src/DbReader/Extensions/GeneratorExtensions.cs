@@ -1,10 +1,12 @@
 namespace DbReader.Extensions
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Reflection.Emit;
 
     /// <summary>
     /// Extends the <see cref="ILGenerator"/> class.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class GeneratorExtensions
     {
         /// <summary>
@@ -56,6 +58,6 @@ namespace DbReader.Extensions
             {
                 il.Emit(OpCodes.Ldc_I4, value);
             }
-        }                       
+        }
     }
 }

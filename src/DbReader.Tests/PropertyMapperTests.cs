@@ -33,6 +33,7 @@
             var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
 
             result[0].ColumnInfo.Ordinal.ShouldBe(-1);
+            result[0].ColumnInfo.ToString().ShouldBe("Not Mapped");
         }
 
         [Fact]
@@ -60,14 +61,14 @@
         public void ShouldThrowExceptionWhenTypesDoesNotMatch()
         {
             var dataRecord = new { Property = "SomeValue" }.ToDataRecord();
-            Should.Throw<InvalidOperationException>(() => propertyMapper.Execute(typeof (ClassWithProperty<int>), dataRecord, string.Empty));
+            Should.Throw<InvalidOperationException>(() => propertyMapper.Execute(typeof(ClassWithProperty<int>), dataRecord, string.Empty));
         }
 
         [Fact]
         public void ShouldMapPropertiesWithCustomConversion()
         {
             var dataRecord = new { Property = 42 }.ToDataRecord();
-            var result = propertyMapper.Execute(typeof (ClassWithProperty<CustomValueType>), dataRecord, string.Empty);
+            var result = propertyMapper.Execute(typeof(ClassWithProperty<CustomValueType>), dataRecord, string.Empty);
             result[0].ColumnInfo.Ordinal.ShouldBe(0);
         }
 

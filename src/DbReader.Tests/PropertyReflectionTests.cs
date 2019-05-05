@@ -13,14 +13,14 @@
         [Fact]
         public void ShouldConsiderPublicInstancePropertyWithSetterAsWriteable()
         {
-            typeof (ClassWithProperty<int>).GetProperty("Property")
+            typeof(ClassWithProperty<int>).GetProperty("Property")
                 .IsWriteable().ShouldBeTrue();
         }
 
         [Fact]
         public void ShouldNotConsiderPublicStaticPropertyWithSetterAsWriteable()
         {
-            typeof (ClassWithStaticProperty).GetProperty("StaticProperty")
+            typeof(ClassWithStaticProperty).GetProperty("StaticProperty")
                 .IsWriteable().ShouldBeFalse();
         }
 
@@ -41,8 +41,8 @@
         [Fact]
         public void OrderByDeclaration_InOrder_ReturnsPropertiesInOrder()
         {
-            var type = new {A = 1, B = 2}.GetType();
-            var properties = new []{type.GetProperty("A"), type.GetProperty("B")};
+            var type = new { A = 1, B = 2 }.GetType();
+            var properties = new[] { type.GetProperty("A"), type.GetProperty("B") };
 
             var orderedProperties = properties.OrderByDeclaration();
 
@@ -54,6 +54,17 @@
         {
             var type = new { A = 1, B = 2 }.GetType();
             var properties = new[] { type.GetProperty("A"), type.GetProperty("B") };
+
+            var orderedProperties = properties.Reverse().OrderByDeclaration();
+
+            orderedProperties.SequenceEqual(properties).ShouldBeTrue();
+        }
+
+        [Fact]
+        public void OrderByDeclaration_SamePropertyTwice_ReturnsPropertiesInOrder()
+        {
+            var type = new { A = 1, B = 2 }.GetType();
+            var properties = new[] { type.GetProperty("A"), type.GetProperty("A") };
 
             var orderedProperties = properties.Reverse().OrderByDeclaration();
 

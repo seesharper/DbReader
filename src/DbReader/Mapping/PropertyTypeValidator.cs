@@ -7,7 +7,7 @@ namespace DbReader.Mapping
     using Extensions;
 
     /// <summary>
-    /// An <see cref="IPropertyMapper"/> decorator that ensures that the mapping 
+    /// An <see cref="IPropertyMapper"/> decorator that ensures that the mapping
     /// between fields and properties are compatible with regards to datatypes.
     /// </summary>
     public class PropertyTypeValidator : IPropertyMapper
@@ -36,7 +36,12 @@ namespace DbReader.Mapping
             foreach (var mappingInfo in mappings.Where(m => m.ColumnInfo.Ordinal != -1))
             {
                 var propertyType = mappingInfo.Property.PropertyType;
-                if (!propertyType.GetTypeInfo().IsAssignableFrom(mappingInfo.ColumnInfo.Type.GetTypeInfo()) && !ValueConverter.CanConvert(propertyType))
+                if (propertyType.IsEnum)
+                {
+                    propertyType = propertyType.GetUnderlyingType();
+                }
+
+                if (!propertyType.IsAssignableFrom(mappingInfo.ColumnInfo.Type.GetTypeInfo()) && !ValueConverter.CanConvert(propertyType))
                 {
                     throw new InvalidOperationException(
                         ErrorMessages.IncompatibleTypes.FormatWith(

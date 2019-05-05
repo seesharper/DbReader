@@ -16,7 +16,7 @@
     public static class DataReaderExtensions
     {
         private static Lazy<IServiceContainer> containerFactory = new Lazy<IServiceContainer>(CreateContainer);
-       
+
         private static IServiceContainer CreateContainer()
         {
             var container = new ServiceContainer();
@@ -65,7 +65,7 @@
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<T> ReadWithoutNavigationProperties<T>(IDataReader dataReader)
-        {           
+        {
             var result = new List<T>();
 
             var hasRows = dataReader.Read();
@@ -81,9 +81,9 @@
                 using (container.BeginScope())
                 {
                     var propertyReaderMethodBuilder =
-                        container.GetInstance<IReaderMethodBuilder<T>>("PropertyReaderMethodBuilder");                   
+                        container.GetInstance<IReaderMethodBuilder<T>>("PropertyReaderMethodBuilder");
                     var ordinalsSelector = container.GetInstance<IOrdinalSelector>();
-                   
+
                     propertyReaderDelegate = new PropertyReaderDelegate<T>()
                     {
                         Ordinals = ordinalsSelector.Execute(typeof(T), dataReader, string.Empty),

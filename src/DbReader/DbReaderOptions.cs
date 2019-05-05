@@ -86,12 +86,6 @@
         public static IParameterParser ParameterParser { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="IParameterParser"/> that is
-        /// responsible for parsing list parameters like IN (@ids)
-        /// </summary>
-        public static IParameterParser ListParameterParser { get; set; }
-
-        /// <summary>
         /// Specifies the key properties for a the type of <typeparamref name="T"/>.
         /// </summary>
         /// <param name="keyExpressions">The expressions that specifies the key property.</param>
@@ -103,7 +97,7 @@
             for (int index = 0; index < keyExpressions.Length; index++)
             {
                 var keyExpression = keyExpressions[index];
-                var property = ((PropertyInfo)((MemberExpression)((UnaryExpression)keyExpression.Body).Operand).Member);
+                var property = (PropertyInfo)((MemberExpression)keyExpression.Body).Member;
                 properties[index] = property;
 
             }
