@@ -56,7 +56,7 @@ namespace DbReader.Tests
 
         private string ReadScript()
         {
-            var pathToScript = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db", "your_sqlite_text.txt");
+            var pathToScript = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db", "northwind.sql");
             var script = File.ReadAllText(pathToScript, Encoding.UTF8);
             return script;
 
