@@ -17,7 +17,7 @@ Step test = () =>
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () =>
 {
-    Command.Execute("dotnet", $"test -c release -f netcoreapp2.0  /property:CollectCoverage=true /property:Include=\"[DbReader*]*\" /property:Exclude=\"[*Tests*]*\" /property:CoverletOutputFormat=\\\"opencover,lcov,json\\\" /property:CoverletOutput={CodeCoverageArtifactsFolder}/coverage /property:Threshold=99", PathToTestProjectFolder);
+    Command.Execute("dotnet", $"test -c release -f netcoreapp2.0  /property:CollectCoverage=true /property:Include=\"[DbReader*]*\" /property:Exclude=\"[*Tests*]*\" /property:CoverletOutputFormat=\\\"opencover,lcov,json\\\" /property:CoverletOutput={CodeCoverageArtifactsFolder}/coverage /property:Threshold=100", PathToTestProjectFolder);
     var pathToOpenCoverResult = Path.Combine(CodeCoverageArtifactsFolder, "coverage.opencover.xml");
     Command.Execute("dotnet", $"reportgenerator \"-reports:{pathToOpenCoverResult}\"  \"-targetdir:{CodeCoverageArtifactsFolder}/Report\" \"-reportTypes:XmlSummary;Xml;HtmlInline_AzurePipelines_Dark\" \"--verbosity:warning\"", PathToTestProjectFolder);
 };
