@@ -1,6 +1,9 @@
 resources:
 - repo: self
 
+variables:
+- group: api-keys
+
 pool:
   name: Hosted Ubuntu 1604
 steps:

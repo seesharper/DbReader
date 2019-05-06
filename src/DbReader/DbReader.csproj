@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../mono.props" />
   <PropertyGroup>
-    <!-- <TargetFrameworks>netcoreapp2.0;netstandard2.0;net462</TargetFrameworks> -->
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>2.0.5</Version>
+    <TargetFrameworks>netcoreapp2.0;netstandard2.0;net462</TargetFrameworks>
+    <!-- <TargetFramework>netcoreapp2.0</TargetFramework> -->
+    <Version>2.1.0</Version>
     <Authors>Bernhard Richter</Authors>
     <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
