@@ -23,12 +23,15 @@ namespace DbReader.Tests
 
     public class IntegrationTests
     {
-        private string dbFile = @"..\..\db\northwind.db";
+        private static string dbFile;
 
-        private string connectionString = @"Data Source = ..\..\db\northwind.db";
+        private static string connectionString;
 
         static IntegrationTests()
         {
+            dbFile = Path.Combine(Path.GetDirectoryName(new Uri(typeof(IntegrationTests).Assembly.CodeBase).LocalPath), "northwind.db");
+            connectionString = $"Data Source = {dbFile}";
+
             DbReaderOptions.WhenPassing<CustomValueType>()
                 .Use((parameter, argument) => parameter.Value = argument.Value);
         }

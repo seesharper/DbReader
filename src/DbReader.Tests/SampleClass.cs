@@ -58,7 +58,12 @@
     }
 
 
+    public class CustomerWithSimpleIdProperty
+    {
+        public string Id { get; set; }
 
+        public ICollection<Order> Orders { get; set; }
+    }
 
 
 

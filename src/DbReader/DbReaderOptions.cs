@@ -12,6 +12,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Database;
+    using DbReader.Extensions;
     using Interfaces;
     using Selectors;
 
@@ -96,8 +97,8 @@
 
             for (int index = 0; index < keyExpressions.Length; index++)
             {
-                var keyExpression = keyExpressions[index];
-                var property = (PropertyInfo)((MemberExpression)keyExpression.Body).Member;
+                var memberExpression = (MemberExpression)keyExpressions[index].AsEnumerable().Where(e => e is MemberExpression).First();
+                var property = (PropertyInfo)memberExpression.Member;
                 properties[index] = property;
 
             }
