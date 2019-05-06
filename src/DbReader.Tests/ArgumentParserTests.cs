@@ -17,7 +17,7 @@
         [Fact]
         public void Parse_ValidArguments_ReturnsParameters()
         {
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new { FirstParameter = 1, SecondParameter = 2 },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
 
@@ -28,7 +28,7 @@
         [Fact]
         public void Parse_Null_ShouldCreateDbNull()
         {
-            var result = argumentParser.Parse2(":firstParameter",
+            var result = argumentParser.Parse(":firstParameter",
                 new { FirstParameter = (string)null },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
             result.Parameters[0].Value.ShouldBe(DBNull.Value);
@@ -39,7 +39,7 @@
         {
             var exception = Should.Throw<InvalidOperationException>(
                 () =>
-                    argumentParser.Parse2(":firstParameter, :secondParameter",
+                    argumentParser.Parse(":firstParameter, :secondParameter",
                         new { FirstParameter = 1, InvalidParameter = 2 },
                         () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>()));
 
@@ -53,7 +53,7 @@
             existingParameterMock.SetupAllProperties();
             existingParameterMock.Object.ParameterName = "secondParameter";
 
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new { FirstParameter = 1, InvalidParameter = 2 },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, new[] { existingParameterMock.Object });
 
@@ -68,7 +68,7 @@
             existingParameterMock.Object.ParameterName = "secondParameter";
 
             Should.Throw<InvalidOperationException>(
-                () => argumentParser.Parse2(FakeSql.Create(":firstParameter, :secondParameter"),
+                () => argumentParser.Parse(FakeSql.Create(":firstParameter, :secondParameter"),
                     new { FirstParameter = 1, SecondParameter = 2 },
                     () => new Mock<IDataParameter>().SetupAllProperties().Object, new[] { existingParameterMock.Object }
                 ));
@@ -77,7 +77,7 @@
         [Fact]
         public void Parse_WithDifferentCasing_FavorsParameterNames()
         {
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new { FirstParameter = 1, SecondParameter = 2 },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
 
@@ -88,7 +88,7 @@
         [Fact]
         public void ShouldReturnEmptyArrayWhenArgumentObjectIsNull()
         {
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 null,
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
             result.Parameters.ShouldBeEmpty();
@@ -99,7 +99,7 @@
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new { FirstParameter = 1, SecondParameter = parameterMock.Object },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
 
@@ -111,7 +111,7 @@
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new { FirstParameter = 1, SecondParameter = parameterMock.Object },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
 
@@ -124,7 +124,7 @@
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
             parameterMock.Object.ParameterName = "SomeValue";
 
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter",
                 new { FirstParameter = 1, SecondParameter = parameterMock.Object },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
 
@@ -136,7 +136,7 @@
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
-            var result = argumentParser.Parse2(":firstParameter, :firstParameter",
+            var result = argumentParser.Parse(":firstParameter, :firstParameter",
                 new { FirstParameter = 1, SecondParameter = parameterMock.Object },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
 
@@ -148,7 +148,7 @@
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
-            var result = argumentParser.Parse2(":firstParameter, :FirstParameter",
+            var result = argumentParser.Parse(":firstParameter, :FirstParameter",
                 new { FirstParameter = 1, SecondParameter = parameterMock.Object },
                 () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
 
@@ -160,7 +160,7 @@
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
 
-            var result = argumentParser.Parse2(":firstParameter, :secondParameter(1)",
+            var result = argumentParser.Parse(":firstParameter, :secondParameter(1)",
                new { FirstParameter = 1, SecondParameter = parameterMock.Object },
                () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>());
             result.Parameters.Length.ShouldBe(2);
@@ -170,7 +170,7 @@
         public void Parse_ArgumentWithUnknownDataType_ThrowsMeaningfulException()
         {
             var parameterMock = new Mock<IDataParameter>().SetupAllProperties();
-            Should.Throw<InvalidOperationException>(() => argumentParser.Parse2(":firstParameter",
+            Should.Throw<InvalidOperationException>(() => argumentParser.Parse(":firstParameter",
                new { FirstParameter = new UnknownType() },
                () => new Mock<IDataParameter>().SetupAllProperties().Object, Array.Empty<IDataParameter>()));
         }

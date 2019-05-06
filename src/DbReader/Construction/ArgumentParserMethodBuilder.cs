@@ -46,7 +46,7 @@ namespace DbReader.Construction
         /// <summary>
         /// Initializes a new instance of the <see cref="ArgumentParserMethodBuilder"/> class.
         /// </summary>
-
+        /// <param name="parameterMatcher">The <see cref="IParameterMatcher"/> that is responsible for matching argument properties with parameters fund in the SQL.</param>
         /// <param name="methodSkeletonFactory">The <see cref="IMethodSkeletonFactory"/> that is responsible for providing a <see cref="IMethodSkeleton"/>.</param>
         public ArgumentParserMethodBuilder(IParameterMatcher parameterMatcher, IMethodSkeletonFactory methodSkeletonFactory)
         {
@@ -61,7 +61,7 @@ namespace DbReader.Construction
         /// <param name="argumentsType">The arguments type for which to create the method.</param>
         /// <param name="existingParameters">A list of already existing parameters.</param>
         /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
-        public Func<string, object, Func<IDataParameter>, QueryInfo> CreateMethod2(string sql, Type argumentsType, IDataParameter[] existingParameters)
+        public Func<string, object, Func<IDataParameter>, QueryInfo> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters)
         {
             var matchedParameters = parameterMatcher.Match(sql, argumentsType, existingParameters);
 
@@ -203,14 +203,6 @@ namespace DbReader.Construction
         }
     }
 
-    public static class DbNullConverter
-    {
-        public static object ToDbNullIfNull(object value)
-        {
-            return value ?? DBNull.Value;
-        }
-    }
-
     internal static class ParameterHelper
     {
         public static void Add<T>(List<IDataParameter> dataParameters, string name, T value, Func<IDataParameter> parameterFactory)
@@ -279,13 +271,18 @@ namespace DbReader.Construction
         {
             var dataParameter = parameterFactory();
             dataParameter.ParameterName = name;
-            dataParameter.Value = DbNullConverter.ToDbNullIfNull(value);
+            dataParameter.Value = ToDbNullIfNull(value);
             return dataParameter;
         }
 
         public static QueryInfo CreateQueryInfo(string sql, List<IDataParameter> dataParameters)
         {
             return new QueryInfo(sql, dataParameters.ToArray());
+        }
+
+        public static object ToDbNullIfNull(object value)
+        {
+            return value ?? DBNull.Value;
         }
     }
 }

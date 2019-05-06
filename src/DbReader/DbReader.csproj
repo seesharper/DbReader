@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../mono.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;netstandard2.0;net462</TargetFrameworks>
+    <!-- <TargetFrameworks>netcoreapp2.0;netstandard2.0;net462</TargetFrameworks> -->
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <Version>2.0.5</Version>
     <Authors>Bernhard Richter</Authors>
     <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
@@ -12,24 +13,14 @@
     <PackageTags>data-access orm sql micro-orm</PackageTags>
     <Description>A simple and fast database reader for the .Net framework.</Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>Full</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\DbReader.xml</DocumentationFile>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\DbReader.xml</DocumentationFile>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
-    <DocumentationFile>bin\Debug\net46\DbReader.xml</DocumentationFile>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46.0|AnyCPU'">
-    <DocumentationFile>bin\Release\net46\DbReader.xml</DocumentationFile>
-  </PropertyGroup>
+
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />

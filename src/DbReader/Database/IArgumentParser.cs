@@ -18,6 +18,6 @@
         /// <param name="parameterFactory">A factory delegate used to create an <see cref="IDataParameter"/> instance.</param>
         /// <param name="existingParameters">A list of already existing parameters.</param>
         /// <returns></returns>
-        QueryInfo Parse2(string sql, object arguments, Func<IDataParameter> parameterFactory, IDataParameter[] existingParameters);
+        QueryInfo Parse(string sql, object arguments, Func<IDataParameter> parameterFactory, IDataParameter[] existingParameters);
     }
 }

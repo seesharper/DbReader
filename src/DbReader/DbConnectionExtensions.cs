@@ -22,7 +22,6 @@ namespace DbReader
     {
         private static readonly IServiceContainer Container = new ServiceContainer();
         private static readonly IArgumentParser ArgumentParser;
-        private static readonly IParameterParser ListParameterParser;
 
         static DbConnectionExtensions()
         {
@@ -138,7 +137,7 @@ namespace DbReader
         {
             var command = dbConnection.CreateCommand();
 
-            var queryInfo = ArgumentParser.Parse2(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
+            var queryInfo = ArgumentParser.Parse(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
 
             SqlStatement.Current = queryInfo.Query;
             command.CommandText = queryInfo.Query;
