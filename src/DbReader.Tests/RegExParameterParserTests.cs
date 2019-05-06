@@ -14,7 +14,7 @@
         {
             string source = "Id = @Parameter";
             var parameters = parameterParser.GetParameters(source);
-            parameters.ShouldContain("Parameter");
+            parameters.ShouldContain(p => p.Name == "Parameter");
         }
 
         [Fact]
@@ -22,7 +22,7 @@
         {
             string source = "Id = :Parameter";
             var parameters = parameterParser.GetParameters(source);
-            parameters.ShouldContain("Parameter");
+            parameters.ShouldContain(p => p.Name == "Parameter");
         }
 
         [Fact]
@@ -31,8 +31,8 @@
             string source = "Id = @Parameter, AnotherId = @AnotherParameter";
             var parameters = parameterParser.GetParameters(source);
             parameters.Length.ShouldBe(2);
-            parameters.ShouldContain("Parameter");
-            parameters.ShouldContain("AnotherParameter");
+            parameters.ShouldContain(p => p.Name == "Parameter");
+            parameters.ShouldContain(p => p.Name == "AnotherParameter");
         }
 
         [Fact]
@@ -41,7 +41,28 @@
             string source = "Id = @Parameter, AnotherId = @Parameter";
             var parameters = parameterParser.GetParameters(source);
             parameters.Length.ShouldBe(1);
-            parameters.ShouldContain("Parameter");
+            parameters.ShouldContain(p => p.Name == "Parameter");
+        }
+
+        [Theory]
+        [InlineData("Id = @Parameter, AnotherId IN (@ListParameter)")]
+        [InlineData("Id = @Parameter, AnotherId IN ( @ListParameter )")]
+        [InlineData("Id = @Parameter, AnotherId IN(@ListParameter)")]
+        [InlineData("Id = @Parameter, AnotherId IN( @ListParameter )")]
+        public void ShouldMarkSingleListParameter(string source)
+        {
+            var parameters = parameterParser.GetParameters(source);
+            parameters.Length.ShouldBe(2);
+            parameters.ShouldContain(p => p.FullName == "@ListParameter" && p.IsListParameter);
+        }
+
+        [Theory]
+        [InlineData("Id = @Parameter, AnotherId IN (@Param1, @Param3)")]
+        public void ShouldNotMarkAsListParameterWhenMultiple(string source)
+        {
+            var parameters = parameterParser.GetParameters(source);
+            parameters.Length.ShouldBe(3);
+            parameters.ShouldNotContain(p => p.IsListParameter);
         }
     }
 }

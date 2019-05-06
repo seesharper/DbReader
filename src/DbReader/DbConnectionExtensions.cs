@@ -3,12 +3,15 @@
 namespace DbReader
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
     using System.Threading;
     using System.Threading.Tasks;
     using Database;
+    using DbReader.Construction;
+    using DbReader.Extensions;
     using LightInject;
     using static DbReaderOptions;
 
@@ -132,17 +135,22 @@ namespace DbReader
         /// <returns><see cref="IDbCommand"/></returns>
         public static IDbCommand CreateCommand(this IDbConnection dbConnection, string query, object arguments = null)
         {
-            SqlStatement.Current = query;
             var command = dbConnection.CreateCommand();
-            command.CommandText = query;
+
+            var queryInfo = ArgumentParser.Parse(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
+
+            SqlStatement.Current = queryInfo.Query;
+            command.CommandText = queryInfo.Query;
             CommandInitializer?.Invoke(command);
-            var parameters = ArgumentParser.Parse(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
-            foreach (var dataParameter in parameters)
+
+            foreach (var dataParameter in queryInfo.Parameters)
             {
                 command.Parameters.Add(dataParameter);
             }
             return command;
         }
+
+
 
         /// <summary>
         /// Executes the given <paramref name="query"/> and returns the number of rows affected.

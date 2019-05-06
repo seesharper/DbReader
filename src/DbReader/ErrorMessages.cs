@@ -20,5 +20,8 @@
             "{0} Simple types such as string and int are not allowed as the item type for a collection property.";
 
         public const string UnknownArgumentType = "The property {0} has a type ({1}) that cannot be passed as an argument. Consider adding support for {1} using DbReaderOptions.WhenPassing()";
+
+        public const string InvalidListArgument = "The parameter {0} is defined a list parameter, but the property {1} is not IEnumerable<T>";
+
     }
 }

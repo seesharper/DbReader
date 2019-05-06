@@ -23,12 +23,15 @@ namespace DbReader.Tests
 
     public class IntegrationTests
     {
-        private string dbFile = @"..\..\db\northwind.db";
+        private static string dbFile;
 
-        private string connectionString = @"Data Source = ..\..\db\northwind.db";
+        private static string connectionString;
 
         static IntegrationTests()
         {
+            dbFile = Path.Combine(Path.GetDirectoryName(new Uri(typeof(IntegrationTests).Assembly.CodeBase).LocalPath), "northwind.db");
+            connectionString = $"Data Source = {dbFile}";
+
             DbReaderOptions.WhenPassing<CustomValueType>()
                 .Use((parameter, argument) => parameter.Value = argument.Value);
         }
@@ -53,7 +56,7 @@ namespace DbReader.Tests
 
         private string ReadScript()
         {
-            var pathToScript = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db", "your_sqlite_text.txt");
+            var pathToScript = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db", "northwind.sql");
             var script = File.ReadAllText(pathToScript, Encoding.UTF8);
             return script;
 
@@ -76,6 +79,27 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldReturnEmptyListWithoutNavigationProperties()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE 1 = 2");
+                customers.Count().ShouldBe(0);
+            }
+        }
+
+        [Fact]
+        public void ShouldReturnEmptyListWithNavigationProperties()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<CustomerWithOrders>("SELECT CustomerId as CustomerWithOrdersId FROM Customers WHERE 1 = 2");
+                customers.Count().ShouldBe(0);
+            }
+        }
+
+
         public async Task ShouldHandleRunningInParallel()
         {
             var task1 = ShouldReadCustomersAndOrdersAsync();
@@ -90,6 +114,17 @@ namespace DbReader.Tests
         [Fact]
         public async Task ShouldReadCustomersAsync()
         {
+            using (var connection = CreateConnection())
+            {
+                var customers = await connection.ReadAsync<Customer>(SQL.Customers);
+                customers.Count().ShouldBe(93);
+            }
+        }
+
+        [Fact]
+        public async Task ShouldReadCustomersAsyncWithCustomKeySelector()
+        {
+            DbReaderOptions.KeySelector<CustomerWithCustomKeySelector>(c => c.CustomerId);
             using (var connection = CreateConnection())
             {
                 var customers = await connection.ReadAsync<Customer>(SQL.Customers);
@@ -155,7 +190,8 @@ namespace DbReader.Tests
         }
 
         [Fact]
-        public void ShouldThrowExceptionWhenArgumentNotFound()
+        public void
+        ShouldThrowExceptionWhenArgumentNotFound()
         {
             using (var connection = CreateConnection())
             {
@@ -294,17 +330,55 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public async Task ShouldExecuteReaderAsyncWithoutCancellationToken()
+        {
+            using (var connection = CreateConnection())
+            {
+                var reader = await connection.ExecuteReaderAsync("SELECT City FROM Customers WHERE CustomerID = 'ALFKI'");
+                reader.Read();
+                var city = reader.GetString(0);
+                city.ShouldBe("Berlin");
+            }
+        }
+
+
+        [Fact]
+        public void ShouldHandleList()
+        {
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Customers WHERE CustomerID IN (@Ids)", new { Ids = new[] { "ALFKI", "BLAUS" } });
+                count.ShouldBe(2);
+            }
+        }
+
+        [Fact]
+        public void ShouldHandleListWithCustomType()
+        {
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Suppliers WHERE SupplierId IN (@Ids)", new { Ids = new[] { new CustomValueType(1), new CustomValueType(2) } });
+                count.ShouldBe(2);
+            }
+        }
+
+        [Fact]
+        public void ShouldThrowMeaningfulExpectionWhenArgumentIsNotEnumerable()
+        {
+            using (var connection = CreateConnection())
+            {
+                var exception = Should.Throw<InvalidOperationException>(() => connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Suppliers WHERE SupplierId IN (@Ids)", new { Ids = 10 }));
+                exception.Message.ShouldBe("The parameter @Ids is defined a list parameter, but the property Ids is not IEnumerable<T>");
+            }
+        }
+
 
         private string LoadSql(string name)
         {
             var provider = new SqlProvider();
             return provider.Load(name);
         }
-
-
-
-
-
 
         //public void ShouldOutPerformDapperForListWithoutParameter(
         //    IReaderMethodBuilder<CustomerWithOrders> propertyReaderMethodBuilder, IOrdinalSelector ordinalSelector)
@@ -412,7 +486,6 @@ namespace DbReader.Tests
         //    }
 
         //}
-
 
     }
 }

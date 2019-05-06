@@ -17,8 +17,10 @@ namespace DbReader.Tests
             var methodBuilderMock = CreateMethodBuilderMock();
             var methodBuilder = new CachedArgumentParserMethodBuilder(methodBuilderMock.Object);
 
-            methodBuilder.CreateMethod(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
-            methodBuilder.CreateMethod(FakeSql.Create(), new { A = 1 }.GetType(), Array.Empty<IDataParameter>());
+            var arg = new { A = 1 };
+
+            methodBuilder.CreateMethod(FakeSql.Create("10"), arg.GetType(), Array.Empty<IDataParameter>());
+            methodBuilder.CreateMethod(FakeSql.Create("10"), arg.GetType(), Array.Empty<IDataParameter>());
 
             methodBuilderMock.Verify(m => m.CreateMethod(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()), Times.Once);
         }
@@ -64,7 +66,7 @@ namespace DbReader.Tests
         {
             var methodBuilderMock = new Mock<IArgumentParserMethodBuilder>();
             methodBuilderMock.Setup(m => m.CreateMethod(It.IsAny<string>(), It.IsAny<Type>(), It.IsAny<IDataParameter[]>()))
-                .Returns((o, func) => null);
+                .Returns((s, o, func) => null);
             return methodBuilderMock;
         }
     }

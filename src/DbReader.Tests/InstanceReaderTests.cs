@@ -211,6 +211,15 @@
         }
 
         [Fact]
+        public void ShouldReadEnum()
+        {
+            var dataRecord = new { Id = 1, Property = 1 }.ToDataRecord();
+            var instance = GetReader<ClassWithProperty<SampleEnum>>().Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(SampleEnum.One);
+        }
+
+
+        [Fact]
         public void ShouldReadCustomValueType()
         {
             var dataRecord = new { Id = 42, Property = 42 }.ToDataRecord();
@@ -246,7 +255,7 @@
         [Fact]
         public void ShouldReadInstanceWithRecursiveOneToManyRelation()
         {
-            var dataRecord = new [] { new {Id = 42, OneToManyRelation_Id = 64} , new { Id = 42, OneToManyRelation_Id = 128 } }.ToDataReader();
+            var dataRecord = new[] { new { Id = 42, OneToManyRelation_Id = 64 }, new { Id = 42, OneToManyRelation_Id = 128 } }.ToDataReader();
 
             ClassWithRecursiveOneToManyRelation instance = null;
             var reader = GetReader<ClassWithRecursiveOneToManyRelation>();
@@ -282,7 +291,7 @@
         [Fact]
         public void ShouldHandleManyToOneWithoutAnyMatchingColumns()
         {
-            var dataRecord = new { Id = 1}.ToDataRecord();
+            var dataRecord = new { Id = 1 }.ToDataRecord();
             var reader = GetReader<ClassWithProperty<ClassWithId>>();
             var instance = reader.Read(dataRecord, string.Empty);
             instance.Property.ShouldBeNull();

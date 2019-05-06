@@ -10,7 +10,7 @@ namespace DbReader.Construction
     using Selectors;
 
     /// <summary>
-    /// A class that dynamically creates a method used to 
+    /// A class that dynamically creates a method used to
     /// populate collection properties of a given type.
     /// </summary>
     /// <typeparam name="T">The <see cref="Type"/> for which to create the dynamic method.</typeparam>
@@ -50,7 +50,7 @@ namespace DbReader.Construction
                 return null;
             }
             var instanceReaders = new List<object>(properties.Length);
-            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("OneToManyDynamicMethod",typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
+            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("OneToManyDynamicMethod", typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
             var generator = methodSkeleton.GetGenerator();
             bool shouldCreateMethod = false;
             foreach (var property in properties)
@@ -61,7 +61,7 @@ namespace DbReader.Construction
 
                     shouldCreateMethod = true;
                     var elementType = property.PropertyType.GetProjectionType();
-                    MethodInfo tryAddMethod = CollectionExtensions.GetTryAddMethod(elementType);
+                    MethodInfo tryAddMethod = Extensions.CollectionExtensions.GetTryAddMethod(elementType);
                     Type instanceReaderType = typeof(IInstanceReader<>).MakeGenericType(elementType);
                     MethodInfo readMethod = instanceReaderType.GetMethod("Read");
 
@@ -70,12 +70,12 @@ namespace DbReader.Construction
 
                     MethodInfo getMethod = property.GetGetMethod();
 
-                    // Push the instance onto the stack. 
-                    generator.Emit(OpCodes.Ldarg_0);     
-                                                       
+                    // Push the instance onto the stack.
+                    generator.Emit(OpCodes.Ldarg_0);
+
                     // Call the property getter and push the result onto the stack.
                     generator.Emit(OpCodes.Callvirt, getMethod);
-                    
+
                     // Push the object reader.
                     generator.Emit(OpCodes.Ldarg_2);
                     generator.EmitFastInt(instanceReaderIndex);
@@ -87,20 +87,20 @@ namespace DbReader.Construction
 
                     // Push the prefix
                     generator.Emit(OpCodes.Ldstr, propertyPrefix);
-                    
+
                     // Call the read method.
                     generator.Emit(OpCodes.Callvirt, readMethod);
 
-                    generator.Emit(OpCodes.Call, tryAddMethod);                                                            
+                    generator.Emit(OpCodes.Call, tryAddMethod);
                 }
-                                                       
+
             }
 
             if (shouldCreateMethod)
             {
                 generator.Emit(OpCodes.Ret);
                 var method = (Action<T, IDataRecord, object[]>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, object[]>));
-                return (record, instance) => method(instance, record, instanceReaders.ToArray());                
+                return (record, instance) => method(instance, record, instanceReaders.ToArray());
             }
 
             return null;

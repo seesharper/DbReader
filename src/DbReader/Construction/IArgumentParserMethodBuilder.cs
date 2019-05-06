@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data;
+    using DbReader.Database;
 
     /// <summary>
     /// Represents a class that based on a given sql and the type of the arguments object,
@@ -16,6 +17,6 @@
         /// <param name="argumentsType">The arguments type for which to create the method.</param>
         /// <param name="existingParameters">A list of already existing parameters.</param>
         /// <returns>A method that maps an argument object instance into a list of <see cref="IDataParameter"/> instances.</returns>
-        Func<object, Func<IDataParameter> ,  IDataParameter[]> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters);
-    }   
+        Func<string, object, Func<IDataParameter>, QueryInfo> CreateMethod(string sql, Type argumentsType, IDataParameter[] existingParameters);
+    }
 }

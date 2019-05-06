@@ -67,7 +67,7 @@ namespace DbReader.Extensions
         /// Determines if the a given type is a <see cref="Nullable{T}"/> type.
         /// </summary>
         /// <param name="type">The target <see cref="Type"/>.</param>
-        /// <returns><b>true</b> if the <paramref name="type"/> is a <see cref="Nullable{T}"/> type, otherwise <b>false</b></returns>       
+        /// <returns><b>true</b> if the <paramref name="type"/> is a <see cref="Nullable{T}"/> type, otherwise <b>false</b></returns>
         public static bool IsNullable(this Type type)
         {
             return Nullable.GetUnderlyingType(type) != null;
@@ -77,7 +77,7 @@ namespace DbReader.Extensions
         /// Determines if a given type is a "simple" type.
         /// </summary>
         /// <param name="type">The target <see cref="Type"/>.</param>
-        /// <returns><b>true</b> if the <paramref name="type"/> is a "simple" type, otherwise <b>false</b></returns>   
+        /// <returns><b>true</b> if the <paramref name="type"/> is a "simple" type, otherwise <b>false</b></returns>
         public static bool IsSimpleType(this Type type)
         {
             type = type.GetUnderlyingType();
@@ -88,10 +88,25 @@ namespace DbReader.Extensions
         /// Determines if a given type implements the <see cref="IEnumerable{T}"/> interface.
         /// </summary>
         /// <param name="type">The target <see cref="Type"/>.</param>
-        /// <returns><b>true</b> if the <paramref name="type"/> implements <see cref="ICollection{T}"/>, otherwise <b>false</b></returns>       
+        /// <returns><b>true</b> if the <paramref name="type"/> implements <see cref="ICollection{T}"/>, otherwise <b>false</b></returns>
         public static bool IsEnumerable(this Type type)
         {
             return IsEnumerableOfT(type) || (type.GetInterfaces().Any(IsEnumerableOfT));
+        }
+
+        /// <summary>
+        /// Determines if the given type implements <see cref="IEnumerable{T}"/> and that the the element type is a simple type.
+        /// </summary>
+        /// <param name="type">The target <see cref="Type"/>.</param>
+        /// <returns><b>true</b> if the <paramref name="type"/> implements <see cref="IEnumerable{T}"/> and the element type is a simple type, otherwise <b>false</b></returns>
+        public static bool IsEnumerableOfSimpleType(this Type type)
+        {
+            if (!type.IsEnumerable())
+            {
+                return false;
+            }
+
+            return type.GetProjectionType().IsSimpleType();
         }
 
         /// <summary>

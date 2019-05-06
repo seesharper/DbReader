@@ -12,6 +12,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Database;
+    using DbReader.Extensions;
     using Interfaces;
     using Selectors;
 
@@ -36,7 +37,8 @@
             KeyConvention = p =>
                 p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
                 || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase);
-            ParameterParser = new RegExParameterParser(@":(\w+)|@(\w+)");
+            ParameterParser = new RegExParameterParser(@"(:\w+)|(@\w+)", @"IN\s*\((\s*(?:@|:)\w+)\s*\)");
+
         }
 
         /// <summary>
@@ -84,7 +86,6 @@
         /// </summary>
         public static IParameterParser ParameterParser { get; set; }
 
-
         /// <summary>
         /// Specifies the key properties for a the type of <typeparamref name="T"/>.
         /// </summary>
@@ -96,8 +97,8 @@
 
             for (int index = 0; index < keyExpressions.Length; index++)
             {
-                var keyExpression = keyExpressions[index];
-                var property = ((PropertyInfo)((MemberExpression)((UnaryExpression)keyExpression.Body).Operand).Member);
+                var memberExpression = (MemberExpression)keyExpressions[index].AsEnumerable().Where(e => e is MemberExpression).First();
+                var property = (PropertyInfo)memberExpression.Member;
                 properties[index] = property;
 
             }

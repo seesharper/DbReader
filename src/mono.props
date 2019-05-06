@@ -1,4 +1,5 @@
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" 
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <!-- When compiling .NET SDK 2.0 projects targeting .NET 4.x on Mono using 'dotnet build' you -->
     <!-- have to teach MSBuild where the Mono copy of the reference asssemblies is -->
@@ -24,7 +25,7 @@
     <AssemblySearchPaths Condition="'$(BaseFrameworkPathOverrideForMono)' != ''">$(FrameworkPathOverride)/Facades;$(AssemblySearchPaths)</AssemblySearchPaths>
   </PropertyGroup>
 
-   <ItemGroup Condition=" '$(TargetFramework)' == 'net462'">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462'">
     <Reference Include="System" />
     <Reference Include="System.IO" />
     <Reference Include="System.Runtime" />

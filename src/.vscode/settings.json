@@ -1,6 +1,9 @@
 {
-    "cSpell.words": [
-        "Shouldly",
-        "Xunit"
-    ]
+  "cSpell.words": ["Shouldly", "Xunit"],
+
+  "coverage-gutters.xmlname": "../../build/Artifacts/CodeCoverage/coverage.opencover.xml",
+  "coverage-gutters.coverageReportFileName": "../../build/Artifacts/CodeCoverage/**/index.htm",
+  "coverage-gutters.showLineCoverage": true,
+
+  "coverage-gutters.showRulerCoverage": true
 }

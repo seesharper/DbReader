@@ -19,9 +19,8 @@
         {
             RegisterSingletonServices(serviceRegistry);
             RegisterScopedServices(serviceRegistry);
-           // ((ServiceContainer)serviceRegistry).Validate(message => { Trace.TraceWarning(message);});
         }
-       
+
         private static IReaderMethodBuilder<IStructuralEquatable> CreateConstructorReaderMethodBuilder(Type type, IServiceFactory factory)
         {
             Type closedGenericMethodBuilderType = typeof(IReaderMethodBuilder<>).MakeGenericType(type);
@@ -52,7 +51,7 @@
                 .Decorate(typeof(IPropertySelector), typeof(OneToManyPropertyValidator), sr => sr.ImplementingType == typeof(OneToManyPropertySelector))
                 .Decorate(typeof(IPropertySelector), typeof(ReadableArgumentPropertiesValidator), sr => sr.ImplementingType == typeof(ReadablePropertySelector))
                 .Decorate<IPropertySelector, CachedPropertySelector>()
-                
+
                 .Register<Func<Type, IReaderMethodBuilder<IStructuralEquatable>>>(
                     factory => type => CreateConstructorReaderMethodBuilder(type, factory), new PerContainerLifetime())
 
@@ -64,7 +63,8 @@
                 .Register<IConstructorSelector, FirstConstructorSelector>("FirstConstructorSelector", new PerContainerLifetime())
                 .Decorate(typeof(IConstructorSelector), typeof(ConstructorValidator), sr => sr.ImplementingType == typeof(ParameterlessConstructorSelector))
 
-                .Register(factory => DbReaderOptions.ParameterParser, new PerContainerLifetime());
+                .Register(factory => DbReaderOptions.ParameterParser, new PerContainerLifetime())
+                .RegisterSingleton<IParameterMatcher, ParameterMatcher>();
         }
 
         private void RegisterScopedServices(IServiceRegistry registry)
@@ -72,7 +72,7 @@
             registry
                 .Register<IFieldSelector, FieldSelector>(new PerScopeLifetime())
                 .Decorate<IFieldSelector, CachedFieldSelector>()
-            
+
                 .Register<IPrefixResolver, PrefixResolver>(new PerScopeLifetime())
 
                 .Register<IInstanceReaderFactory>(f => new InstanceReaderFactory(f.GetInstance), new PerScopeLifetime())
@@ -80,20 +80,20 @@
                 //.Register(typeof(IInstanceReader<>), typeof(InstanceReader<>))
                 .Register(typeof(IInstanceReader<>), typeof(InstanceReader<>), new PerScopeLifetime())
                 .Decorate(typeof(IInstanceReader<>), typeof(CachedInstanceReader<>))
-            
+
                 .Register(typeof(IInstanceReaderMethodBuilder<>), typeof(InstanceReaderMethodBuilder<>), new PerScopeLifetime())
                 .Decorate(typeof(IInstanceReaderMethodBuilder<>), typeof(CachedInstanceReaderMethodBuilder<>))
 
 
                 .Register<IKeyPropertyMapper, KeyPropertyMapper>(new PerScopeLifetime())
                 .Decorate<IKeyPropertyMapper, KeyPropertyMapperValidator>()
-                
 
-                
+
+
                 .Register<IPropertyMapper, PropertyMapper>(new PerScopeLifetime())
                 .Decorate<IPropertyMapper, PropertyTypeValidator>()
                 .Decorate<IPropertyMapper, CachedPropertyMapper>()
-                
+
 
 
                 .Register<IKeyReader, KeyReader>(new PerScopeLifetime())

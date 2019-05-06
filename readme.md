@@ -106,11 +106,63 @@ dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
 
 If we need more control with the regards to the parameters, we can simply assign an *IDataParameter* instance to a property of the argument object.
 
-```
+```C#
  var parameter = new SQLiteParameter(DbType.String) { Value = "ALFKI" }
  
  connection.Read<Customer>(sql, new { CustomerId = parameter });
 
+```
+
+## List Parameters
+
+A pretty typical scenario is that we have a list of values o the .Net side that we want to pass into a SQL statement.
+
+```c#
+var customers = connection.Read<Customer>(sql, new { Id1 = "ALFKI", Id2 = "BLAUS" });
+```
+
+The SQL would look something like this
+
+```SQL
+SELECT
+	CustomerId,
+	CompanyName
+FROM 
+	Customers
+WHERE 
+	CustomerId IN ( @Id1, @Id2)
+```
+
+The problem with this approach is that it is not very dynamic as we would have to change the SQL and the arguments object if we wanted to add another value to the list. 
+
+**DbReader** solves this by letting us pass an  `IEnumerable<T>` that will  expand the parameter list based on the number  of items in the list that we pass in. Note that this will only work for IN clauses in the SQL.
+
+```SQL
+SELECT
+	CustomerId,
+	CompanyName
+FROM 
+	Customers
+WHERE 
+	CustomerId IN ( @Ids )
+```
+
+We can now supply a list of customer ids like this.
+
+```c#
+var customers = connection.Read<Customer>(sql, new { Ids = new[] { "ALFKI", "BLAUS" } });
+```
+
+What happens under the hood here is that the SQL will expand the parameter list and the SQL will look like this. 
+
+```SQL
+SELECT
+	CustomerId,
+	CompanyName
+FROM 
+	Customers
+WHERE 
+	CustomerId IN (@Ids0, @Ids1)
 ```
 
 
