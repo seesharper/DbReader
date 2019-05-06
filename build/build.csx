@@ -6,6 +6,7 @@
 using static ChangeLog;
 using static ReleaseManagement;
 
+Console.WriteLine(BuildEnvironment.IsSecure);
 
 [StepDescription("Runs all tests")]
 Step test = () =>
