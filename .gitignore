@@ -16,7 +16,9 @@ local.properties
 .settings/
 Artifacts
 .loadpath
+# Ignore these since we download dotnet-script into the root folder on the build server.
 dotnet-script
+dotnet-script.zip
 # External tool builders
 .externalToolBuilders/
 
