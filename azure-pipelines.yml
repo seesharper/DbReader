@@ -5,6 +5,9 @@ trigger:
   tags:
     include:
       - refs/tags/*
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 variables:
 - group: api-keys
