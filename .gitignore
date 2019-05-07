@@ -16,7 +16,7 @@ local.properties
 .settings/
 Artifacts
 .loadpath
-
+dotnet-script
 # External tool builders
 .externalToolBuilders/
 
