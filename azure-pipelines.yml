@@ -1,6 +1,11 @@
 resources:
 - repo: self
 
+trigger:
+  tags:
+    include:
+      - refs/tags/*
+
 variables:
 - group: api-keys
 
