@@ -14,7 +14,7 @@
     <Description>A simple and fast database reader for the .Net framework.</Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DebugType>Full</DebugType>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
 

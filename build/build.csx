@@ -22,18 +22,19 @@ Step testcoverage = () =>
     Command.Execute("dotnet", $"reportgenerator \"-reports:{pathToOpenCoverResult}\"  \"-targetdir:{CodeCoverageArtifactsFolder}/Report\" \"-reportTypes:XmlSummary;Xml;HtmlInline_AzurePipelines_Dark\" \"--verbosity:warning\"", PathToTestProjectFolder);
 };
 
-[StepDescription("Runs the tests with test coverage")]
+[StepDescription("Creates the NuGet package")]
 Step pack = () =>
 {
+    testcoverage();
     DotNet.Pack(PathToProjectFolder, NuGetArtifactsFolder);
 };
 
 [DefaultStep]
 [StepDescription("Builds and creates a release")]
-Step release = () =>
+AsyncStep release = async () =>
 {
-    testcoverage();
-    DotNet.Pack(PathToProjectFolder, NuGetArtifactsFolder);
+    pack();
+    await PublishRelease();
 };
 
 
