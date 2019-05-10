@@ -28,7 +28,7 @@
         public RegExParameterParser(string parameterPattern, string listParameterPattern)
         {
             this.parameterMatcher = new Regex(parameterPattern, RegexOptions.Compiled);
-            this.listParameterMatcher = new Regex(listParameterPattern, RegexOptions.Compiled);
+            this.listParameterMatcher = new Regex(listParameterPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         }
 
         /// <summary>
