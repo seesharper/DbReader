@@ -49,6 +49,7 @@
         [InlineData("Id = @Parameter, AnotherId IN ( @ListParameter )")]
         [InlineData("Id = @Parameter, AnotherId IN(@ListParameter)")]
         [InlineData("Id = @Parameter, AnotherId IN( @ListParameter )")]
+        [InlineData("Id = @Parameter, AnotherId in( @ListParameter )")]
         public void ShouldMarkSingleListParameter(string source)
         {
             var parameters = parameterParser.GetParameters(source);
