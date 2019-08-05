@@ -3,20 +3,13 @@ namespace DbReader.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Data;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using Construction;
-    //using Dapper;
     using Extensions;
-    using Selectors;
     using Shouldly;
-    using DbReader.LightInject;
     using DbReader;
-    using Readers;
     using Xunit;
     using System.Text;
     using System.Data.SQLite;
@@ -373,6 +366,22 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldNotSetParameterValueWhenPassingCustomType()
+        {
+            DbReaderOptions.WhenPassing<CustomerId>().Use((p, c) =>
+                {
+                    p.Value.ShouldBeNull();
+                    p.Value = (string)c;
+                });
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
+                    new { CustomerId = new CustomerId("ALFKI") });
+                customers.Count().ShouldBe(1);
+            }
+        }
+
 
         private string LoadSql(string name)
         {
@@ -486,6 +495,26 @@ namespace DbReader.Tests
         //    }
 
         //}
+
+        public class CustomerId
+        {
+            private string Value { get; set; }
+
+            public CustomerId(string value)
+            {
+                Value = value;
+            }
+
+            public static implicit operator string(CustomerId value)
+            {
+                return value.Value;
+            }
+
+            public static implicit operator CustomerId(string value)
+            {
+                return new CustomerId(value);
+            }
+        }
 
     }
 }

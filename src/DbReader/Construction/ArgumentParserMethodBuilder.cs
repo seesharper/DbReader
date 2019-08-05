@@ -213,7 +213,7 @@ namespace DbReader.Construction
 
         public static void AddAndConvert<T>(List<IDataParameter> dataParameters, string name, T value, Func<IDataParameter> parameterFactory)
         {
-            var dataParameter = CreateParameter<T>(name, value, parameterFactory);
+            var dataParameter = CreateParameter(name, parameterFactory);
             ArgumentProcessor.Process(typeof(T), dataParameter, value);
             dataParameters.Add(dataParameter);
         }
@@ -244,7 +244,7 @@ namespace DbReader.Construction
             foreach (var value in values)
             {
                 var listParameterName = $"{name}{i}";
-                var dataParameter = CreateParameter(listParameterName, value, parameterFactory);
+                var dataParameter = CreateParameter(listParameterName, parameterFactory);
                 ArgumentProcessor.Process(typeof(T), dataParameter, value);
                 dataParameters.Add(dataParameter);
                 var expandedParameterName = $"{fullName}{i}";
@@ -267,11 +267,17 @@ namespace DbReader.Construction
 
 
 
-        private static IDataParameter CreateParameter<T>(string name, T value, Func<IDataParameter> parameterFactory)
+        private static IDataParameter CreateParameter(string name, object value, Func<IDataParameter> parameterFactory)
+        {
+            var dataParameter = CreateParameter(name, parameterFactory);
+            dataParameter.Value = ToDbNullIfNull(value);
+            return dataParameter;
+        }
+
+        private static IDataParameter CreateParameter(string name, Func<IDataParameter> parameterFactory)
         {
             var dataParameter = parameterFactory();
             dataParameter.ParameterName = name;
-            dataParameter.Value = ToDbNullIfNull(value);
             return dataParameter;
         }
 
