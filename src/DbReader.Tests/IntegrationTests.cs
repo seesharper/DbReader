@@ -183,8 +183,7 @@ namespace DbReader.Tests
         }
 
         [Fact]
-        public void
-        ShouldThrowExceptionWhenArgumentNotFound()
+        public void ShouldThrowExceptionWhenArgumentNotFound()
         {
             using (var connection = CreateConnection())
             {
@@ -222,6 +221,28 @@ namespace DbReader.Tests
 
             DbReaderOptions.CommandInitializer = null;
         }
+
+        [Fact]
+        public void ShouldInvokeCommandInitializerBeforeParsingQuery()
+        {
+            DbReaderOptions.CommandInitializer = command =>
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = "@CustomerId";
+                parameter.Value = "ALFKI";
+                command.Parameters.Add(parameter);
+            };
+
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId and CompanyName = @CompanyName", new { CompanyName = "Alfreds Futterkiste" });
+
+                customers.Count().ShouldBe(1);
+            }
+
+            DbReaderOptions.CommandInitializer = null;
+        }
+
 
         [Fact]
         public void ShouldReadEmployeeHierarchy()

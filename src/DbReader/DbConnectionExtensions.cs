@@ -136,12 +136,13 @@ namespace DbReader
         public static IDbCommand CreateCommand(this IDbConnection dbConnection, string query, object arguments = null)
         {
             var command = dbConnection.CreateCommand();
-
+            command.CommandText = query;
+            CommandInitializer?.Invoke(command);
             var queryInfo = ArgumentParser.Parse(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
 
             SqlStatement.Current = queryInfo.Query;
             command.CommandText = queryInfo.Query;
-            CommandInitializer?.Invoke(command);
+
 
             foreach (var dataParameter in queryInfo.Parameters)
             {
