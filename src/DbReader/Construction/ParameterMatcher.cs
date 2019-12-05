@@ -56,6 +56,10 @@ namespace DbReader.Construction
 
                 if (!propertyMap.TryGetValue(dataParameter.Name, out var property))
                 {
+                    if (existingParameterNames.Contains(dataParameter.FullName))
+                    {
+                        continue;
+                    }
                     throw new InvalidOperationException(ErrorMessages.MissingArgument.FormatWith(dataParameter.Name));
                 }
 
