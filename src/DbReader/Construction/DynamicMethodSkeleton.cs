@@ -20,11 +20,22 @@ namespace DbReader.Construction
         /// <param name="module">A <see cref="Module"/> representing the module with which the dynamic method is to be logically associated.</param>
         public DynamicMethodSkeleton(string name, Type returnType, Type[] parameterTypes, Module module)
         {
+#if NET46
+             dynamicMethod = new DynamicMethod(
+                       name,
+                       returnType,
+                       parameterTypes,
+                       module,
+                       true);
+
+#else
             dynamicMethod = new DynamicMethod(
-                name,
-                returnType,
-                parameterTypes,
-                module);
+                       name,
+                       returnType,
+                       parameterTypes,
+                       module);
+#endif
+
         }
 
         /// <summary>
@@ -36,11 +47,21 @@ namespace DbReader.Construction
         /// <param name="owner">A <see cref="Type"/> with which the dynamic method is logically associated. The dynamic method has access to all members of the type.</param>
         public DynamicMethodSkeleton(string name, Type returnType, Type[] parameterTypes, Type owner)
         {
+#if NET46
             dynamicMethod = new DynamicMethod(
-                name,
-                returnType,
-                parameterTypes,
-                owner);
+                        name,
+                        returnType,
+                        parameterTypes,
+                        owner,
+                        true);
+#else
+            dynamicMethod = new DynamicMethod(
+                                name,
+                                returnType,
+                                parameterTypes,
+                                owner);
+#endif
+
         }
 
         /// <summary>
