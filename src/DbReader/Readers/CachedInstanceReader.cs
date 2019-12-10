@@ -7,7 +7,7 @@ namespace DbReader.Readers
     using Construction;
 
     /// <summary>
-    /// An <see cref="IInstanceReader{T}"/> decorator that caches instances 
+    /// An <see cref="IInstanceReader{T}"/> decorator that caches instances
     /// of <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The type of object to be cached.</typeparam>
@@ -18,8 +18,8 @@ namespace DbReader.Readers
         private readonly IKeyReader keyReader;
 
         private readonly IOneToManyMethodBuilder<T> oneToManyMethodBuilder;
-        
-        private readonly ConcurrentDictionary<IStructuralEquatable, T> queryCache = new ConcurrentDictionary<IStructuralEquatable, T>(); 
+
+        private readonly ConcurrentDictionary<IStructuralEquatable, T> queryCache = new ConcurrentDictionary<IStructuralEquatable, T>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedInstanceReader{T}"/> class.
@@ -42,15 +42,19 @@ namespace DbReader.Readers
         /// <param name="currentPrefix">The current prefix.</param>
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Read(IDataRecord dataRecord, string currentPrefix)
-        {            
+        {
             var instance = ReadInstance(dataRecord, currentPrefix);
+            if (instance == null)
+            {
+                return default(T);
+            }
             var method = oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix);
             method?.Invoke(dataRecord, instance);
             return instance;
         }
 
         private T ReadInstance(IDataRecord dataRecord, string currentPrefix)
-        {            
+        {
             var key = keyReader.Read(typeof(T), dataRecord, currentPrefix);
             if (key == null)
             {
@@ -63,7 +67,7 @@ namespace DbReader.Readers
                 queryCache.TryAdd(key, instance);
             }
             return instance;
-            
+
         }
     }
 }
