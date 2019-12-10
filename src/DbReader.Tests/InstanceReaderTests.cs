@@ -3,9 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Database;
     using DbReader.Construction;
-    using DbReader.Interfaces;
 
     using Readers;
     using Shouldly;
@@ -252,6 +250,8 @@
             instance.OneToManyRelation.Count().ShouldBe(1);
         }
 
+
+
         [Fact]
         public void ShouldReadInstanceWithRecursiveOneToManyRelation()
         {
@@ -302,11 +302,11 @@
         {
             var rows = new[]
             {
-                new { MasterId = 1 ,Details_DetailId = 1 ,SubDetails_SubdetailId = 1 },
-                new { MasterId = 1, Details_DetailId = 1 ,SubDetails_SubdetailId = 2 },
-                new { MasterId = 1 ,Details_DetailId = 2 ,SubDetails_SubdetailId = 3 },
-                new { MasterId = 1 ,Details_DetailId = 2 ,SubDetails_SubdetailId = 4 },
-                new { MasterId = 1 ,Details_DetailId = 2 ,SubDetails_SubdetailId = 5 }
+                new { MasterId = 1 ,Details_DetailId = 1 ,Details_SubDetails_SubdetailId = 1 },
+                new { MasterId = 1, Details_DetailId = 1 ,Details_SubDetails_SubdetailId = 2 },
+                new { MasterId = 1 ,Details_DetailId = 2 ,Details_SubDetails_SubdetailId = 3 },
+                new { MasterId = 1 ,Details_DetailId = 2 ,Details_SubDetails_SubdetailId = 4 },
+                new { MasterId = 1 ,Details_DetailId = 2 ,Details_SubDetails_SubdetailId = 5 }
             };
 
             var instances = rows.ToDataReader().Read<Master>().ToArray();
@@ -320,6 +320,34 @@
             var dataRecord = new { Id = 42, Property = "SomeValue" }.ToDataRecord();
             var reader = GetReader<ClassWithProperty<int>>();
             Should.Throw<InvalidOperationException>(() => reader.Read(dataRecord, string.Empty));
+        }
+
+        [Fact]
+        public void ShouldHandleNullValuesInNavigationChain()
+        {
+            var dataRecord = new { ParentID = "42", Children_ChildId = (string)null, Children_SubChildren_SubChildId = (string)null }.ToDataRecord();
+            var reader = GetReader<Parent>();
+            var result = reader.Read(dataRecord, string.Empty);
+            result.Children.ShouldBeEmpty();
+        }
+
+        public class Parent
+        {
+            public string ParentId { get; set; }
+
+            public ICollection<Child> Children { get; set; }
+        }
+
+        public class Child
+        {
+            public string ChildId { get; set; }
+
+            public ICollection<SubChild> SubChildren { get; set; }
+        }
+
+        public class SubChild
+        {
+            public string SubChildId { get; set; }
         }
     }
 
