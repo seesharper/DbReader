@@ -403,6 +403,16 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldReadSimpleType()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customerIds = connection.Read<string>("SELECT CustomerID FROM Customers");
+                customerIds.Count().ShouldBe(93);
+            }
+        }
+
 
         private string LoadSql(string name)
         {
