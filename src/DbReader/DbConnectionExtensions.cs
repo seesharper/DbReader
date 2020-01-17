@@ -203,9 +203,8 @@ namespace DbReader
         public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, string query, object arguments = null)
         {
             var command = (DbCommand)CreateCommand(dbConnection, query, arguments);
-            var value = await command.ExecuteScalarAsync();
-            return ConvertFromDbValue<T>(value);
-
+            var reader = await command.ExecuteReaderAsync();
+            return ReadScalarValue<T>(reader);
         }
 
         /// <summary>
@@ -219,8 +218,23 @@ namespace DbReader
         public static T ExecuteScalar<T>(this IDbConnection dbConnection, string query, object arguments = null)
         {
             var command = CreateCommand(dbConnection, query, arguments);
-            var value = command.ExecuteScalar();
-            return ConvertFromDbValue<T>(value);
+            var reader = command.ExecuteReader();
+            return ReadScalarValue<T>(reader);
+        }
+
+        private static T ReadScalarValue<T>(IDataReader reader)
+        {
+            if (!reader.Read())
+            {
+                return default(T);
+            }
+
+            if (ValueConverter.CanConvert(typeof(T)))
+            {
+                return ValueConverter.Convert<T>(reader, 0);
+            }
+
+            return ConvertFromDbValue<T>(reader.GetValue(0));
         }
 
         private static T ConvertFromDbValue<T>(object value)

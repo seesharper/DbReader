@@ -74,6 +74,28 @@
                 return result;
             }
 
+            if (typeof(T).IsSimpleType())
+            {
+                if (ValueConverter.CanConvert(typeof(T)))
+                {
+                    result.Add((T)ValueConverter.Convert<T>(dataReader, 0));
+                    while (dataReader.Read())
+                    {
+                        result.Add((T)ValueConverter.Convert<T>(dataReader, 0));
+                    }
+                }
+                else
+                {
+                    result.Add((T)dataReader.GetValue(0));
+                    while (dataReader.Read())
+                    {
+                        result.Add((T)dataReader.GetValue(0));
+                    }
+                }
+
+                return result;
+            }
+
             var propertyReaderDelegate = PropertyReaderDelegateCache<T>.Get(SqlStatement.Current);
             if (propertyReaderDelegate == null)
             {
