@@ -67,7 +67,7 @@ FROM
 
 With both the Customer class and the SQL in place, we are ready to query the database.
 
-```
+```sql
 var customers = dbConnection.Read<Customer>(sql)
 ```
 
@@ -510,6 +510,16 @@ The *Guid* also needs to be converted back into a byte array when passing a *Gui
 ```
 DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray());
 ```
+
+## Simple Types
+
+Sometimes we just want to get a list of a simple types such as `string` or maybe an `integer`
+
+```c#
+var customerIds = connection.Read<string>("SELECT CustomerID FROM Customers");
+```
+
+This will simply return a list of strings representing the customer ids.
 
 
 
