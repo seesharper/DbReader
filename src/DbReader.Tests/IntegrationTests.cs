@@ -313,6 +313,16 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public async Task ShouldConvertScalarValueUsingValueConverter()
+        {
+            DbReaderOptions.WhenReading<CustomScalarValue>().Use((datarecord, i) => new CustomScalarValue(datarecord.GetInt64(i)));
+            using (var connection = CreateConnection())
+            {
+                var scalar = await connection.ExecuteScalarAsync<CustomScalarValue>("SELECT COUNT(*) FROM Customers");
+                scalar.Value.ShouldBe(93);
+            }
+        }
 
         [Fact]
         public async Task ShouldGetScalarValueAsync()
@@ -413,6 +423,17 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public void ShouldReadSimpleTypeUsingValueConverter()
+        {
+            DbReaderOptions.WhenReading<CustomValueType>().Use((record, ordinal) => new CustomValueType(record.GetInt32(ordinal)));
+
+            using (var connection = CreateConnection())
+            {
+                var orderIds = connection.Read<CustomValueType>("SELECT OrderId FROM Orders");
+                orderIds.Count().ShouldBe(830);
+            }
+        }
 
         private string LoadSql(string name)
         {
@@ -547,6 +568,16 @@ namespace DbReader.Tests
             }
         }
 
+    }
+
+    public struct CustomScalarValue
+    {
+        public CustomScalarValue(long value)
+        {
+            Value = value;
+        }
+
+        public long Value { get; }
     }
 }
 #endif
