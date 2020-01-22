@@ -50,9 +50,9 @@
             }
 
             var container = containerFactory.Value;
-            using (container.BeginScope())
+            using (var scope = container.BeginScope())
             {
-                var instanceReader = container.GetInstance<IInstanceReader<T>>();
+                var instanceReader = scope.GetInstance<IInstanceReader<T>>();
                 result.TryAdd(instanceReader.Read(dataReader, string.Empty));
                 while (dataReader.Read())
                 {
@@ -100,11 +100,11 @@
             if (propertyReaderDelegate == null)
             {
                 var container = containerFactory.Value;
-                using (container.BeginScope())
+                using (var scope = container.BeginScope())
                 {
                     var propertyReaderMethodBuilder =
-                        container.GetInstance<IReaderMethodBuilder<T>>("PropertyReaderMethodBuilder");
-                    var ordinalsSelector = container.GetInstance<IOrdinalSelector>();
+                        scope.GetInstance<IReaderMethodBuilder<T>>("PropertyReaderMethodBuilder");
+                    var ordinalsSelector = scope.GetInstance<IOrdinalSelector>();
 
                     propertyReaderDelegate = new PropertyReaderDelegate<T>()
                     {

@@ -20,7 +20,7 @@ namespace DbReader
     /// </summary>
     public static class DbConnectionExtensions
     {
-        private static readonly IServiceContainer Container = new ServiceContainer();
+        private static readonly IServiceContainer Container = new ServiceContainer(options => options.EnableCurrentScope = false);
         private static readonly IArgumentParser ArgumentParser;
 
         static DbConnectionExtensions()

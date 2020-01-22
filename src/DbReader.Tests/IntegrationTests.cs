@@ -441,33 +441,6 @@ namespace DbReader.Tests
             return provider.Load(name);
         }
 
-        //public void ShouldOutPerformDapperForListWithoutParameter(
-        //    IReaderMethodBuilder<CustomerWithOrders> propertyReaderMethodBuilder, IOrdinalSelector ordinalSelector)
-        //{
-
-
-
-        //    using (var connection = CreateConnection())
-        //    {
-        //        var dapperResult = Measure.Run(() => connection.Query<Customer>(SQL.Customers), 100,
-        //            "Dapper (All Customers)");
-        //        var dbReaderResult = Measure.Run(() => connection.Read<Customer>(SQL.Customers), 100,
-        //            "DbReader (All Customers)");
-
-        //        Console.WriteLine(dbReaderResult);
-        //        Console.WriteLine(dapperResult);
-        //    }
-        //}
-
-        //public void DbReaderVsDapper()
-        //{
-        //    GetAllCustomersUsingDapper();
-        //    GetAllCustomersUsingDbReader();
-        //    //GetAllCustomersUsingPropertyReader();
-        //}
-
-
-
         [Fact]
         public void GetAllCustomersUsingDbReader()
         {
@@ -479,74 +452,17 @@ namespace DbReader.Tests
             }
         }
 
-        //public void GetAllCustomersUsingDapper()
-        //{
-        //    using (var connection = CreateConnection())
-        //    {
-        //        var dbReaderResult = Measure.Run(() => connection.Query<Customer>(SQL.Customers), 10,
-        //            "Dapper (All Customers)");
-        //        Console.WriteLine(dbReaderResult);
-        //    }
-        //}
-
-        public void GetAllCustomersUsingPlainDataReader()
+        [Fact]
+        public void ShouldGetOrdersWithCustomersTwice()
         {
+            var sql = "SELECT o.OrderID as OrderWithCustomerId, c.CustomerID AS Customer_CustomerId FROM ORDERS AS o INNER JOIN Customers c on o.CustomerID = c.CustomerID";
             using (var connection = CreateConnection())
             {
-
-
-                var dbReaderResult = Measure.Run(() =>
-                {
-                    var command = connection.CreateCommand();
-                    command.CommandText = LoadSql("Customers");
-                    var reader = command.ExecuteReader();
-                    List<Customer> result = new List<Customer>();
-                    while (reader.Read())
-                    {
-                        Customer c = new Customer();
-                        c.CustomerId = reader.GetString(0);
-                        result.TryAdd(c);
-                    }
-                }, 10,
-                    "DbReader (All Customers)");
-                Console.WriteLine(dbReaderResult);
+                var firstOrders = connection.Read<OrderWithCustomer>(sql);
+                var secondOrders = connection.Read<OrderWithCustomer>(sql);
             }
         }
 
-        //public void GetAllCustomersUsingPropertyReader()
-        //{
-        //    var container = new ServiceContainer();
-        //    container.RegisterFrom<CompositionRoot>();
-
-        //    var propertyreaderMethodBuilder = container.GetInstance<IReaderMethodBuilder<Customer>>("PropertyReaderMethodBuilder");
-        //    var method = propertyreaderMethodBuilder.CreateMethod();
-        //    int[] ordinals = new[] {0,1,2,3};
-        //    using (var connection = CreateConnection())
-        //    {
-
-
-        //        var dbReaderResult = Measure.Run(() =>
-        //        {
-        //            List<Customer> result = new List<Customer>();
-        //            //var command = connection.CreateCommand(SQL.Customers, null);
-        //            var command = connection.CreateCommand();
-        //            command.CommandText = SQL.Customers;
-        //            using (var reader = command.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    var customer = method(reader, ordinals);
-        //                    result.Add(customer);
-        //                }
-
-        //            }
-
-        //        }, 10,
-        //            "DbReader-PropertyReader (All Customers)");
-        //        Console.WriteLine(dbReaderResult);
-        //    }
-
-        //}
 
         public class CustomerId
         {
