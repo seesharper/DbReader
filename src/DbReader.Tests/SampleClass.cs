@@ -25,6 +25,14 @@
     }
 
 
+    public class OrderWithCustomer
+    {
+        [Key]
+        public long OrderWithCustomerId { get; set; }
+
+        public Customer Customer { get; set; }
+    }
+
     public class CustomerWithOrders
     {
         public string CustomerWithOrdersId { get; set; }
@@ -34,6 +42,7 @@
 
     public class Customer
     {
+        [Key]
         public string CustomerId { get; set; }
 
         public string CompanyName { get; set; }
