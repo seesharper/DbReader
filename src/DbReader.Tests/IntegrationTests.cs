@@ -177,15 +177,16 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldReadCustomerByIdUsingArgumentsBuilderBasedUponExistingObject()
         {
-
-
-            var args = new ArgumentsBuilder().From(new { Country = "UK" }).Add("City", "London").Build();
+            var args = new ArgumentsBuilder()
+                .From(new { Country = "UK" })
+                .Add("City", "London")
+                .Build();
 
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE Country = @Country AND City = @City",
                     args);
-                customers.Count().ShouldBe(1);
+                customers.Count().ShouldBe(6);
             }
         }
 

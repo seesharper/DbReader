@@ -10,18 +10,18 @@ namespace DbReader.Extensions
     public static class PropertyInfoEnumerableExtensions
     {
         /// <summary>
-        /// Orders the <paramref name="properties"/> by their declaration order.
+        /// Orders the <paramref name="members"/> by their declaration order.
         /// </summary>
-        /// <param name="properties">The properties for which to be ordered.</param>
-        /// <returns>The <paramref name="properties"/> ordered by declaration.</returns>
-        public static IEnumerable<PropertyInfo> OrderByDeclaration(this IEnumerable<PropertyInfo> properties)
+        /// <param name="members">The properties for which to be ordered.</param>
+        /// <returns>The <paramref name="members"/> ordered by declaration.</returns>
+        public static IEnumerable<MemberInfo> OrderByDeclaration(this IEnumerable<MemberInfo> members)
         {
-            return properties.OrderBy(p => p, new MetadataTokenComparer());
+            return members.OrderBy(p => p, new MetadataTokenComparer());
         }
 
-        private class MetadataTokenComparer : IComparer<PropertyInfo>
+        private class MetadataTokenComparer : IComparer<MemberInfo>
         {
-            public int Compare(PropertyInfo x, PropertyInfo y)
+            public int Compare(MemberInfo x, MemberInfo y)
             {
 
                 var xToken = x.MetadataToken;

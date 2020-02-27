@@ -1,5 +1,7 @@
 using Xunit;
 using Shouldly;
+using DbReader.DynamicArguments;
+
 namespace DbReader.Tests
 {
     public class ArgumentsBuilderTests
@@ -29,11 +31,20 @@ namespace DbReader.Tests
         }
 
         [Fact]
+        public void ShouldNotBeSameTypeWhenNumberOfMembersAreDifferent()
+        {
+            var dynamicObject1 = new ArgumentsBuilder().Add("Id", 42).Build();
+            var dynamicObject2 = new ArgumentsBuilder().Add("Id", 42).Add("Id2", 42).Build();
+            dynamicObject1.GetType().ShouldNotBeSameAs(dynamicObject2.GetType());
+        }
+
+        [Fact]
         public void ShouldNotBeSameTypeWhenMemberNamesAreDifferent()
         {
             var dynamicObject1 = new ArgumentsBuilder().Add("Id1", 42).Build();
             var dynamicObject2 = new ArgumentsBuilder().Add("Id2", 42).Build();
             dynamicObject1.GetType().ShouldNotBeSameAs(dynamicObject2.GetType());
+            object.Equals(dynamicObject1, dynamicObject2).ShouldBeFalse();
         }
 
         [Fact]
@@ -44,13 +55,34 @@ namespace DbReader.Tests
             dynamicObject.Get<string>("Name").ShouldBe("SomeName");
         }
 
-        // [Fact]
-        // public void ShouldBeEqualWhenMemberAndValueMatches()
-        // {
-        //     var dynamicObject1 = new DynamicTypeBuilder().Add("Id1", 42).Build();
-        //     var dynamicObject2 = new DynamicTypeBuilder().Add("Id1", 42).Build();
-        //     dynamicObject1.Should().Be(dynamicObject2);
-        // }
+        [Fact]
+        public void ShouldUseEqualsForDynamicMember()
+        {
+            var firstMember = new DynamicMemberInfo("Id", typeof(int));
+            var secondMember = new DynamicMemberInfo("Id", typeof(int));
+            object.Equals(firstMember, secondMember).ShouldBeTrue();
+        }
+
+        public class DynamicMemberInfoArrayEqualityComparerTests
+        {
+            [Fact]
+            public void ShouldNotBeEqualForDifferentTypes()
+            {
+                var comparer = new DynamicMemberInfoArrayEqualityComparer();
+                var firstList = new DynamicMemberInfo[] { new DynamicMemberInfo("Id1", typeof(int)), new DynamicMemberInfo("Id2", typeof(int)) };
+                var secondList = new DynamicMemberInfo[] { new DynamicMemberInfo("Id1", typeof(int)), new DynamicMemberInfo("Id2", typeof(string)) };
+                comparer.Equals(firstList, secondList).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void ShouldNotBeEqualForDifferentLengths()
+            {
+                var comparer = new DynamicMemberInfoArrayEqualityComparer();
+                var firstList = new DynamicMemberInfo[] { new DynamicMemberInfo("Id1", typeof(int)), new DynamicMemberInfo("Id2", typeof(int)) };
+                var secondList = new DynamicMemberInfo[] { new DynamicMemberInfo("Id1", typeof(int)) };
+                comparer.Equals(firstList, secondList).ShouldBeFalse();
+            }
+        }
 
         public class ObjectWithPropertiesAndFields
         {
