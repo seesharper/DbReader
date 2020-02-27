@@ -113,6 +113,28 @@ If we need more control with the regards to the parameters, we can simply assign
 
 ```
 
+
+
+## ArgumentsBuilder
+
+The `ArgumentsBuilder` can be used to dynamically create the arguments object passed to the query. 
+
+```c#
+var args = new ArgumentsBuilder().Add("CustomerId", "ALFKI").Build();
+connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId", args);
+```
+
+We can base an `ArgumentsBuilder` upon an existing object and keep adding arguments.
+
+```c#
+var args = new ArgumentsBuilder()
+                .From(new { Country = "UK" })
+                .Add("City", "London")
+                .Build();
+```
+
+
+
 ## List Parameters
 
 A pretty typical scenario is that we have a list of values o the .Net side that we want to pass into a SQL statement.

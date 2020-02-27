@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net462</TargetFrameworks>
     <!-- <TargetFramework>netcoreapp2.0</TargetFramework> -->
-    <Version>2.2.1</Version>
+    <Version>2.3.0</Version>
     <Authors>Bernhard Richter</Authors>
     <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
@@ -28,12 +28,13 @@
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LightInject.Source" Version="6.2.0">
+    <PackageReference Include="LightInject.Source" Version="6.3.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <!-- <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/> -->
