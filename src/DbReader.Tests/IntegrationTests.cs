@@ -162,6 +162,35 @@ namespace DbReader.Tests
         }
 
         [Fact]
+        public void ShouldReadCustomerByIdUsingArgumentsBuilder()
+        {
+            var args = new ArgumentsBuilder().Add("CustomerId", "ALFKI").Build();
+
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
+                    args);
+                customers.Count().ShouldBe(1);
+            }
+        }
+
+        [Fact]
+        public void ShouldReadCustomerByIdUsingArgumentsBuilderBasedUponExistingObject()
+        {
+
+
+            var args = new ArgumentsBuilder().From(new { Country = "UK" }).Add("City", "London").Build();
+
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE Country = @Country AND City = @City",
+                    args);
+                customers.Count().ShouldBe(1);
+            }
+        }
+
+
+        [Fact]
         public void ShouldReadCustomerByIdUsingDataParameter()
         {
             using (var connection = CreateConnection())
