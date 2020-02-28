@@ -124,13 +124,14 @@ var args = new ArgumentsBuilder().Add("CustomerId", "ALFKI").Build();
 connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId", args);
 ```
 
-We can base an `ArgumentsBuilder` upon an existing object and keep adding arguments.
+We can even base an `ArgumentsBuilder` upon an existing object and keep adding arguments.
 
 ```c#
 var args = new ArgumentsBuilder()
                 .From(new { Country = "UK" })
                 .Add("City", "London")
                 .Build();
+connection.Read<Customer>("SELECT * FROM Customers WHERE Country = @Country AND City = @City",
 ```
 
 
