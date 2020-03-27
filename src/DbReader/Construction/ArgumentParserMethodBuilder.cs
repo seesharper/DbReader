@@ -203,7 +203,7 @@ namespace DbReader.Construction
         }
     }
 
-    internal static class ParameterHelper
+    public static class ParameterHelper
     {
         public static void Add<T>(List<IDataParameter> dataParameters, string name, T value, Func<IDataParameter> parameterFactory)
         {
