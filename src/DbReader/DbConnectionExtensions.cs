@@ -96,8 +96,10 @@ namespace DbReader
         /// <returns><see cref="IDataReader"/></returns>
         public static IDataReader ExecuteReader(this IDbConnection dbConnection, string query, object arguments = null)
         {
-            var command = CreateCommand(dbConnection, query, arguments);
-            return command.ExecuteReader();
+            using (var command = CreateCommand(dbConnection, query, arguments))
+            {
+                return command.ExecuteReader();
+            }
         }
 
         /// <summary>
@@ -122,8 +124,10 @@ namespace DbReader
         /// <returns><see cref="IDataReader"/></returns>
         public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null)
         {
-            var command = CreateCommand(dbConnection, query, arguments);
-            return await ((DbCommand)command).ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+            using (var command = CreateCommand(dbConnection, query, arguments))
+            {
+                return await ((DbCommand)command).ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -162,8 +166,10 @@ namespace DbReader
         /// <returns>The number of rows affected.</returns>
         public static int Execute(this IDbConnection dbConnection, string query, object arguments = null)
         {
-            var command = CreateCommand(dbConnection, query, arguments);
-            return command.ExecuteNonQuery();
+            using (var command = CreateCommand(dbConnection, query, arguments))
+            {
+                return command.ExecuteNonQuery();
+            }
         }
 
         /// <summary>
@@ -188,8 +194,10 @@ namespace DbReader
         /// <returns>The number of rows affected.</returns>
         public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null)
         {
-            var command = (DbCommand)CreateCommand(dbConnection, query, arguments);
-            return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            using (var command = (DbCommand)CreateCommand(dbConnection, query, arguments))
+            {
+                return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -202,9 +210,13 @@ namespace DbReader
         /// <returns>The type of value to be returned.</returns>
         public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, string query, object arguments = null)
         {
-            var command = (DbCommand)CreateCommand(dbConnection, query, arguments);
-            var reader = await command.ExecuteReaderAsync();
-            return ReadScalarValue<T>(reader);
+            using (var command = (DbCommand)CreateCommand(dbConnection, query, arguments))
+            {
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    return ReadScalarValue<T>(reader);
+                }
+            }
         }
 
         /// <summary>
@@ -217,9 +229,13 @@ namespace DbReader
         /// <returns>The type of value to be returned.</returns>
         public static T ExecuteScalar<T>(this IDbConnection dbConnection, string query, object arguments = null)
         {
-            var command = CreateCommand(dbConnection, query, arguments);
-            var reader = command.ExecuteReader();
-            return ReadScalarValue<T>(reader);
+            using (var command = CreateCommand(dbConnection, query, arguments))
+            {
+                using (var reader = command.ExecuteReader())
+                {
+                    return ReadScalarValue<T>(reader);
+                }
+            }
         }
 
         private static T ReadScalarValue<T>(IDataReader reader)
