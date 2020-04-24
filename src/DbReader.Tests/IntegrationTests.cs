@@ -355,6 +355,18 @@ namespace DbReader.Tests
         }
 
         [Fact]
+        public async Task ShouldHandleNullScalarValueUsingValueConverter()
+        {
+            DbReaderOptions.WhenReading<CustomScalarValue?>().Use((datarecord, i) => new CustomScalarValue(datarecord.GetInt64(i)));
+            using (var connection = CreateConnection())
+            {
+                var scalar = await connection.ExecuteScalarAsync<CustomScalarValue?>("SELECT NULL FROM Customers WHERE CustomerID = 'ALFKI'");
+                scalar.ShouldBe(null);
+            }
+        }
+
+
+        [Fact]
         public async Task ShouldGetScalarValueAsync()
         {
             using (var connection = CreateConnection())

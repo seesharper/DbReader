@@ -240,7 +240,7 @@ namespace DbReader
 
         private static T ReadScalarValue<T>(IDataReader reader)
         {
-            if (!reader.Read())
+            if (!reader.Read() || reader.IsDBNull(0))
             {
                 return default(T);
             }
