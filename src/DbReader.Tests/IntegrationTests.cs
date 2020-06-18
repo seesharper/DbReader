@@ -505,18 +505,6 @@ namespace DbReader.Tests
             }
         }
 
-        [Fact]
-        public void ShouldThrowIncludeParameterNameAndValueWhenPassingInvalidValue()
-        {
-            using (var connection = CreateConnection())
-            {
-                var customers = connection.Read<Customer>("SELECT * FROM Orders WHERE OrderDate = @OrderDate",
-                    new { OrderDate = (string)null });
-                customers.Count().ShouldBe(1);
-            }
-        }
-
-
         public class CustomerId
         {
             private string Value { get; set; }

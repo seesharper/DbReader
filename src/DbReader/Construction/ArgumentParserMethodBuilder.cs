@@ -270,7 +270,15 @@ namespace DbReader.Construction
         private static IDataParameter CreateParameter(string name, object value, Func<IDataParameter> parameterFactory)
         {
             var dataParameter = CreateParameter(name, parameterFactory);
-            dataParameter.Value = ToDbNullIfNull(value);
+            try
+            {
+                dataParameter.Value = ToDbNullIfNull(value);
+            }
+            catch
+            {
+                throw new ArgumentOutOfRangeException(name, value, ErrorMessages.InvalidParameterValue.FormatWith(name, value, value == null ? "null" : value.GetType().Name));
+            }
+
             return dataParameter;
         }
 

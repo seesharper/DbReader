@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using DbReader.Construction;
 using Moq;
+using Shouldly;
 using Xunit;
 
 namespace DbReader.Tests
@@ -11,13 +12,12 @@ namespace DbReader.Tests
         private IArgumentParserMethodBuilder argumentParserMethodBuilder;
 
         [Fact]
-        public void TestName()
+        public void ShouldThrowMeaningfulExceptionWhenParameterValueIsNotAccepted()
         {
             var args = new { CustomerId = "ALFKI" };
             var method = argumentParserMethodBuilder.CreateMethod("@CustomerId", args.GetType(), Array.Empty<IDataParameter>());
-            method("@CustomerId", args, () => new ThrowingDataParameter());
-
-            //method("@CustomerId",)
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => method("@CustomerId", args, () => new ThrowingDataParameter()));
+            exception.Message.ShouldContain("The parameter (CustomerId) did not accept the value `ALFKI` (String). If the value is a custom type, consider adding support for the type using DbReaderOptions.WhenPassing()");
         }
 
 
