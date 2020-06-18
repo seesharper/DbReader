@@ -505,7 +505,6 @@ namespace DbReader.Tests
             }
         }
 
-
         public class CustomerId
         {
             private string Value { get; set; }

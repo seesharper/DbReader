@@ -23,5 +23,6 @@
 
         public const string InvalidListArgument = "The parameter {0} is defined a list parameter, but the property {1} is not IEnumerable<T>";
 
+        public const string InvalidParameterValue = "The parameter ({0}) did not accept the value `{1}` ({2}). If the value is a custom type, consider adding support for the type using DbReaderOptions.WhenPassing()";
     }
 }
