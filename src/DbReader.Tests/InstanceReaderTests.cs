@@ -280,12 +280,13 @@
         [Fact]
         public void ShouldReadInstanceWithTwoManyToOneRelationsOfSameType()
         {
-            var dataRecord = new { Id = 1, FirstProperty_Id = 2, SecondProperty_Id = 3 }.ToDataRecord();
+            var dataRecord = new { Id = 1, FirstProperty_Id = 2, SecondProperty_Id = 2 }.ToDataRecord();
             var reader = GetReader<ClassWithTwoProperties<ClassWithId, ClassWithId>>();
             var instance = reader.Read(dataRecord, string.Empty);
             instance.Id.ShouldBe(1);
             instance.FirstProperty.Id.ShouldBe(2);
-            instance.SecondProperty.Id.ShouldBe(3);
+            instance.SecondProperty.Id.ShouldBe(2);
+            instance.FirstProperty.ShouldNotBeSameAs(instance.SecondProperty);
         }
 
         [Fact]

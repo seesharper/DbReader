@@ -58,13 +58,20 @@ namespace DbReader.Readers
             var key = keyReader.Read(typeof(T), dataRecord, currentPrefix);
             if (key == null)
             {
-                return default(T);
+                return default;
             }
-            T instance;
-            if (!queryCache.TryGetValue(key, out instance))
+
+            IStructuralEquatable cacheKey = key;
+            if (!string.IsNullOrWhiteSpace(currentPrefix))
+            {
+                cacheKey = (key, currentPrefix);
+            }
+
+            // Note the cache need to include the prefix
+            if (!queryCache.TryGetValue(cacheKey, out T instance))
             {
                 instance = instanceReader.Read(dataRecord, currentPrefix);
-                queryCache.TryAdd(key, instance);
+                queryCache.TryAdd(cacheKey, instance);
             }
             return instance;
 
