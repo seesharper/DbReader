@@ -35,20 +35,32 @@ namespace DbReader.Mapping
             var mappings = propertyMapper.Execute(type, dataRecord, prefix);
             foreach (var mappingInfo in mappings.Where(m => m.ColumnInfo.Ordinal != -1))
             {
-                var propertyType = mappingInfo.Property.PropertyType;
-                if (propertyType.IsEnum)
+                if (mappingInfo.ColumnInfo.Type == typeof(DBNull))
                 {
-                    propertyType = propertyType.GetUnderlyingType();
+                    continue;
                 }
+
+                var propertyType = mappingInfo.Property.PropertyType;
+                // if (propertyType.IsEnum)
+                // {
+                //     propertyType = propertyType.GetUnderlyingType();
+                // }
 
                 if (!propertyType.IsAssignableFrom(mappingInfo.ColumnInfo.Type.GetTypeInfo()) && !ValueConverter.CanConvert(propertyType))
                 {
-                    throw new InvalidOperationException(
+                    if (propertyType.IsEnum)
+                    {
+                        Execute(propertyType.GetUnderlyingType(), dataRecord, prefix);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
                         ErrorMessages.IncompatibleTypes.FormatWith(
                             mappingInfo.Property,
                             mappingInfo.ColumnInfo,
                             mappingInfo.ColumnInfo.Type,
                             mappingInfo.Property.PropertyType));
+                    }
                 }
             }
             return mappings;

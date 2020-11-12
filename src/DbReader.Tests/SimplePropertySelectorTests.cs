@@ -13,6 +13,7 @@
     {
         public readonly IPropertySelector simplePropertySelector;
 
+        [Fact]
         public void ShouldReturnSameInstance()
         {
             var firstInstance = ServiceFactory.GetInstance<IPropertySelector>("SimplePropertySelector");
