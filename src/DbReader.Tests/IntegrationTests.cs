@@ -93,6 +93,7 @@ namespace DbReader.Tests
         }
 
 
+        [Fact]
         public async Task ShouldHandleRunningInParallel()
         {
             var task1 = ShouldReadCustomersAndOrdersAsync();

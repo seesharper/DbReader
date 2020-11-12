@@ -290,6 +290,28 @@
         }
 
         [Fact]
+        public void ShouldNotCreateInstanceWhenNavigationKeyIsNull()
+        {
+            var dataRecord = new { Id = 1, FirstProperty_Id = 10, SecondProperty_Id = DBNull.Value }.ToDataRecord();
+            var reader = GetReader<ClassWithTwoProperties<ClassWithId, ClassWithId>>();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Id.ShouldBe(1);
+            instance.FirstProperty.Id.ShouldBe(10);
+            instance.SecondProperty.ShouldBeNull();
+        }
+
+        [Fact]
+        public void ShouldUseConverterFunctionEvenWhenEnumHasIncompatibleUnderlyingType()
+        {
+            DbReaderOptions.WhenReading<Int32Enum>().Use((dr, i) => (Int32Enum)dr.GetInt64(i));
+            var dataRecord = new { Id = 1, Property = (long)1 }.ToDataRecord();
+            var reader = GetReader<ClassWithProperty<Int32Enum>>();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(Int32Enum.One);
+        }
+
+
+        [Fact]
         public void ShouldHandleManyToOneWithoutAnyMatchingColumns()
         {
             var dataRecord = new { Id = 1 }.ToDataRecord();
@@ -331,6 +353,15 @@
             var result = reader.Read(dataRecord, string.Empty);
             result.Children.ShouldBeEmpty();
         }
+
+        public enum Int32Enum
+        {
+            Zero,
+            One,
+
+            Two
+        }
+
 
         public class Parent
         {
