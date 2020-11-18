@@ -14,8 +14,8 @@ namespace DbReader.Tests
         {
             var rows = new[]
             {
-                new { CustomerId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "John Dear Road 10" },
-                new { CustomerId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "John Dear Road 20" }
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "John Dear Road 10" },
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "John Dear Road 20" }
             };
             var dataReader = rows.ToDataReader();
 
@@ -23,8 +23,8 @@ namespace DbReader.Tests
 
             rows = new[]
             {
-                new { CustomerId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "John Dear Road 30" },
-                new { CustomerId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "John Dear Road 30" }
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "John Dear Road 30" },
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "John Dear Road 30" }
             };
 
             dataReader = rows.ToDataReader();
@@ -64,7 +64,7 @@ namespace DbReader.Tests
         public class CustomerWithOrders
         {
             [Key]
-            public string CustomerId { get; set; }
+            public string CustomerWithOrdersId { get; set; }
 
             public string Name { get; set; }
             public ICollection<Order> Orders { get; set; }
