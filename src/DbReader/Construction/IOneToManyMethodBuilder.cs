@@ -17,6 +17,6 @@
         /// <param name="dataRecord">The source <see cref="IDataRecord"/>.</param>
         /// <param name="prefix">The property prefix used to identify the fields in the <see cref="IDataRecord"/>.</param>
         /// <returns>A delegate representing a dynamic method that populates mapped collection properties.</returns>
-        Action<T, IDataRecord, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix);
+        Action<T, IDataRecord, IInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix);
     }
 }

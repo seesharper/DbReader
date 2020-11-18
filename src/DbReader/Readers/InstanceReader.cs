@@ -10,14 +10,15 @@
     public class InstanceReader<T> : IInstanceReader<T>
     {
         private readonly IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder;
-        private readonly IGenericInstanceReaderFactory instanceReaderFactory;
+        private readonly IInstanceReaderFactory instanceReaderFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstanceReader{T}"/> class.
         /// </summary>
         /// <param name="instanceReaderMethodBuilder">The <see cref="IInstanceReaderMethodBuilder{T}"/> that is responsible
         /// for building a method that is capable of reading an instance of <typeparamref name="T"/> from an <see cref="IDataRecord"/>.</param>
-        public InstanceReader(IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder, IGenericInstanceReaderFactory instanceReaderFactory)
+        /// <param name="instanceReaderFactory">The <see cref="IInstanceReaderFactory"/> that is responsible for resolving <see cref="IInstanceReader{T}"/> instances.</param>
+        public InstanceReader(IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder, IInstanceReaderFactory instanceReaderFactory)
         {
             this.instanceReaderMethodBuilder = instanceReaderMethodBuilder;
             this.instanceReaderFactory = instanceReaderFactory;

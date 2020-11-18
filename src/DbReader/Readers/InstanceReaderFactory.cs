@@ -1,62 +1,34 @@
-﻿using System;
-using System.Collections.Concurrent;
-using DbReader.LightInject;
+﻿using DbReader.LightInject;
 
 namespace DbReader.Readers
 {
+
     /// <summary>
-    /// A class that is capable of
-    /// producing an <see cref="IInstanceReader{T}"/> based on a given <see cref="Type"/> and prefix.
+    /// A class that is capable of creating an <see cref="IInstanceReader{T}"/> based on the given type.
     /// </summary>
     public class InstanceReaderFactory : IInstanceReaderFactory
     {
-        private readonly ConcurrentDictionary<Tuple<Type, string>, object> readers = new ConcurrentDictionary<Tuple<Type, string>, object>();
-
-        private readonly Func<Type, object> createReader;
+        private readonly IServiceFactory serviceFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstanceReaderFactory"/> class.
         /// </summary>
-        /// <param name="createReader">A function delegate used to create an <see cref="IInstanceReader{T}"/> based on a given <see cref="Type"/>.</param>
-        public InstanceReaderFactory(Func<Type, object> createReader)
-        {
-            this.createReader = createReader;
-        }
-
-        /// <summary>
-        /// Gets an <see cref="IInstanceReader{T}"/> for the given <paramref name="type"/> and <paramref name="prefix"/>.
-        /// </summary>
-        /// <param name="type">The type for which to get an <see cref="IInstanceReader{T}"/>.</param>
-        /// <param name="prefix">The prefix for which to get an <see cref="IInstanceReader{T}"/>.</param>
-        /// <returns></returns>
-        public object GetInstanceReader(Type type, string prefix)
-        {
-            return readers.GetOrAdd(Tuple.Create(type, prefix), t => createReader(t.Item1));
-        }
-    }
-
-    public interface IGenericInstanceReaderFactory
-    {
-        IInstanceReader<T> GetInstanceReader<T>(string prefix);
-    }
-
-    public class GenericInstanceReaderFactory : IGenericInstanceReaderFactory
-    {
-        private readonly ConcurrentDictionary<Tuple<Type, string>, object> readers = new ConcurrentDictionary<Tuple<Type, string>, object>();
-
-        private readonly Func<Type, object> createReader;
-        private readonly IServiceFactory serviceFactory;
-
-        internal GenericInstanceReaderFactory(IServiceFactory serviceFactory)
+        /// <param name="serviceFactory">The <see cref="IServiceFactory"/> used to resolve <see cref="IInstanceReader{T}"/> instances.</param>
+        internal InstanceReaderFactory(IServiceFactory serviceFactory)
         {
             this.serviceFactory = serviceFactory;
         }
 
+        ///<inheritdoc/>
         public IInstanceReader<T> GetInstanceReader<T>(string prefix)
         {
             return serviceFactory.GetInstance<IInstanceReader<T>>();
-            //return (IInstanceReader<T>)createReader(typeof(IInstanceReader<>).MakeGenericType(typeof(T)));
-            //return (IInstanceReader<T>)readers.GetOrAdd(Tuple.Create(typeof(T), prefix), t => createReader(typeof(IInstanceReader<>).MakeGenericType(t.Item1)));
+
+            // NOTE: We used to cache the readers on the prefix. Have no idea why anymore;
+            /* OLD CODE
+                private readonly ConcurrentDictionary<Tuple<Type, string>, object> readers = new ConcurrentDictionary<Tuple<Type, string>, object>();
+                return (IInstanceReader<T>)readers.GetOrAdd(Tuple.Create(typeof(T), prefix), t => serviceFactory.GetInstance<IInstanceReader<T>>());
+            */
         }
     }
 }

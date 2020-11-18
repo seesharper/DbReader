@@ -40,12 +40,12 @@
         /// <param name="prefix">The current prefix.</param>
         /// <returns>A method that creates an instance of <typeparamref name="T"/>
         /// based on the given <paramref name="dataRecord"/>.</returns>
-        public Func<IDataRecord, IGenericInstanceReaderFactory, T> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Func<IDataRecord, IInstanceReaderFactory, T> CreateMethod(IDataRecord dataRecord, string prefix)
         {
             int[] ordinals = ordinalSelector.Execute(typeof(T), dataRecord, prefix);
             Func<IDataRecord, int[], T> propertyReaderMethod = propertyReaderMethodBuilder.CreateMethod();
 
-            Action<T, IDataRecord, IGenericInstanceReaderFactory> manyToOneMethod = manyToOneMethodBuilder.CreateMethod(dataRecord, prefix);
+            Action<T, IDataRecord, IInstanceReaderFactory> manyToOneMethod = manyToOneMethodBuilder.CreateMethod(dataRecord, prefix);
 
             if (manyToOneMethod != null)
             {
