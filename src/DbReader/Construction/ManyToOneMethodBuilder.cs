@@ -43,7 +43,7 @@
         /// <param name="dataRecord">The source <see cref="IDataRecord"/>.</param>
         /// <param name="prefix">The property prefix used to identify the fields in the <see cref="IDataRecord"/>.</param>
         /// <returns>A delegate representing a dynamic method that populates mapped "many-to-one" properties.</returns>
-        public Action<IDataRecord, T, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Action<T, IDataRecord, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
         {
             var properties = manyToOnePropertySelector.Execute(typeof(T));
             if (properties.Length == 0)
@@ -93,8 +93,7 @@
             {
                 generator.Emit(OpCodes.Ret);
                 var method = (Action<T, IDataRecord, IGenericInstanceReaderFactory>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, IGenericInstanceReaderFactory>));
-
-                return (record, instance, instanceReaderFactory) => method(instance, record, instanceReaderFactory);
+                return method;
             }
 
             return null;

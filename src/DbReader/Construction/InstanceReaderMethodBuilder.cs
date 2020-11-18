@@ -45,14 +45,14 @@
             int[] ordinals = ordinalSelector.Execute(typeof(T), dataRecord, prefix);
             Func<IDataRecord, int[], T> propertyReaderMethod = propertyReaderMethodBuilder.CreateMethod();
 
-            Action<IDataRecord, T, IGenericInstanceReaderFactory> manyToOneMethod = manyToOneMethodBuilder.CreateMethod(dataRecord, prefix);
+            Action<T, IDataRecord, IGenericInstanceReaderFactory> manyToOneMethod = manyToOneMethodBuilder.CreateMethod(dataRecord, prefix);
 
             if (manyToOneMethod != null)
             {
                 return (record, instanceReaderFactory) =>
                     {
                         var instance = propertyReaderMethod(record, ordinals);
-                        manyToOneMethod(record, instance, instanceReaderFactory);
+                        manyToOneMethod(instance, record, instanceReaderFactory);
                         return instance;
                     };
             }
