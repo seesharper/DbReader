@@ -18,7 +18,7 @@ namespace DbReader.Readers
         private readonly IKeyReader keyReader;
 
         private readonly IOneToManyMethodBuilder<T> oneToManyMethodBuilder;
-
+        private readonly IInstanceReaderFactory instanceReaderFactory;
         private readonly ConcurrentDictionary<IStructuralEquatable, T> queryCache = new ConcurrentDictionary<IStructuralEquatable, T>();
 
         /// <summary>
@@ -28,11 +28,13 @@ namespace DbReader.Readers
         /// for reading an instance of <typeparamref name="T"/> from an <see cref="IDataRecord"/>.</param>
         /// <param name="keyReader">An instance of <typeparamref name="T"/>.</param>
         /// <param name="oneToManyMethodBuilder"></param>
-        public CachedInstanceReader(IInstanceReader<T> instanceReader, IKeyReader keyReader, IOneToManyMethodBuilder<T> oneToManyMethodBuilder)
+        /// <param name="instanceReaderFactory">The <see cref="IInstanceReaderFactory"/> that is responsible for resolving <see cref="IInstanceReader{T}"/> instances.</param>
+        public CachedInstanceReader(IInstanceReader<T> instanceReader, IKeyReader keyReader, IOneToManyMethodBuilder<T> oneToManyMethodBuilder, IInstanceReaderFactory instanceReaderFactory)
         {
             this.instanceReader = instanceReader;
             this.keyReader = keyReader;
             this.oneToManyMethodBuilder = oneToManyMethodBuilder;
+            this.instanceReaderFactory = instanceReaderFactory;
         }
 
         /// <summary>
@@ -46,10 +48,10 @@ namespace DbReader.Readers
             var instance = ReadInstance(dataRecord, currentPrefix);
             if (instance == null)
             {
-                return default(T);
+                return default;
             }
             var method = oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix);
-            method?.Invoke(dataRecord, instance);
+            method?.Invoke(instance, dataRecord, instanceReaderFactory);
             return instance;
         }
 

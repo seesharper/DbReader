@@ -75,7 +75,8 @@
 
                 .Register<IPrefixResolver, PrefixResolver>(new PerScopeLifetime())
 
-                .Register<IInstanceReaderFactory>(f => new InstanceReaderFactory(f.GetInstance), new PerScopeLifetime())
+                //.Register<IInstanceReaderFactory>(f => new InstanceReaderFactory(f.GetInstance), new PerScopeLifetime())
+                .Register<IInstanceReaderFactory>(f => new InstanceReaderFactory(f), new PerScopeLifetime())
 
                 //.Register(typeof(IInstanceReader<>), typeof(InstanceReader<>))
                 .Register(typeof(IInstanceReader<>), typeof(InstanceReader<>), new PerScopeLifetime())

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data;
+    using DbReader.Readers;
     using Interfaces;
     using Selectors;
 
@@ -39,24 +40,24 @@
         /// <param name="prefix">The current prefix.</param>
         /// <returns>A method that creates an instance of <typeparamref name="T"/>
         /// based on the given <paramref name="dataRecord"/>.</returns>
-        public Func<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Func<IDataRecord, IInstanceReaderFactory, T> CreateMethod(IDataRecord dataRecord, string prefix)
         {
             int[] ordinals = ordinalSelector.Execute(typeof(T), dataRecord, prefix);
             Func<IDataRecord, int[], T> propertyReaderMethod = propertyReaderMethodBuilder.CreateMethod();
 
-            Action<IDataRecord, T> manyToOneMethod = manyToOneMethodBuilder.CreateMethod(dataRecord, prefix);
+            Action<T, IDataRecord, IInstanceReaderFactory> manyToOneMethod = manyToOneMethodBuilder.CreateMethod(dataRecord, prefix);
 
             if (manyToOneMethod != null)
             {
-                return record =>
+                return (record, instanceReaderFactory) =>
                     {
                         var instance = propertyReaderMethod(record, ordinals);
-                        manyToOneMethod(record, instance);
+                        manyToOneMethod(instance, record, instanceReaderFactory);
                         return instance;
                     };
             }
 
-            return record => propertyReaderMethod(record, ordinals);
+            return (record, instanceReaderFactory) => propertyReaderMethod(record, ordinals);
         }
     }
 }

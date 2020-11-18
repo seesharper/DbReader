@@ -18,7 +18,6 @@ namespace DbReader.Construction
     {
         private readonly IMethodSkeletonFactory methodSkeletonFactory;
         private readonly IPropertySelector oneToManyPropertySelector;
-        private readonly IInstanceReaderFactory instanceReaderFactory;
         private readonly IPrefixResolver prefixResolver;
 
         /// <summary>
@@ -26,13 +25,11 @@ namespace DbReader.Construction
         /// </summary>
         /// <param name="methodSkeletonFactory">The <see cref="IMethodSkeletonFactory"/> that is responsible for providing an <see cref="IMethodSkeleton"/> instance.</param>
         /// <param name="oneToManyPropertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting properties that represents a "one-to-many" relationship.</param>
-        /// <param name="instanceReaderFactory">A factory delegate used to create <see cref="IInstanceReader{T}"/> instances for each "one-to-many" property.</param>
         /// <param name="prefixResolver">The <see cref="IPrefixResolver"/> that is responsible for resolving the prefix for each "one-to-many" property.</param>
-        public OneToManyMethodBuilder(IMethodSkeletonFactory methodSkeletonFactory, IPropertySelector oneToManyPropertySelector, IInstanceReaderFactory instanceReaderFactory, IPrefixResolver prefixResolver)
+        public OneToManyMethodBuilder(IMethodSkeletonFactory methodSkeletonFactory, IPropertySelector oneToManyPropertySelector, IPrefixResolver prefixResolver)
         {
             this.methodSkeletonFactory = methodSkeletonFactory;
             this.oneToManyPropertySelector = oneToManyPropertySelector;
-            this.instanceReaderFactory = instanceReaderFactory;
             this.prefixResolver = prefixResolver;
         }
 
@@ -42,7 +39,7 @@ namespace DbReader.Construction
         /// <param name="dataRecord">The source <see cref="IDataRecord"/>.</param>
         /// <param name="prefix">The property prefix used to identify the fields in the <see cref="IDataRecord"/>.</param>
         /// <returns>A delegate representing a dynamic method that populates mapped collection properties.</returns>
-        public Action<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Action<T, IDataRecord, IInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
         {
             PropertyInfo[] properties = oneToManyPropertySelector.Execute(typeof(T));
             if (properties.Length == 0)
@@ -50,7 +47,7 @@ namespace DbReader.Construction
                 return null;
             }
             var instanceReaders = new List<object>(properties.Length);
-            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("OneToManyDynamicMethod", typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
+            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("OneToManyDynamicMethod", typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(IInstanceReaderFactory) });
             var generator = methodSkeleton.GetGenerator();
             bool shouldCreateMethod = false;
             foreach (var property in properties)
@@ -65,9 +62,6 @@ namespace DbReader.Construction
                     Type instanceReaderType = typeof(IInstanceReader<>).MakeGenericType(elementType);
                     MethodInfo readMethod = instanceReaderType.GetMethod("Read");
 
-                    instanceReaders.Add(instanceReaderFactory.GetInstanceReader(instanceReaderType, propertyPrefix));
-                    int instanceReaderIndex = instanceReaders.Count - 1;
-
                     MethodInfo getMethod = property.GetGetMethod();
 
                     // Push the instance onto the stack.
@@ -76,11 +70,11 @@ namespace DbReader.Construction
                     // Call the property getter and push the result onto the stack.
                     generator.Emit(OpCodes.Callvirt, getMethod);
 
-                    // Push the object reader.
+                    // Push the instancereader factory
                     generator.Emit(OpCodes.Ldarg_2);
-                    generator.EmitFastInt(instanceReaderIndex);
-                    generator.Emit(OpCodes.Ldelem_Ref);
-                    generator.Emit(OpCodes.Castclass, instanceReaderType);
+                    var closedGenericGetInstanceReaderMethod = typeof(IInstanceReaderFactory).GetMethod(nameof(IInstanceReaderFactory.GetInstanceReader)).MakeGenericMethod(elementType);
+                    generator.Emit(OpCodes.Ldstr, propertyPrefix);
+                    generator.Emit(OpCodes.Callvirt, closedGenericGetInstanceReaderMethod);
 
                     // Push the datarecord
                     generator.Emit(OpCodes.Ldarg_1);
@@ -99,8 +93,8 @@ namespace DbReader.Construction
             if (shouldCreateMethod)
             {
                 generator.Emit(OpCodes.Ret);
-                var method = (Action<T, IDataRecord, object[]>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, object[]>));
-                return (record, instance) => method(instance, record, instanceReaders.ToArray());
+                var method = (Action<T, IDataRecord, IInstanceReaderFactory>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, IInstanceReaderFactory>));
+                return method;
             }
 
             return null;
