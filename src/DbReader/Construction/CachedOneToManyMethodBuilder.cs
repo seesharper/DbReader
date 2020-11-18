@@ -29,9 +29,9 @@ namespace DbReader.Construction
         /// <param name="dataRecord">The source <see cref="IDataRecord"/>.</param>
         /// <param name="prefix">The property prefix used to identify the fields in the <see cref="IDataRecord"/>.</param>
         /// <returns>A delegate representing a dynamic method that populates mapped collection properties.</returns>
-        public Action<IDataRecord, T, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Action<T, IDataRecord, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
         {
-            return StaticCache<Action<IDataRecord, T, IGenericInstanceReaderFactory>>.GetOrAdd(typeof(T), prefix,
+            return StaticCache<Action<T, IDataRecord, IGenericInstanceReaderFactory>>.GetOrAdd(typeof(T), prefix,
                 () => oneToManyMethodBuilder.CreateMethod(dataRecord, prefix));
         }
     }

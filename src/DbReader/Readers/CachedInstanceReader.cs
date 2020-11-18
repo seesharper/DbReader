@@ -47,10 +47,10 @@ namespace DbReader.Readers
             var instance = ReadInstance(dataRecord, currentPrefix);
             if (instance == null)
             {
-                return default(T);
+                return default;
             }
             var method = oneToManyMethodBuilder.CreateMethod(dataRecord, currentPrefix);
-            method?.Invoke(dataRecord, instance, instanceReaderFactory);
+            method?.Invoke(instance, dataRecord, instanceReaderFactory);
             return instance;
         }
 

@@ -42,7 +42,7 @@ namespace DbReader.Construction
         /// <param name="dataRecord">The source <see cref="IDataRecord"/>.</param>
         /// <param name="prefix">The property prefix used to identify the fields in the <see cref="IDataRecord"/>.</param>
         /// <returns>A delegate representing a dynamic method that populates mapped collection properties.</returns>
-        public Action<IDataRecord, T, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Action<T, IDataRecord, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
         {
             PropertyInfo[] properties = oneToManyPropertySelector.Execute(typeof(T));
             if (properties.Length == 0)
@@ -65,10 +65,6 @@ namespace DbReader.Construction
                     Type instanceReaderType = typeof(IInstanceReader<>).MakeGenericType(elementType);
                     MethodInfo readMethod = instanceReaderType.GetMethod("Read");
 
-                    // THIS IS WRONG, WE END UP CLOSING AROUND THE INSTANCEREADER
-                    // instanceReaders.Add(instanceReaderFactory.GetInstanceReader(instanceReaderType, propertyPrefix));
-                    // int instanceReaderIndex = instanceReaders.Count - 1;
-
                     MethodInfo getMethod = property.GetGetMethod();
 
                     // Push the instance onto the stack.
@@ -82,10 +78,6 @@ namespace DbReader.Construction
                     var closedGenericGetInstanceReaderMethod = typeof(IGenericInstanceReaderFactory).GetMethod(nameof(IGenericInstanceReaderFactory.GetInstanceReader)).MakeGenericMethod(elementType);
                     generator.Emit(OpCodes.Ldstr, propertyPrefix);
                     generator.Emit(OpCodes.Callvirt, closedGenericGetInstanceReaderMethod);
-
-                    // generator.EmitFastInt(instanceReaderIndex);
-                    // generator.Emit(OpCodes.Ldelem_Ref);
-                    // generator.Emit(OpCodes.Castclass, instanceReaderType);
 
                     // Push the datarecord
                     generator.Emit(OpCodes.Ldarg_1);
@@ -105,9 +97,9 @@ namespace DbReader.Construction
             {
                 generator.Emit(OpCodes.Ret);
                 var method = (Action<T, IDataRecord, IGenericInstanceReaderFactory>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, IGenericInstanceReaderFactory>));
-                //return method;
-                // Note Change the signature to avoid another delegate
-                return (record, instance, instanceReaderFactory) => method(instance, record, instanceReaderFactory);
+                return method;
+                // // Note Change the signature to avoid another delegate
+                // return (record, instance, instanceReaderFactory) => method(instance, record, instanceReaderFactory);
             }
 
             return null;
