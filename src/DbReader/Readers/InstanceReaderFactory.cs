@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 namespace DbReader.Readers
 {
     /// <summary>
-    /// A class that is capable of 
+    /// A class that is capable of
     /// producing an <see cref="IInstanceReader{T}"/> based on a given <see cref="Type"/> and prefix.
     /// </summary>
     public class InstanceReaderFactory : IInstanceReaderFactory
@@ -31,6 +31,29 @@ namespace DbReader.Readers
         public object GetInstanceReader(Type type, string prefix)
         {
             return readers.GetOrAdd(Tuple.Create(type, prefix), t => createReader(t.Item1));
+        }
+    }
+
+    public interface IGenericInstanceReaderFactory
+    {
+        IInstanceReader<T> GetInstanceReader<T>(string prefix);
+    }
+
+    public class GenericInstanceReaderFactory : IGenericInstanceReaderFactory
+    {
+        private readonly ConcurrentDictionary<Tuple<Type, string>, object> readers = new ConcurrentDictionary<Tuple<Type, string>, object>();
+
+        private readonly Func<Type, object> createReader;
+
+        public GenericInstanceReaderFactory(Func<Type, object> createReader)
+        {
+            this.createReader = createReader;
+        }
+
+        public IInstanceReader<T> GetInstanceReader<T>(string prefix)
+        {
+            return (IInstanceReader<T>)createReader(typeof(IInstanceReader<>).MakeGenericType(typeof(T)));
+            //return (IInstanceReader<T>)readers.GetOrAdd(Tuple.Create(typeof(T), prefix), t => createReader(typeof(IInstanceReader<>).MakeGenericType(t.Item1)));
         }
     }
 }

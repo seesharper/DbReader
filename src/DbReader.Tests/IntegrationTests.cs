@@ -506,6 +506,28 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public async Task ShouldNotCacheCollection()
+        {
+            using (var connection = CreateConnection())
+            {
+                using (var transaction = connection.BeginTransaction())
+                {
+                    var customers = await connection.ReadAsync<CustomerWithOrders>("SELECT c.CustomerID as CustomerWithOrdersId, o.OrderId as O_OrderId, o.OrderDate as O_OrderDate FROM Customers c INNER JOIN Orders o ON c.CustomerId =o.CustomerId AND c.CustomerId = @CustomerId", new { CustomerId = "ALFKI" });
+                    var firstCustomer = customers.First();
+                    var firstCustomerId = firstCustomer.CustomerWithOrdersId;
+                    int rowsAffected = await connection.ExecuteAsync("UPDATE Orders set OrderDate = @OrderDate WHERE CustomerID =@CustomerId", new { OrderDate = DateTime.Now, CustomerId = firstCustomerId });
+                    customers = await connection.ReadAsync<CustomerWithOrders>("SELECT c.CustomerID as CustomerWithOrdersId, o.OrderId as O_OrderId, o.OrderDate as O_OrderDate FROM Customers c INNER JOIN Orders o ON c.CustomerId =o.CustomerId AND c.CustomerId = @CustomerId", new { CustomerId = "ALFKI" });
+                    var test = connection.ExecuteScalar<DateTime>("SELECT OrderDate FROM Orders WHERE CustomerID = @CustomerId", new { CustomerId = firstCustomerId });
+                    transaction.Rollback();
+                }
+
+            }
+        }
+
+
+
+
         public class CustomerId
         {
             private string Value { get; set; }
