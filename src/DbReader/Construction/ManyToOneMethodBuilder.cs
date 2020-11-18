@@ -11,7 +11,7 @@
     using Selectors;
 
     /// <summary>
-    /// A class that dynamically creates a method used to 
+    /// A class that dynamically creates a method used to
     /// populate "many-to-one" properties of a given type.
     /// </summary>
     /// <typeparam name="T">The <see cref="Type"/> for which to create the dynamic method.</typeparam>
@@ -43,7 +43,7 @@
         /// <param name="dataRecord">The source <see cref="IDataRecord"/>.</param>
         /// <param name="prefix">The property prefix used to identify the fields in the <see cref="IDataRecord"/>.</param>
         /// <returns>A delegate representing a dynamic method that populates mapped "many-to-one" properties.</returns>
-        public Action<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Action<IDataRecord, T, IGenericInstanceReaderFactory> CreateMethod(IDataRecord dataRecord, string prefix)
         {
             var properties = manyToOnePropertySelector.Execute(typeof(T));
             if (properties.Length == 0)
@@ -51,7 +51,7 @@
                 return null;
             }
             var instanceReaders = new List<object>(properties.Length);
-            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("ManyToOneDynamicMethod",typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(object[]) });
+            var methodSkeleton = methodSkeletonFactory.GetMethodSkeleton("ManyToOneDynamicMethod", typeof(void), new[] { typeof(T), typeof(IDataRecord), typeof(IGenericInstanceReaderFactory) });
             var generator = methodSkeleton.GetGenerator();
 
             bool shouldCreateMethod = false;
@@ -63,18 +63,18 @@
                 {
                     shouldCreateMethod = true;
                     Type instanceReaderType = typeof(IInstanceReader<>).MakeGenericType(property.PropertyType);
-                    object instanceReader = instanceReaderFactory.GetInstanceReader(instanceReaderType, propertyPrefix);
-                    
-                    instanceReaders.Add(instanceReader);
-                    
+                    // object instanceReader = instanceReaderFactory.GetInstanceReader(instanceReaderType, propertyPrefix);
+
+                    // instanceReaders.Add(instanceReader);
+
                     generator.Emit(OpCodes.Ldarg_0);
-                    
+
 
                     // Push the instance readers
                     generator.Emit(OpCodes.Ldarg_2);
-                    generator.EmitFastInt(instanceReaders.Count - 1);
-                    generator.Emit(OpCodes.Ldelem_Ref);
-                    generator.Emit(OpCodes.Castclass, instanceReaderType);
+                    var closedGenericGetInstanceReaderMethod = typeof(IGenericInstanceReaderFactory).GetMethod(nameof(IGenericInstanceReaderFactory.GetInstanceReader)).MakeGenericMethod(property.PropertyType);
+                    generator.Emit(OpCodes.Ldstr, propertyPrefix);
+                    generator.Emit(OpCodes.Callvirt, closedGenericGetInstanceReaderMethod);
 
                     MethodInfo readMethod = instanceReaderType.GetMethod("Read");
 
@@ -87,18 +87,18 @@
                     //Call the read method.
                     generator.Emit(OpCodes.Callvirt, readMethod);
                     generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
-                }                
+                }
             }
             if (shouldCreateMethod)
             {
                 generator.Emit(OpCodes.Ret);
-                var method = (Action<T, IDataRecord, object[]>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, object[]>));
+                var method = (Action<T, IDataRecord, IGenericInstanceReaderFactory>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, IGenericInstanceReaderFactory>));
 
-                return (record, instance) => method(instance, record, instanceReaders.ToArray());    
+                return (record, instance, instanceReaderFactory) => method(instance, record, instanceReaderFactory);
             }
 
             return null;
         }
 
     }
-} 
+}

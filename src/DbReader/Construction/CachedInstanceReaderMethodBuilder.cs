@@ -2,10 +2,11 @@
 {
     using System;
     using System.Data;
+    using DbReader.Readers;
     using Interfaces;
 
     /// <summary>
-    /// An <see cref="IInstanceReaderMethodBuilder{T}"/> decorator that is used 
+    /// An <see cref="IInstanceReaderMethodBuilder{T}"/> decorator that is used
     /// to cache the dynamic method created at runtime to read an instance of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -30,9 +31,9 @@
         /// <param name="prefix">The current prefix.</param>
         /// <returns>A method that creates an instance of <typeparamref name="T"/>
         /// based on the given <paramref name="dataRecord"/>.</returns>
-        public Func<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix)
+        public Func<IDataRecord, IGenericInstanceReaderFactory, T> CreateMethod(IDataRecord dataRecord, string prefix)
         {
-            return StaticCache<Func<IDataRecord, T>>.GetOrAdd(typeof(T), prefix,
+            return StaticCache<Func<IDataRecord, IGenericInstanceReaderFactory, T>>.GetOrAdd(typeof(T), prefix,
                 () => instanceReaderMethodBuilder.Value.CreateMethod(dataRecord, prefix));
         }
     }

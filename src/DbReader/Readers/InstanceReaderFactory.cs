@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using DbReader.LightInject;
 
 namespace DbReader.Readers
 {
@@ -44,15 +45,17 @@ namespace DbReader.Readers
         private readonly ConcurrentDictionary<Tuple<Type, string>, object> readers = new ConcurrentDictionary<Tuple<Type, string>, object>();
 
         private readonly Func<Type, object> createReader;
+        private readonly IServiceFactory serviceFactory;
 
-        public GenericInstanceReaderFactory(Func<Type, object> createReader)
+        internal GenericInstanceReaderFactory(IServiceFactory serviceFactory)
         {
-            this.createReader = createReader;
+            this.serviceFactory = serviceFactory;
         }
 
         public IInstanceReader<T> GetInstanceReader<T>(string prefix)
         {
-            return (IInstanceReader<T>)createReader(typeof(IInstanceReader<>).MakeGenericType(typeof(T)));
+            return serviceFactory.GetInstance<IInstanceReader<T>>();
+            //return (IInstanceReader<T>)createReader(typeof(IInstanceReader<>).MakeGenericType(typeof(T)));
             //return (IInstanceReader<T>)readers.GetOrAdd(Tuple.Create(typeof(T), prefix), t => createReader(typeof(IInstanceReader<>).MakeGenericType(t.Item1)));
         }
     }

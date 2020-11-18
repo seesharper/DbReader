@@ -10,15 +10,17 @@
     public class InstanceReader<T> : IInstanceReader<T>
     {
         private readonly IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder;
-        
+        private readonly IGenericInstanceReaderFactory instanceReaderFactory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InstanceReader{T}"/> class.
         /// </summary>
-        /// <param name="instanceReaderMethodBuilder">The <see cref="IInstanceReaderMethodBuilder{T}"/> that is responsible 
+        /// <param name="instanceReaderMethodBuilder">The <see cref="IInstanceReaderMethodBuilder{T}"/> that is responsible
         /// for building a method that is capable of reading an instance of <typeparamref name="T"/> from an <see cref="IDataRecord"/>.</param>
-        public InstanceReader(IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder)
+        public InstanceReader(IInstanceReaderMethodBuilder<T> instanceReaderMethodBuilder, IGenericInstanceReaderFactory instanceReaderFactory)
         {
             this.instanceReaderMethodBuilder = instanceReaderMethodBuilder;
+            this.instanceReaderFactory = instanceReaderFactory;
         }
 
         /// <summary>
@@ -28,9 +30,9 @@
         /// <param name="currentPrefix">The current prefix.</param>
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Read(IDataRecord dataRecord, string currentPrefix)
-        {                        
+        {
             var method = instanceReaderMethodBuilder.CreateMethod(dataRecord, currentPrefix);
-            return method(dataRecord);
+            return method(dataRecord, instanceReaderFactory);
         }
     }
 }

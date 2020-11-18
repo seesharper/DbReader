@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data;
+    using DbReader.Readers;
 
     /// <summary>
     /// Represents a class that creates an instance of <typeparamref name="T"/>
@@ -18,6 +19,6 @@
         /// <param name="prefix">The current prefix.</param>
         /// <returns>A method that creates an instance of <typeparamref name="T"/>
         /// based on the given <paramref name="dataRecord"/>.</returns>
-        Func<IDataRecord, T> CreateMethod(IDataRecord dataRecord, string prefix);
+        Func<IDataRecord, IGenericInstanceReaderFactory, T> CreateMethod(IDataRecord dataRecord, string prefix);
     }
 }

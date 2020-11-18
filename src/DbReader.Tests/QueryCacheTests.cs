@@ -8,30 +8,29 @@ namespace DbReader.Tests
 {
     public class QueryCacheTests
     {
-
         [Fact]
         public void ShouldNotCacheAcrossReadsUsingOneToManyRelation()
         {
             var rows = new[]
             {
-                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "John Dear Road 10" },
-                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "John Dear Road 20" }
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "Address 1" },
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "Address 2" }
             };
             var dataReader = rows.ToDataReader();
-
+            SqlStatement.Current = "TEST-STATEMENT";
             var customers = dataReader.Read<CustomerWithOrders>();
 
             rows = new[]
             {
-                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "John Dear Road 30" },
-                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "John Dear Road 30" }
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 1 ,Orders_ShippingAddress = "Address 3" },
+                new { CustomerWithOrdersId = "ALFKI", Name = "Alfreds Futterkiste" , Orders_OrderId = 2 ,Orders_ShippingAddress = "Address 3" }
             };
 
             dataReader = rows.ToDataReader();
-
+            SqlStatement.Current = "TEST-STATEMENT";
             customers = dataReader.Read<CustomerWithOrders>();
 
-            customers.Single().Orders.ShouldAllBe(o => o.ShippingAddress == "John Dear Road 30");
+            customers.Single().Orders.ShouldAllBe(o => o.ShippingAddress == "Address 3");
         }
 
         [Fact]
@@ -39,21 +38,21 @@ namespace DbReader.Tests
         {
             var rows = new[]
             {
-                new { Customer_CustomerId = "ALFKI", Customer_Name = "Alfreds Futterkiste" , OrderWithCustomerId = 1 ,ShippingAddress = "John Dear Road 10" },
-                new { Customer_CustomerId = "ALFKI", Customer_Name = "Alfreds Futterkiste" , OrderWithCustomerId = 2 ,ShippingAddress = "John Dear Road 20" }
+                new { Customer_CustomerId = "ALFKI", Customer_Name = "Alfreds Futterkiste" , OrderWithCustomerId = 1 ,ShippingAddress = "Address 1" },
+                new { Customer_CustomerId = "ALFKI", Customer_Name = "Alfreds Futterkiste" , OrderWithCustomerId = 2 ,ShippingAddress = "Address 2" }
             };
             var dataReader = rows.ToDataReader();
-
+            SqlStatement.Current = "TEST-STATEMENT";
             dataReader.Read<OrderWithCustomer>();
 
             rows = new[]
              {
-                new { Customer_CustomerId = "ALFKI", Customer_Name = "Fred Futterkiste" , OrderWithCustomerId = 1 ,ShippingAddress = "John Dear Road 10" },
-                new { Customer_CustomerId = "ALFKI", Customer_Name = "Fred Futterkiste" , OrderWithCustomerId = 2 ,ShippingAddress = "John Dear Road 20" }
+                new { Customer_CustomerId = "ALFKI", Customer_Name = "Fred Futterkiste" , OrderWithCustomerId = 1 ,ShippingAddress = "Address 1" },
+                new { Customer_CustomerId = "ALFKI", Customer_Name = "Fred Futterkiste" , OrderWithCustomerId = 2 ,ShippingAddress = "Address 2" }
             };
 
             dataReader = rows.ToDataReader();
-
+            SqlStatement.Current = "TEST-STATEMENT";
             var orders = dataReader.Read<OrderWithCustomer>();
 
             orders.First().Customer.Name.ShouldBe("Fred Futterkiste");
@@ -95,9 +94,5 @@ namespace DbReader.Tests
 
             public Customer Customer { get; set; }
         }
-
     }
-
-
-
 }
