@@ -515,13 +515,13 @@ namespace DbReader.Tests
                 {
                     var customers = await connection.ReadAsync<CustomerWithOrders>("SELECT c.CustomerID as CustomerWithOrdersId, o.OrderId as O_OrderId, o.OrderDate as O_OrderDate FROM Customers c INNER JOIN Orders o ON c.CustomerId =o.CustomerId AND c.CustomerId = @CustomerId", new { CustomerId = "ALFKI" });
                     var firstCustomer = customers.First();
+                    var orderDate = new DateTime(2020, 11, 18);
                     var firstCustomerId = firstCustomer.CustomerWithOrdersId;
-                    int rowsAffected = await connection.ExecuteAsync("UPDATE Orders set OrderDate = @OrderDate WHERE CustomerID =@CustomerId", new { OrderDate = DateTime.Now, CustomerId = firstCustomerId });
+                    int rowsAffected = await connection.ExecuteAsync("UPDATE Orders set OrderDate = @OrderDate WHERE CustomerID =@CustomerId", new { OrderDate = orderDate, CustomerId = firstCustomerId });
                     customers = await connection.ReadAsync<CustomerWithOrders>("SELECT c.CustomerID as CustomerWithOrdersId, o.OrderId as O_OrderId, o.OrderDate as O_OrderDate FROM Customers c INNER JOIN Orders o ON c.CustomerId =o.CustomerId AND c.CustomerId = @CustomerId", new { CustomerId = "ALFKI" });
-                    var test = connection.ExecuteScalar<DateTime>("SELECT OrderDate FROM Orders WHERE CustomerID = @CustomerId", new { CustomerId = firstCustomerId });
+                    customers.Single().Orders.ShouldAllBe(o => o.OrderDate == orderDate);
                     transaction.Rollback();
                 }
-
             }
         }
 
