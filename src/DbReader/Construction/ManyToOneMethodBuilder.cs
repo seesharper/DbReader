@@ -60,9 +60,6 @@
                 {
                     shouldCreateMethod = true;
                     Type instanceReaderType = typeof(IInstanceReader<>).MakeGenericType(property.PropertyType);
-                    // object instanceReader = instanceReaderFactory.GetInstanceReader(instanceReaderType, propertyPrefix);
-
-                    // instanceReaders.Add(instanceReader);
 
                     generator.Emit(OpCodes.Ldarg_0);
 

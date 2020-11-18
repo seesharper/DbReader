@@ -95,8 +95,6 @@ namespace DbReader.Construction
                 generator.Emit(OpCodes.Ret);
                 var method = (Action<T, IDataRecord, IInstanceReaderFactory>)methodSkeleton.CreateDelegate(typeof(Action<T, IDataRecord, IInstanceReaderFactory>));
                 return method;
-                // // Note Change the signature to avoid another delegate
-                // return (record, instance, instanceReaderFactory) => method(instance, record, instanceReaderFactory);
             }
 
             return null;
