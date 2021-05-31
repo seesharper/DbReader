@@ -20,7 +20,7 @@
     <PackageReference Include="shouldly" Version="3.0.2" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
   </ItemGroup>

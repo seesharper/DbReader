@@ -13,7 +13,7 @@ namespace DbReader.Tests
     using Xunit;
     using System.Text;
     using System.Data.SQLite;
-    using DbReader.Annotations;
+    using System.ComponentModel.DataAnnotations;
 
     public class IntegrationTests
     {
@@ -592,10 +592,10 @@ namespace DbReader.Tests
     {
     }
 
-    public record CustomerRecordWithOrders([Key] string CustomerId, string CompanyName, ICollection<OrderRecord> Orders)
+    public record CustomerRecordWithOrders([property: Key] string CustomerId, string CompanyName, ICollection<OrderRecord> Orders)
     {
     }
 
-    public record OrderRecord([Key] long OrderId, DateTime? OrderDate);
+    public record OrderRecord([property: Key] long OrderId, DateTime? OrderDate);
 }
 #endif

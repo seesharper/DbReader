@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
     using System.Data;
     using System.Data.Common;
     using System.Linq;
@@ -12,7 +13,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Database;
-    using DbReader.Annotations;
     using DbReader.Extensions;
     using Interfaces;
     using Selectors;
@@ -37,15 +37,11 @@
         {
             KeyConvention = p =>
                 p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
-                || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase) || p.IsDefined(typeof(KeyAttribute), true) || HasConstructorWithKeyParameterMatchingProperty(p);
+                || p.Name.Equals(p.DeclaringType.Name + "Id", StringComparison.OrdinalIgnoreCase) || p.IsDefined(typeof(KeyAttribute), true);
             ParameterParser = new RegExParameterParser(@"(:\w+)|(@\w+)", @"IN\s*\((\s*(?:@|:)\w+)\s*\)");
         }
 
-        private static bool HasConstructorWithKeyParameterMatchingProperty(PropertyInfo property)
-        {
-            var constructors = property.DeclaringType.GetConstructors();
-            return constructors.SelectMany(c => c.GetParameters()).Any(c => c.Name.Equals(property.Name, StringComparison.Ordinal) && c.IsDefined(typeof(KeyAttribute), true));
-        }
+
 
 
 
