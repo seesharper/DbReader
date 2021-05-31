@@ -145,10 +145,10 @@ public record Customer(string CustomerId, string CompanyName)
 To define key "properties", we can decorate the constructor arguments with the `KeyAttribute`  
 
 ```c#
-public record Customer([Key]string CustomerId, string CompanyName)
+public record Customer([attribute:Key]string CustomerId, string CompanyName)
 ```
 
-
+> Note: The `[attribute:Key]` syntax simply tells the compiler to add the `KeyAttribute` to the generated property
 
 ## List Parameters
 
@@ -412,7 +412,7 @@ ON
 
 ## Keys
 
-The only requirement with regards to metadata is that a class must declare a property that uniquely identifies an instance of this class. This information is used to determine if we should create a new instance of a class or retrieve it from the query cache. The query cache makes sure that we don't eagerly create new instances of classes that has already been read. The default convention here is that each class must declare a property named *Id*, *[classname]Id* or decorate the key property with the `KeyAttribute` from the `DbReader.Annotations` namespace.
+The only requirement with regards to metadata is that a class must declare a property that uniquely identifies an instance of this class. This information is used to determine if we should create a new instance of a class or retrieve it from the query cache. The query cache makes sure that we don't eagerly create new instances of classes that has already been read. The default convention here is that each class must declare a property named *Id*, *[classname]Id* or decorate the key property with the `KeyAttribute` from the `System.ComponentModel.DataAnnotations` namespace.
 
 
 ```c#
