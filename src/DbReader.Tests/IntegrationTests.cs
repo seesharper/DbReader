@@ -13,6 +13,7 @@ namespace DbReader.Tests
     using Xunit;
     using System.Text;
     using System.Data.SQLite;
+    using DbReader.Annotations;
 
     public class IntegrationTests
     {
@@ -134,6 +135,33 @@ namespace DbReader.Tests
             {
                 var test = SQL.CustomersAndOrders;
                 var customers = connection.Read<CustomerWithOrders>(SQL.CustomersAndOrders);
+                customers.Count().ShouldBe(89);
+                customers.SelectMany(c => c.Orders).Count().ShouldBe(830);
+            }
+        }
+
+        [Fact]
+        public void ShouldReadCustomersAsRecordType()
+        {
+            using (var connection = CreateConnection())
+            {
+                var test = SQL.Customers;
+                var customers = connection.Read<CustomerRecord>("SELECT CustomerID, CompanyName FROM Customers");
+                customers.Count().ShouldBe(93);
+            }
+        }
+
+        [Fact]
+        public void ShouldReadCustomersAndOrdersAsRecordType()
+        {
+
+            // DbReaderOptions.KeySelector<CustomerRecordWithOrders>(c => c.CustomerId);
+            // DbReaderOptions.KeySelector<OrderRecord>(o => o.OrderId);
+
+            using (var connection = CreateConnection())
+            {
+                var test = SQL.Customers;
+                var customers = connection.Read<CustomerRecordWithOrders>("SELECT c.CustomerID, c.CompanyName, o.OrderId as Orders_OrderId, o.OrderDate as Orders_OrderDate FROM Customers c INNER JOIN Orders o ON o.CustomerId = c.CustomerId");
                 customers.Count().ShouldBe(89);
                 customers.SelectMany(c => c.Orders).Count().ShouldBe(830);
             }
@@ -559,5 +587,15 @@ namespace DbReader.Tests
 
         public long Value { get; }
     }
+
+    public record CustomerRecord(string CustomerId, string CompanyName)
+    {
+    }
+
+    public record CustomerRecordWithOrders([Key] string CustomerId, string CompanyName, ICollection<OrderRecord> Orders)
+    {
+    }
+
+    public record OrderRecord([Key] long OrderId, DateTime? OrderDate);
 }
 #endif

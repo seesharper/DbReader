@@ -5,17 +5,19 @@
     using System.Data;
     using System.Reflection;
     using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.Serialization;
     using Extensions;
     using Readers;
     using Selectors;
 
     /// <summary>
-    /// A class that is capable of creating a delegate that creates and populates an instance of <typeparamref name="T"/> from an 
+    /// A class that is capable of creating a delegate that creates and populates an instance of <typeparamref name="T"/> from an
     /// <see cref="IDataRecord"/>.
     /// </summary>
-    /// <typeparam name="T">The type of object to be created.</typeparam> 
-    public class PropertyReaderMethodBuilder<T> : ReaderMethodBuilder<T> 
-    {       
+    /// <typeparam name="T">The type of object to be created.</typeparam>
+    public class PropertyReaderMethodBuilder<T> : ReaderMethodBuilder<T>
+    {
         private readonly IPropertySelector simplePropertySelector;
 
         private readonly IPropertySelector oneToManyPropertySelector;
@@ -27,7 +29,7 @@
         /// </summary>
         /// <param name="methodSkeletonFactory">The <see cref="IMethodSkeletonFactory"/> that is responsible for
         /// creating an <see cref="IMethodSkeleton"/>.</param>
-        /// <param name="methodSelector">The <see cref="IMethodSelector"/> that is responsible for selecting the <see cref="IDataRecord"/> 
+        /// <param name="methodSelector">The <see cref="IMethodSelector"/> that is responsible for selecting the <see cref="IDataRecord"/>
         /// get method that corresponds to the property type.</param>
         /// <param name="simplePropertySelector">The <see cref="IPropertySelector"/> that is responsible for selecting the target properties.</param>
         /// <param name="oneToManyPropertySelector"></param>
@@ -76,7 +78,7 @@
                 var collectionType = typeof(Collection<>).MakeGenericType(projectionType);
                 var collectionConstructor = collectionType.GetConstructor(Type.EmptyTypes);
                 var setMethod = property.GetSetMethod();
-                LoadInstance(il, instanceVariable);                
+                LoadInstance(il, instanceVariable);
                 il.Emit(OpCodes.Newobj, collectionConstructor);
                 il.Emit(OpCodes.Callvirt, setMethod);
             }
@@ -95,8 +97,21 @@
 
         private static LocalBuilder EmitNewInstance(ILGenerator il, ConstructorInfo constructorInfo)
         {
-            il.Emit(OpCodes.Newobj, constructorInfo);
             LocalBuilder instanceVariable = il.DeclareLocal(typeof(T));
+            if (typeof(T).IsRecordType())
+            {
+                var getUninitializedObjectMethod = typeof(FormatterServices).GetMethod(nameof(FormatterServices.GetUninitializedObject), BindingFlags.Static | BindingFlags.Public);
+                var getTypeFromHandleMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), BindingFlags.Static | BindingFlags.Public);
+                il.Emit(OpCodes.Ldtoken, typeof(T));
+                il.Emit(OpCodes.Call, getTypeFromHandleMethod);
+                il.Emit(OpCodes.Call, getUninitializedObjectMethod);
+                il.Emit(OpCodes.Castclass, typeof(T));
+            }
+            else
+            {
+                il.Emit(OpCodes.Newobj, constructorInfo);
+
+            }
             il.Emit(OpCodes.Stloc, instanceVariable);
             return instanceVariable;
         }
@@ -125,6 +140,6 @@
             EmitGetValue(il, propertyIndex, getMethod, property.PropertyType);
             EmitCallPropertySetterMethod(il, property);
             il.MarkLabel(endLabel);
-        }        
+        }
     }
 }
