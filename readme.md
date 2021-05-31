@@ -134,6 +134,20 @@ var args = new ArgumentsBuilder()
 connection.Read<Customer>("SELECT * FROM Customers WHERE Country = @Country AND City = @City",
 ```
 
+## Record types
+
+**DbReader** supports [C# records](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record) meaning that we can ensure immutability and it also makes it possible to create a class representing the result of a query with minimum effort.
+
+```c#
+public record Customer(string CustomerId, string CompanyName)
+```
+
+To define key "properties", we can decorate the constructor arguments with the `KeyAttribute`  
+
+```c#
+public record Customer([Key]string CustomerId, string CompanyName)
+```
+
 
 
 ## List Parameters
@@ -398,10 +412,10 @@ ON
 
 ## Keys
 
-The only requirement with regards to metadata is that a class must declare a property that uniquely identifies an instance of this class. This information is used to determine if we should create a new instance of a class or retrieve it from the query cache. The query cache makes sure that we don't eagerly create new instances of classes that has already been read. The default convention here is that each class must declare a property named *Id* or *[classname]Id*.
-For instance there might be desirable to be more explicit about the key properties and there also might be needed to define composite keys. One solution here is to take advantage of the *KeyAttribute* defined in the System.Components.DataAnnotations namespace.
+The only requirement with regards to metadata is that a class must declare a property that uniquely identifies an instance of this class. This information is used to determine if we should create a new instance of a class or retrieve it from the query cache. The query cache makes sure that we don't eagerly create new instances of classes that has already been read. The default convention here is that each class must declare a property named *Id*, *[classname]Id* or decorate the key property with the `KeyAttribute` from the `DbReader.Annotations` namespace.
 
-```
+
+```c#
 public class OrderDetail
 {
 	[Key]
@@ -412,10 +426,15 @@ public class OrderDetail
 }
 ```
 The convention can easily be changes through the DbReaderOptions class.
-```
+```c#
 DbReaderOptions.KeyConvention = (property) => property.IsDefined(typeof(KeyAttribute));
 ```
 
+Another possibility is to supply this information using the DbReaderOptions`KeySelector` method.
+
+```c#
+DbReaderOptions.KeySelector<Customer>(c => c.CustomerId)
+```
 
 ## Prefixes
 

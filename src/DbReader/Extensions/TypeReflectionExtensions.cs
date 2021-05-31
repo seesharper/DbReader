@@ -119,6 +119,16 @@ namespace DbReader.Extensions
             return ProjectionTypeCache.GetOrAdd(type, ResolveProjectionType);
         }
 
+        /// <summary>
+        /// Determines if the given <paramref name="type"/> is a record type.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> to be checked.</param>
+        /// <returns>true if the type if a record type, otherwise false.</returns>
+        public static bool IsRecordType(this Type type)
+        {
+            return type.GetMethods().Any(m => m.Name == "<Clone>$");
+        }
+
         private static bool IsEnumerableOfT(Type @interface)
         {
             return @interface.GetTypeInfo().IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IEnumerable<>);
