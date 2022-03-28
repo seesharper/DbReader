@@ -41,14 +41,10 @@ namespace DbReader.Mapping
                 }
 
                 var propertyType = mappingInfo.Property.PropertyType;
-                // if (propertyType.IsEnum)
-                // {
-                //     propertyType = propertyType.GetUnderlyingType();
-                // }
 
                 if (!propertyType.IsAssignableFrom(mappingInfo.ColumnInfo.Type.GetTypeInfo()) && !ValueConverter.CanConvert(propertyType))
                 {
-                    if (propertyType.IsEnum)
+                    if (propertyType.IsEnum || propertyType.IsNullable())
                     {
                         Execute(propertyType.GetUnderlyingType(), dataRecord, prefix);
                     }
