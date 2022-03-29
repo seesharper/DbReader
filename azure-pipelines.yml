@@ -13,7 +13,7 @@ variables:
 - group: api-keys
 
 pool:
-  name: Hosted Ubuntu 1804
+  vmImage: 'ubuntu-latest'
 steps:
 - bash: 'sudo apt install nuget'
   displayName: 'Install NuGet'
