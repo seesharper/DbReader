@@ -13,12 +13,12 @@ variables:
 - group: api-keys
 
 pool:
-  name: Hosted Ubuntu 1604
+  vmImage: 'ubuntu-latest'
 steps:
 - bash: 'sudo apt install nuget'
   displayName: 'Install NuGet'
 - bash: |
-   curl -L https://github.com/filipw/dotnet-script/releases/download/0.28.0/dotnet-script.0.28.0.zip > dotnet-script.zip
+   curl -L https://github.com/filipw/dotnet-script/releases/download/1.3.1/dotnet-script.1.3.1.zip > dotnet-script.zip
    unzip -o dotnet-script.zip -d ./
   displayName: 'Install latest otnet-script'
 
