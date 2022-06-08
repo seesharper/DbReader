@@ -18,8 +18,8 @@ namespace DbReader.Tests
 
         public MethodBuilderMethodSkeleton(string name, Type returnType, Type[] parameterTypes)
         {
-            this.name = name;
-            this.outputPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, name + ".dll");
+            this.name = name;            
+            this.outputPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MethodBuilderMethodSkeleton).Assembly.CodeBase).LocalPath), name + ".dll");
             if (File.Exists(outputPath))
             {
                 File.Delete(outputPath);
