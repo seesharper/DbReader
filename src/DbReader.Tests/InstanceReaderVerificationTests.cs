@@ -14,6 +14,13 @@ namespace DbReader.Tests
         {
             container.Register<IMethodSkeletonFactory, MethodBuilderMethodSkeletonFactory>(new PerContainerLifetime());
         }
+
+        internal override void Configure(IServiceRegistry serviceRegistry)
+        {
+            base.Configure(serviceRegistry);
+            serviceRegistry.Register<IMethodSkeletonFactory, MethodBuilderMethodSkeletonFactory>(new PerContainerLifetime());
+            
+        }
     }
 }
 #endif

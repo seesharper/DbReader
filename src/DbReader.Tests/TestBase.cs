@@ -9,8 +9,8 @@ namespace DbReader.Tests
         public ContainerFixture()
         {
             var container = CreateContainer();
-            Configure(container);
             container.RegisterFrom<CompositionRoot>();
+            Configure(container);
             ServiceFactory = container.BeginScope();
             InjectPrivateFields();
         }
