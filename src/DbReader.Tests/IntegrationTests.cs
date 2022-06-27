@@ -303,26 +303,26 @@ namespace DbReader.Tests
         }
 
 
-        // [Fact]
-        // public void ShouldReadEmployeeHierarchy()
-        // {
-        //     using (var connection = CreateConnection())
-        //     {
-        //         var employees = connection.Read<Employee>(SQL.EmployeesHierarchy).ToArray();
-        //         Dictionary<long?, Employee> map = new Dictionary<long?, Employee>();
-        //         foreach (var employee in employees)
-        //         {
-        //             if (employee.ReportsTo != null)
-        //             {
-        //                 map[employee.ReportsTo].Employees.Add(employee);
-        //             }
-        //             map.Add(employee.EmployeeId, employee);
-        //         }
+        [OnlyOnIntelFactAttribute]
+        public void ShouldReadEmployeeHierarchy()
+        {
+            using (var connection = CreateConnection())
+            {
+                var employees = connection.Read<Employee>(SQL.EmployeesHierarchy).ToArray();
+                Dictionary<long?, Employee> map = new Dictionary<long?, Employee>();
+                foreach (var employee in employees)
+                {
+                    if (employee.ReportsTo != null)
+                    {
+                        map[employee.ReportsTo].Employees.Add(employee);
+                    }
+                    map.Add(employee.EmployeeId, employee);
+                }
 
-        //         var initialEmployee = map.First().Value;
-        //         initialEmployee.Employees.Count().ShouldBe(5);
-        //     }
-        // }
+                var initialEmployee = map.First().Value;
+                initialEmployee.Employees.Count().ShouldBe(5);
+            }
+        }
 
         [Fact]
         public void ShouldReturnRowsAffected()
