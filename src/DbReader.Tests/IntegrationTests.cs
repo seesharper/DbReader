@@ -3,17 +3,17 @@ namespace DbReader.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
     using System.Data;
+    using System.Data.SQLite;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
+    using DbReader;
     using Extensions;
     using Shouldly;
-    using DbReader;
     using Xunit;
-    using System.Text;
-    using System.Data.SQLite;
-    using System.ComponentModel.DataAnnotations;
 
     public class IntegrationTests
     {
@@ -303,7 +303,7 @@ namespace DbReader.Tests
         }
 
 
-        [Fact]
+        [OnlyOnIntelFactAttribute]
         public void ShouldReadEmployeeHierarchy()
         {
             using (var connection = CreateConnection())

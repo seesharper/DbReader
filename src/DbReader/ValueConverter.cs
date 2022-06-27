@@ -31,7 +31,7 @@ namespace DbReader
     /// <summary>
     /// Used to register a custom conversion from a <see cref="IDataRecord"/> to an instance of a given <see cref="Type"/>.
     /// </summary>
-    internal static class ValueConverter
+    public static class ValueConverter
     {
         private static readonly ConcurrentDictionary<Type, Delegate> ReadDelegates =
             new ConcurrentDictionary<Type, Delegate>();

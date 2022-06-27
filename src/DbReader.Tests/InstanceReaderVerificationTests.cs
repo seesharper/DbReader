@@ -1,4 +1,4 @@
-﻿#if NET462
+﻿#if NET6_0
 namespace DbReader.Tests
 {
     using System;
@@ -12,7 +12,14 @@ namespace DbReader.Tests
     {
         internal static void Configure(IServiceContainer container)
         {
-            container.Register<IMethodSkeletonFactory, MethodBuilderMethodSkeletonFactory>(new PerContainerLifetime());
+            container.Register<IMethodSkeletonFactory, VerifiableMethodSkeletonFactory>(new PerContainerLifetime());
+        }
+
+        internal override void Configure(IServiceRegistry serviceRegistry)
+        {
+            base.Configure(serviceRegistry);
+            serviceRegistry.Register<IMethodSkeletonFactory, VerifiableMethodSkeletonFactory>(new PerContainerLifetime());
+
         }
     }
 }
