@@ -3,17 +3,17 @@ namespace DbReader.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
     using System.Data;
+    using System.Data.SQLite;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
+    using DbReader;
     using Extensions;
     using Shouldly;
-    using DbReader;
     using Xunit;
-    using System.Text;
-    using System.Data.SQLite;
-    using System.ComponentModel.DataAnnotations;
 
     public class IntegrationTests
     {
@@ -303,26 +303,26 @@ namespace DbReader.Tests
         }
 
 
-        [Fact]
-        public void ShouldReadEmployeeHierarchy()
-        {
-            using (var connection = CreateConnection())
-            {
-                var employees = connection.Read<Employee>(SQL.EmployeesHierarchy).ToArray();
-                Dictionary<long?, Employee> map = new Dictionary<long?, Employee>();
-                foreach (var employee in employees)
-                {
-                    if (employee.ReportsTo != null)
-                    {
-                        map[employee.ReportsTo].Employees.Add(employee);
-                    }
-                    map.Add(employee.EmployeeId, employee);
-                }
+        // [Fact]
+        // public void ShouldReadEmployeeHierarchy()
+        // {
+        //     using (var connection = CreateConnection())
+        //     {
+        //         var employees = connection.Read<Employee>(SQL.EmployeesHierarchy).ToArray();
+        //         Dictionary<long?, Employee> map = new Dictionary<long?, Employee>();
+        //         foreach (var employee in employees)
+        //         {
+        //             if (employee.ReportsTo != null)
+        //             {
+        //                 map[employee.ReportsTo].Employees.Add(employee);
+        //             }
+        //             map.Add(employee.EmployeeId, employee);
+        //         }
 
-                var initialEmployee = map.First().Value;
-                initialEmployee.Employees.Count().ShouldBe(5);
-            }
-        }
+        //         var initialEmployee = map.First().Value;
+        //         initialEmployee.Employees.Count().ShouldBe(5);
+        //     }
+        // }
 
         [Fact]
         public void ShouldReturnRowsAffected()
