@@ -4,7 +4,10 @@
     {
       "label": "build",
       "command": "dotnet",
-      "args": ["build", "/property:GenerateFullPaths=true"],
+      "args": [
+        "build",
+        "/property:GenerateFullPaths=true"
+      ],
       "type": "shell",
       "group": "build",
       "presentation": {
@@ -15,7 +18,11 @@
     {
       "label": "rebuild",
       "command": "dotnet",
-      "args": ["build", "--no-incremental", "/property:GenerateFullPaths=true"],
+      "args": [
+        "build",
+        "--no-incremental",
+        "/property:GenerateFullPaths=true"
+      ],
       "type": "shell",
       "group": "build",
       "presentation": {
@@ -28,7 +35,11 @@
       "label": "test",
       "command": "dotnet",
       "type": "process",
-      "args": ["script", "${workspaceFolder}/../build/build.csx", "test"],
+      "args": [
+        "script",
+        "${workspaceFolder}/build/build.csx",
+        "test"
+      ],
       "problemMatcher": "$msCompile",
       "group": {
         "kind": "test",

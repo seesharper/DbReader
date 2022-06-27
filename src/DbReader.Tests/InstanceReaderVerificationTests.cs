@@ -1,4 +1,4 @@
-﻿#if NET462
+﻿#if NET6_0
 namespace DbReader.Tests
 {
     using System;
@@ -8,19 +8,19 @@ namespace DbReader.Tests
     using IMethodSkeleton = Construction.IMethodSkeleton;
 
 
-    public class InstanceReaderVerificationTests : InstanceReaderTests
-    {
-        internal static void Configure(IServiceContainer container)
-        {
-            container.Register<IMethodSkeletonFactory, MethodBuilderMethodSkeletonFactory>(new PerContainerLifetime());
-        }
+    // public class InstanceReaderVerificationTests : InstanceReaderTests
+    // {
+    //     internal static void Configure(IServiceContainer container)
+    //     {
+    //         container.Register<IMethodSkeletonFactory, VerifiableMethodSkeletonFactory>(new PerContainerLifetime());
+    //     }
 
-        internal override void Configure(IServiceRegistry serviceRegistry)
-        {
-            base.Configure(serviceRegistry);
-            serviceRegistry.Register<IMethodSkeletonFactory, MethodBuilderMethodSkeletonFactory>(new PerContainerLifetime());
-            
-        }
-    }
+    //     internal override void Configure(IServiceRegistry serviceRegistry)
+    //     {
+    //         base.Configure(serviceRegistry);
+    //         serviceRegistry.Register<IMethodSkeletonFactory, VerifiableMethodSkeletonFactory>(new PerContainerLifetime());
+
+    //     }
+    // }
 }
 #endif

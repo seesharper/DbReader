@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="5e9ad830-5f29-465e-b596-dbd4014e6b2d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/DbReader.Tests/ILVerify.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../build/.vscode/launch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DbReader/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DbReader/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DbReader/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DbReader/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DbReader/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/tasks.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DbReader.Tests/DbReader.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DbReader.Tests/DbReader.Tests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DbReader.Tests/InstanceReaderVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DbReader.Tests/InstanceReaderVerificationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DbReader.Tests/MethodBuilderMethodSkeleton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DbReader.Tests/MethodBuilderMethodSkeleton.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DbReader.Tests/MethodBuilderMethodSkeletonFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DbReader.Tests/MethodBuilderMethodSkeletonFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DbReader.sln" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DbReader/DbReader.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DbReader/DbReader.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mono.props" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/DbReader.Tests/InstanceReaderVerificationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/DbReader.Tests/IntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/DbReader/CompositionRoot.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2AJSEpnmewVmZxhbxRTVyOjShOO" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.Assembly Explorer",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5e9ad830-5f29-465e-b596-dbd4014e6b2d" name="Changes" comment="" />
+      <created>1654726087154</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1654726087154</updated>
+      <workItem from="1654726091701" duration="1307000" />
+      <workItem from="1654766099308" duration="788000" />
+      <workItem from="1654767536167" duration="801000" />
+      <workItem from="1654772463617" duration="1134000" />
+      <workItem from="1654773684086" duration="963000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
