@@ -27,7 +27,7 @@ namespace DbReader
     using System.Collections.Concurrent;
     using System.Data;
     using System.Reflection;
-    
+
     /// <summary>
     /// Used to register a custom conversion from a <see cref="IDataRecord"/> to an instance of a given <see cref="Type"/>.
     /// </summary>
@@ -35,7 +35,7 @@ namespace DbReader
     {
         private static readonly ConcurrentDictionary<Type, Delegate> ReadDelegates =
             new ConcurrentDictionary<Type, Delegate>();
-       
+
         /// <summary>
         /// Registers a function delegate that creates a value of <typeparamref name="T"/> from an <see cref="IDataRecord"/>
         /// at the specified ordinal (column index).
@@ -46,7 +46,7 @@ namespace DbReader
         {
             ReadDelegates.AddOrUpdate(typeof(T), type => convertFunction, (type, del) => convertFunction);
         }
-       
+
         /// <summary>
         /// Determines if the given <paramref name="type"/> can be converted.
         /// </summary>        
@@ -79,6 +79,6 @@ namespace DbReader
         {
             var openGenericConvertMethod = typeof(ValueConverter).GetMethod("Convert", BindingFlags.Static | BindingFlags.Public);
             return openGenericConvertMethod.MakeGenericMethod(type);
-        }        
+        }
     }
 }

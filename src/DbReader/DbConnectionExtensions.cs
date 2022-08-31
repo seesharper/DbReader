@@ -242,12 +242,14 @@ namespace DbReader
         {
             if (!reader.Read() || reader.IsDBNull(0))
             {
-                return default(T);
+                return default;
             }
 
-            if (ValueConverter.CanConvert(typeof(T)))
+            var underlyingType = typeof(T).GetUnderlyingType();
+
+            if (ValueConverter.CanConvert(underlyingType))
             {
-                return ValueConverter.Convert<T>(reader, 0);
+                return (T)ValueConverter.GetConvertMethod(underlyingType).Invoke(null, new object[] { reader, 0 });
             }
 
             return ConvertFromDbValue<T>(reader.GetValue(0));

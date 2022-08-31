@@ -28,6 +28,8 @@ namespace DbReader.Tests
 
             DbReaderOptions.WhenPassing<CustomValueType>()
                 .Use((parameter, argument) => parameter.Value = argument.Value);
+
+            DbReaderOptions.WhenReading<CustomScalarValue>().Use((datarecord, i) => new CustomScalarValue(datarecord.GetInt64(i)));
         }
 
 
@@ -375,7 +377,6 @@ namespace DbReader.Tests
         [Fact]
         public async Task ShouldConvertScalarValueUsingValueConverter()
         {
-            DbReaderOptions.WhenReading<CustomScalarValue>().Use((datarecord, i) => new CustomScalarValue(datarecord.GetInt64(i)));
             using (var connection = CreateConnection())
             {
                 var scalar = await connection.ExecuteScalarAsync<CustomScalarValue>("SELECT COUNT(*) FROM Customers");
@@ -384,15 +385,26 @@ namespace DbReader.Tests
         }
 
         [Fact]
-        public async Task ShouldHandleNullScalarValueUsingValueConverter()
+        public async Task ShouldHandleReturningNullIntoNullableTypeWithValueConverter()
         {
-            DbReaderOptions.WhenReading<CustomScalarValue?>().Use((datarecord, i) => new CustomScalarValue(datarecord.GetInt64(i)));
             using (var connection = CreateConnection())
             {
                 var scalar = await connection.ExecuteScalarAsync<CustomScalarValue?>("SELECT NULL FROM Customers WHERE CustomerID = 'ALFKI'");
                 scalar.ShouldBe(null);
             }
         }
+
+        [Fact]
+        public async Task ShouldHandleReturningValueIntoNullableTypeWithValueConverter()
+        {
+            using (var connection = CreateConnection())
+            {
+                var scalar = await connection.ExecuteScalarAsync<CustomScalarValue?>("SELECT 1 FROM Customers WHERE CustomerID = 'ALFKI'");
+                scalar.Value.Value.ShouldBe(1);
+            }
+        }
+
+        //ShouldHandleReturningNullIntoNullableTypeWithValueConverter()
 
 
         [Fact]
