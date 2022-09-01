@@ -496,6 +496,18 @@ namespace DbReader.Tests
         }
 
         [Fact]
+        public async Task ShouldHandlePassingNullableCustomValueTypeWithNull()
+        {
+            CustomValueType? shipVia = null;
+
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Orders WHERE ShipVia = @ShipVia", new { ShipVia = shipVia });
+                count.ShouldBe(0);
+            }
+        }
+
+        [Fact]
         public void ShouldNotSetParameterValueWhenPassingCustomType()
         {
             DbReaderOptions.WhenPassing<CustomerId>().Use((p, c) =>

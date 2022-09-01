@@ -42,7 +42,14 @@ namespace DbReader
 
         public static void Process(Type argumentType, IDataParameter dataParameter, object argument)
         {
-            ProcessDelegates[argumentType.GetUnderlyingType()](dataParameter, argument);
+            if (argument != null)
+            {
+                ProcessDelegates[argumentType.GetUnderlyingType()](dataParameter, argument);
+            }
+            else
+            {
+                dataParameter.Value = DBNull.Value;
+            }
         }
 
         public static bool CanProcess(Type type)
