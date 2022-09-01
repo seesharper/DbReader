@@ -6,6 +6,7 @@ namespace DbReader
     using System.Collections.Concurrent;
     using System.Data;
     using System.Reflection;
+    using DbReader.Extensions;
 
     internal static class ArgumentProcessor
     {
@@ -41,12 +42,12 @@ namespace DbReader
 
         public static void Process(Type argumentType, IDataParameter dataParameter, object argument)
         {
-            ProcessDelegates[argumentType](dataParameter, argument);
+            ProcessDelegates[argumentType.GetUnderlyingType()](dataParameter, argument);
         }
 
         public static bool CanProcess(Type type)
         {
-            return ProcessDelegates.ContainsKey(type);
+            return ProcessDelegates.ContainsKey(type.GetUnderlyingType());
         }
     }
 }

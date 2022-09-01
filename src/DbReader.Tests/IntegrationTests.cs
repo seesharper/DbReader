@@ -27,7 +27,10 @@ namespace DbReader.Tests
             connectionString = $"Data Source = {dbFile}";
 
             DbReaderOptions.WhenPassing<CustomValueType>()
-                .Use((parameter, argument) => parameter.Value = argument.Value);
+                .Use((parameter, argument) =>
+                {
+                    parameter.Value = argument.Value;
+                });
 
             DbReaderOptions.WhenReading<CustomScalarValue>().Use((datarecord, i) => new CustomScalarValue(datarecord.GetInt64(i)));
         }
@@ -477,6 +480,18 @@ namespace DbReader.Tests
             {
                 var exception = Should.Throw<InvalidOperationException>(() => connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Suppliers WHERE SupplierId IN (@Ids)", new { Ids = 10 }));
                 exception.Message.ShouldBe("The parameter @Ids is defined a list parameter, but the property Ids is not IEnumerable<T>");
+            }
+        }
+
+        [Fact]
+        public async Task ShouldHandlePassingNullableCustomValueTypeWithValue()
+        {
+            CustomValueType? shipVia = new CustomValueType(1);
+
+            using (var connection = CreateConnection())
+            {
+                var count = connection.ExecuteScalar<long>("SELECT COUNT(*) FROM Orders WHERE ShipVia = @ShipVia", new { ShipVia = shipVia });
+                count.ShouldBe(249);
             }
         }
 
