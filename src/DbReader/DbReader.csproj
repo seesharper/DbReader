@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;netstandard2.0;net462</TargetFrameworks>
-    <Version>2.5.4</Version>
     <Authors>Bernhard Richter</Authors>
     <PackageProjectUrl>https://github.com/seesharper/DbReader</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
@@ -11,7 +10,6 @@
     <Copyright>Bernhard Richter</Copyright>
     <PackageTags>data-access orm sql micro-orm</PackageTags>
     <Description>A simple and fast database reader for the .Net framework.</Description>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
