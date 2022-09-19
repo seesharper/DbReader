@@ -20,7 +20,10 @@ namespace DbReader
         {
             ConvertMethod = typeof(ArgumentProcessor).GetTypeInfo().DeclaredMethods
                 .Single(m => m.Name == "Process");
-
+            ProcessDelegates.TryAdd(typeof(int), (parameter, value) =>
+            {
+                parameter.Value = (int)value;
+            });
         }
 
         public static void RegisterProcessDelegate<TArgument>(Action<IDataParameter, TArgument> convertFunction)
@@ -32,7 +35,7 @@ namespace DbReader
             Type argumentType = typeof(TArgument);
             if (ProcessDelegates.ContainsKey(argumentType))
             {
-                ProcessDelegates.TryUpdate(argumentType, processDelegate, processDelegate);
+                ProcessDelegates[argumentType] = processDelegate;
             }
             else
             {
@@ -42,19 +45,68 @@ namespace DbReader
 
         public static void Process(Type argumentType, IDataParameter dataParameter, object argument)
         {
-            if (argument != null)
+            if (argument == null)
             {
-                ProcessDelegates[argumentType.GetUnderlyingType()](dataParameter, argument);
+                dataParameter.Value = DBNull.Value;
+                return;
+            }
+
+            if (ProcessDelegates.ContainsKey(argumentType))
+            {
+                ProcessDelegates[argumentType](dataParameter, argument);
             }
             else
             {
-                dataParameter.Value = DBNull.Value;
+                Type underlyingType = argumentType.GetUnderlyingType();
+                while (underlyingType != argumentType)
+                {
+                    if (ProcessDelegates.ContainsKey(underlyingType))
+                    {
+                        ProcessDelegates[underlyingType](dataParameter, argument);
+                        break;
+                    }
+                    else
+                    {
+                        underlyingType = underlyingType.GetUnderlyingType();
+                    }
+                }
             }
         }
 
         public static bool CanProcess(Type type)
         {
-            return ProcessDelegates.ContainsKey(type.GetUnderlyingType());
+            //Keep a map to that we know that Nullable<Guid> maps to ConvertFunction for Guid
+
+            if (ProcessDelegates.ContainsKey(type))
+            {
+                return true;
+            }
+            else
+            {
+                Type underlyingType = type.GetUnderlyingType();
+                if (underlyingType != type)
+                {
+                    return CanProcess(underlyingType);
+                }
+
+                return false;
+            }
+
+
+
+            // Type underlyingType = type.GetUnderlyingType();
+            // while (type != underlyingType)
+            // {
+            //     if (ProcessDelegates.ContainsKey(type))
+            //     {
+            //         return true;
+            //     }
+            //     else
+            //     {
+            //         return CanProcess(underlyingType);
+            //     }
+            // }
+            // return type.IsSimpleType();
         }
     }
 }

@@ -5,8 +5,8 @@
     using System.Data;
     using System.Runtime.CompilerServices;
     using Construction;
-    using LightInject;
     using Extensions;
+    using LightInject;
     using Readers;
     using Selectors;
 
