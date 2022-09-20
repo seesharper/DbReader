@@ -53,15 +53,10 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldHandleNullableEnumWithoutConverterFunction()
         {
-            DbReaderOptions.WhenPassing<int>().Use((parameter, value) =>
-            {
-
-            });
-
             var args = new { Status = new EnumWithoutConverterFunction?(EnumWithoutConverterFunction.Value2) };
             var method = argumentParserMethodBuilder.CreateMethod("@Status", args.GetType(), Array.Empty<IDataParameter>());
             var result = method("@Status", args, () => new TestDataParameter());
-            result.Parameters[0].Value.ShouldBe(EnumWithoutConverterFunction.Value2);
+            result.Parameters[0].Value.ShouldBe(2);
         }
 
 

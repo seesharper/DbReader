@@ -20,10 +20,40 @@ namespace DbReader
         {
             ConvertMethod = typeof(ArgumentProcessor).GetTypeInfo().DeclaredMethods
                 .Single(m => m.Name == "Process");
-            ProcessDelegates.TryAdd(typeof(int), (parameter, value) =>
+            ProcessDelegates.TryAdd(typeof(int), (parameter, value) => AssignParameterValue(parameter, (int)value));
+            ProcessDelegates.TryAdd(typeof(uint), (parameter, value) => AssignParameterValue(parameter, (uint)value));
+            ProcessDelegates.TryAdd(typeof(long), (parameter, value) => AssignParameterValue(parameter, (long)value));
+            ProcessDelegates.TryAdd(typeof(ulong), (parameter, value) => AssignParameterValue(parameter, (ulong)value));
+            ProcessDelegates.TryAdd(typeof(string), (parameter, value) => AssignParameterValue(parameter, (string)value));
+            ProcessDelegates.TryAdd(typeof(DateTime), (parameter, value) => AssignParameterValue(parameter, (DateTime)value));
+            ProcessDelegates.TryAdd(typeof(Guid), (parameter, value) => AssignParameterValue(parameter, (Guid)value));
+            ProcessDelegates.TryAdd(typeof(decimal), (parameter, value) => AssignParameterValue(parameter, (decimal)value));
+            ProcessDelegates.TryAdd(typeof(byte[]), (parameter, value) => AssignParameterValue(parameter, (byte[])value));
+            ProcessDelegates.TryAdd(typeof(char[]), (parameter, value) => AssignParameterValue(parameter, (char[])value));
+            ProcessDelegates.TryAdd(typeof(sbyte), (parameter, value) => AssignParameterValue(parameter, (sbyte)value));
+            ProcessDelegates.TryAdd(typeof(byte), (parameter, value) => AssignParameterValue(parameter, (byte)value));
+            ProcessDelegates.TryAdd(typeof(short), (parameter, value) => AssignParameterValue(parameter, (short)value));
+            ProcessDelegates.TryAdd(typeof(ushort), (parameter, value) => AssignParameterValue(parameter, (ushort)value));
+            ProcessDelegates.TryAdd(typeof(ushort), (parameter, value) => AssignParameterValue(parameter, (ushort)value));            
+        }
+
+
+        //Extension method?
+        private static void AssignParameterValue<T>(IDataParameter dataParameter, T value)
+        {
+            try
             {
-                parameter.Value = (int)value;
-            });
+                dataParameter.Value = ToDbNullIfNull(value);
+            }
+            catch
+            {
+                throw new ArgumentOutOfRangeException(dataParameter.ParameterName, value, ErrorMessages.InvalidParameterValue.FormatWith(dataParameter.ParameterName, value, value == null ? "null" : value.GetType().Name));
+            }
+        }
+
+        private static object ToDbNullIfNull(object value)
+        {
+            return value ?? DBNull.Value;
         }
 
         public static void RegisterProcessDelegate<TArgument>(Action<IDataParameter, TArgument> convertFunction)

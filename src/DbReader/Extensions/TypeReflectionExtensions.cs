@@ -80,6 +80,7 @@ namespace DbReader.Extensions
         /// <returns><b>true</b> if the <paramref name="type"/> is a "simple" type, otherwise <b>false</b></returns>
         public static bool IsSimpleType(this Type type)
         {
+            type = type.GetUnderlyingType();
             return type.GetTypeInfo().IsPrimitive || SimpleTypes.Contains(type) || ValueConverter.CanConvert(type) || ArgumentProcessor.CanProcess(type);
         }
 

@@ -310,18 +310,6 @@
             instance.Property.ShouldBe(Int32Enum.One);
         }
 
-
-        [Fact]
-        public void ShouldUseConverterFunctionEvenWhenEnumHasIncompatibleUnderlyingType2()
-        {
-            DbReaderOptions.WhenReading<Int32Enum>().Use((dr, i) => (Int32Enum)dr.GetInt64(i));
-            var dataRecord = new { Id = 1, Property = new Int32Enum?() }.ToDataRecord();
-            var reader = GetReader<ClassWithProperty<Int32Enum>>();
-            var instance = reader.Read(dataRecord, string.Empty);
-            instance.Property.ShouldBe(Int32Enum.One);
-        }
-
-
         [Fact]
         public void ShouldHandleManyToOneWithoutAnyMatchingColumns()
         {
