@@ -12,8 +12,8 @@ namespace DbReader.Construction
     /// implementations.
     /// </summary>
     /// <typeparam name="T">The type of object to be created.</typeparam> 
-    public abstract class ReaderMethodBuilder<T> : IReaderMethodBuilder<T> 
-    {        
+    public abstract class ReaderMethodBuilder<T> : IReaderMethodBuilder<T>
+    {
         private readonly IMethodSkeletonFactory methodSkeletonFactory;
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace DbReader.Construction
             MethodSelector = methodSelector;
             this.methodSkeletonFactory = methodSkeletonFactory;
         }
-        
+
         /// <summary>
         /// Gets the <see cref="IMethodSelector"/> that is responsible for selecting the <see cref="IDataRecord"/> 
         /// get method that corresponds to the property type.
@@ -93,7 +93,7 @@ namespace DbReader.Construction
         /// <param name="targetType">The <see cref="Type"/> of the target <see cref="PropertyInfo"/> or <see cref="ParameterInfo"/>.</param>
         protected void EmitGetValue(ILGenerator il, int index, MethodInfo getMethod, Type targetType)
         {
-            if (targetType.IsNullable())
+            if (targetType.IsNullable() && !getMethod.ReturnType.IsNullable())
             {
                 EmitGetNullableValue(il, index, getMethod, targetType);
             }
@@ -177,7 +177,7 @@ namespace DbReader.Construction
         {
             return (Func<IDataRecord, int[], T>)methodSkeleton.CreateDelegate(typeof(Func<IDataRecord, int[], T>));
         }
-       
+
         private static void LoadDataRecord(ILGenerator il)
         {
             il.Emit(OpCodes.Ldarg_0);

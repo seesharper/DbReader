@@ -31,6 +31,13 @@
                 return ValueConverter.GetConvertMethod(type);
             }
 
+            type = type.GetUnderlyingType();
+
+            if (ValueConverter.CanConvert(type))
+            {
+                return ValueConverter.GetConvertMethod(type);
+            }
+
             if (type == typeof(bool))
             {
                 return typeof(IDataRecord).GetTypeInfo().GetMethod("GetBoolean");

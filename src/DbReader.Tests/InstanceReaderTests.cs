@@ -216,6 +216,22 @@
             instance.Property.ShouldBe(SampleEnum.One);
         }
 
+        [Fact]
+        public void ShouldReadNullableEnum()
+        {
+            //DbReaderOptions.WhenReading<SampleEnum?>().Use((dr, ordinal) => (SampleEnum)dr.GetInt32(ordinal));
+            var dataRecord = new { Id = 1, Property = 1 }.ToDataRecord();
+            var instance = GetReader<ClassWithProperty<SampleEnum?>>().Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(SampleEnum.One);
+        }
+
+        [Fact]
+        public void ShouldReadNullableEnumWithNullValue()
+        {
+            var dataRecord = new { Id = 1, Property = DBNull.Value }.ToDataRecord();
+            var instance = GetReader<ClassWithProperty<SampleEnum?>>().Read(dataRecord, string.Empty);
+            instance.Property.ShouldBeNull();
+        }
 
         [Fact]
         public void ShouldReadCustomValueType()
