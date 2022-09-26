@@ -21,7 +21,7 @@
     </PackageReference>
     <PackageReference Include="moq" Version="4.18.2" />
     <PackageReference Include="shouldly" Version="4.1.0" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />

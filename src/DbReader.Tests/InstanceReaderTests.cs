@@ -216,6 +216,53 @@
             instance.Property.ShouldBe(SampleEnum.One);
         }
 
+        [Fact]
+        public void ShouldReadNullableEnum()
+        {
+            var dataRecord = new { Id = 1, Property = 1 }.ToDataRecord();
+            var instance = GetReader<ClassWithProperty<SampleEnum?>>().Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(SampleEnum.One);
+        }
+
+        [Fact]
+        public void ShouldReadNullableEnumWithNullValue()
+        {
+            var dataRecord = new { Id = 1, Property = DBNull.Value }.ToDataRecord();
+            var instance = GetReader<ClassWithProperty<SampleEnum?>>().Read(dataRecord, string.Empty);
+            instance.Property.ShouldBeNull();
+        }
+
+        [Fact]
+        public void ShouldReadNullableEnumWithConverterFunction()
+        {
+            var dataRecord = new { Id = 1, Property = 2 }.ToDataRecord();
+            bool wasCalled = false;
+            DbReaderOptions.WhenReading<EnumWithConverterFunction>().Use((dataRecord, ordinal) =>
+            {
+                wasCalled = true;
+                return (EnumWithConverterFunction)dataRecord.GetInt32(ordinal);
+            });
+            var instance = GetReader<ClassWithProperty<EnumWithConverterFunction?>>().Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(EnumWithConverterFunction.Value2);
+            wasCalled.ShouldBe(true);
+        }
+
+
+        [Fact]
+        public void ShouldReadNullableEnumWithConverterFunctionForIntegralType()
+        {
+            var dataRecord = new { Id = 1, Property = 2 }.ToDataRecord();
+            bool wasCalled = false;
+            DbReaderOptions.WhenReading<ushort>().Use((dataRecord, ordinal) =>
+            {
+                wasCalled = true;
+                return (ushort)dataRecord.GetInt32(ordinal);
+            });
+            var instance = GetReader<ClassWithProperty<EnumWithoutConverterFunctionForIntegralType>>().Read(dataRecord, string.Empty);
+            instance.Property.ShouldBe(EnumWithoutConverterFunctionForIntegralType.Value2);
+            wasCalled.ShouldBe(true);
+        }
+
 
         [Fact]
         public void ShouldReadCustomValueType()
@@ -310,7 +357,6 @@
             instance.Property.ShouldBe(Int32Enum.One);
         }
 
-
         [Fact]
         public void ShouldHandleManyToOneWithoutAnyMatchingColumns()
         {
@@ -353,6 +399,21 @@
             var result = reader.Read(dataRecord, string.Empty);
             result.Children.ShouldBeEmpty();
         }
+
+        public enum EnumWithoutConverterFunctionForIntegralType : ushort
+        {
+            Value1 = 1,
+            Value2 = 2,
+            Value3 = 3
+        }
+
+        public enum EnumWithConverterFunction
+        {
+            Value1 = 1,
+            Value2 = 2,
+            Value3 = 3
+        }
+
 
         public enum Int32Enum
         {

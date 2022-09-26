@@ -16,7 +16,7 @@
     {
         private readonly IPropertySelector oneToManyPropertySelector;
 
-        private static readonly Type[] ValidCollectionTypes = {typeof(IEnumerable<>), typeof(ICollection<>), typeof(Collection<>)};
+        private static readonly Type[] ValidCollectionTypes = { typeof(IEnumerable<>), typeof(ICollection<>), typeof(Collection<>) };
         private static readonly Lazy<string> ValidCollectionTypesMessage;
 
         static OneToManyPropertyValidator()
@@ -87,10 +87,10 @@
             var openGenericTypeDefinition = propertyType.GetGenericTypeDefinition();
             return ValidCollectionTypes.Contains(openGenericTypeDefinition);
         }
-      
+
         private static bool IsValidProjectionType(Type propertyType)
         {
             return !propertyType.GetTypeInfo().GenericTypeArguments[0].IsSimpleType();
-        }       
+        }
     }
 }

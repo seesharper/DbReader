@@ -27,7 +27,7 @@
         private static bool EvaluateType()
         {
             PropertyInfo[] properties = typeof(T).GetProperties();
-            return properties.Any(p => !p.PropertyType.IsSimpleType());            
+            return properties.Any(p => !p.PropertyType.IsSimpleType());
         }
     }
 }
