@@ -25,7 +25,7 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldHandleEnumWithoutConverterFunction()
         {
-            var args = new { Status = EnumWithoutConverterFunction.Value2 };
+            var args = new { Status = EnumParameterWithoutConverterFunction.Value2 };
             var method = argumentParserMethodBuilder.CreateMethod("@Status", args.GetType(), Array.Empty<IDataParameter>());
             var result = method("@Status", args, () => new TestDataParameter());
             result.Parameters[0].Value.ShouldBe(2);
@@ -34,8 +34,8 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldHandleEnumWithConverterFunction()
         {
-            DbReaderOptions.WhenPassing<EnumWithConverterFunction>().Use((parameter, value) => parameter.Value = (int)EnumWithConverterFunction.Value3);
-            var args = new { Status = EnumWithConverterFunction.Value2 };
+            DbReaderOptions.WhenPassing<EnumParameterWithConverterFunction>().Use((parameter, value) => parameter.Value = (int)EnumParameterWithConverterFunction.Value3);
+            var args = new { Status = EnumParameterWithConverterFunction.Value2 };
             var method = argumentParserMethodBuilder.CreateMethod("@Status", args.GetType(), Array.Empty<IDataParameter>());
             var result = method("@Status", args, () => new TestDataParameter());
             result.Parameters[0].Value.ShouldBe(3);
@@ -44,7 +44,7 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldHandleNullableEnumWithoutConverterFunctionPassingNull()
         {
-            var args = new { Status = new EnumWithoutConverterFunction?() };
+            var args = new { Status = new EnumParameterWithoutConverterFunction?() };
             var method = argumentParserMethodBuilder.CreateMethod("@Status", args.GetType(), Array.Empty<IDataParameter>());
             var result = method("@Status", args, () => new TestDataParameter());
             result.Parameters[0].Value.ShouldBe(DBNull.Value);
@@ -53,7 +53,7 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldHandleNullableEnumWithoutConverterFunction()
         {
-            var args = new { Status = new EnumWithoutConverterFunction?(EnumWithoutConverterFunction.Value2) };
+            var args = new { Status = new EnumParameterWithoutConverterFunction?(EnumParameterWithoutConverterFunction.Value2) };
             var method = argumentParserMethodBuilder.CreateMethod("@Status", args.GetType(), Array.Empty<IDataParameter>());
             var result = method("@Status", args, () => new TestDataParameter());
             result.Parameters[0].Value.ShouldBe(2);
@@ -118,19 +118,20 @@ namespace DbReader.Tests
             public DataRowVersion SourceVersion { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             public object Value { get => throw new NotImplementedException(); set => throw new ArgumentException(); }
         }
+        public enum EnumParameterWithoutConverterFunction
+        {
+            Value1 = 1,
+            Value2 = 2,
+            Value3 = 3
+        }
+
+        public enum EnumParameterWithConverterFunction
+        {
+            Value1 = 1,
+            Value2 = 2,
+            Value3 = 3
+        }
     }
 
-    public enum EnumWithoutConverterFunction
-    {
-        Value1 = 1,
-        Value2 = 2,
-        Value3 = 3
-    }
 
-    public enum EnumWithConverterFunction
-    {
-        Value1 = 1,
-        Value2 = 2,
-        Value3 = 3
-    }
 }
