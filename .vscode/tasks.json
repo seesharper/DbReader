@@ -13,6 +13,9 @@
       "presentation": {
         "reveal": "always"
       },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "problemMatcher": "$msCompile"
     },
     {
@@ -28,6 +31,9 @@
       "presentation": {
         "reveal": "always",
         "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": "$msCompile"
     },

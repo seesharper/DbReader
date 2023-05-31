@@ -1,4 +1,4 @@
-﻿#if NET6_0
+﻿#if NET7_0
 namespace DbReader.Tests
 {
     using System;
