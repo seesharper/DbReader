@@ -34,7 +34,7 @@ namespace DbReader
             ProcessDelegates.TryAdd(typeof(byte), (parameter, value) => AssignParameterValue(parameter, (byte)value));
             ProcessDelegates.TryAdd(typeof(short), (parameter, value) => AssignParameterValue(parameter, (short)value));
             ProcessDelegates.TryAdd(typeof(ushort), (parameter, value) => AssignParameterValue(parameter, (ushort)value));
-            ProcessDelegates.TryAdd(typeof(ushort), (parameter, value) => AssignParameterValue(parameter, (ushort)value));            
+            ProcessDelegates.TryAdd(typeof(ushort), (parameter, value) => AssignParameterValue(parameter, (ushort)value));
         }
 
 
@@ -75,7 +75,7 @@ namespace DbReader
 
         public static void Process(Type argumentType, IDataParameter dataParameter, object argument)
         {
-            if (argument == null)
+            if (argument == null && !ProcessDelegates.ContainsKey(argumentType))
             {
                 dataParameter.Value = DBNull.Value;
                 return;

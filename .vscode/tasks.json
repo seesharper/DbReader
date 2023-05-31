@@ -60,7 +60,7 @@
       "type": "process",
       "args": [
         "script",
-        "${workspaceFolder}/../build/build.csx",
+        "${workspaceFolder}/build/build.csx",
         "testcoverage"
       ],
       "problemMatcher": "$msCompile",
