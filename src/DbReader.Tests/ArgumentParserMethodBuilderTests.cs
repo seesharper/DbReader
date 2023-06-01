@@ -44,10 +44,21 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldHandleNullableEnumWithoutConverterFunctionPassingNull()
         {
-            var args = new { Status = new EnumParameterWithoutConverterFunction?() };
+            //var args = new { EnumParameterWithoutConverterFunctionStatus = (EnumParameterWithoutConverterFunction?)null };
+            var args = new Args() { Status = null };
             var method = argumentParserMethodBuilder.CreateMethod("@Status", args.GetType(), Array.Empty<IDataParameter>());
             var result = method("@Status", args, () => new TestDataParameter());
             result.Parameters[0].Value.ShouldBe(DBNull.Value);
+        }
+
+        [Fact]
+        public void ShouldHandleNullableEnumWithConverterFunctionPassingNull()
+        {
+            DbReaderOptions.WhenPassing<EnumParameterWithConverterFunctionPassingNull?>().Use((parameter, value) => parameter.Value = (int)EnumParameterWithConverterFunctionPassingNull.Value3);
+            var args = new { Status = (EnumParameterWithConverterFunctionPassingNull?)null };
+            var method = argumentParserMethodBuilder.CreateMethod("@Status", args.GetType(), Array.Empty<IDataParameter>());
+            var result = method("@Status", args, () => new TestDataParameter());
+            result.Parameters[0].Value.ShouldBe(3);
         }
 
         [Fact]
@@ -118,6 +129,15 @@ namespace DbReader.Tests
             public DataRowVersion SourceVersion { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             public object Value { get => throw new NotImplementedException(); set => throw new ArgumentException(); }
         }
+
+        public enum EnumParameterWithConverterFunctionPassingNull
+        {
+            Value1 = 1,
+            Value2 = 2,
+            Value3 = 3
+        }
+
+
         public enum EnumParameterWithoutConverterFunction
         {
             Value1 = 1,
@@ -131,7 +151,12 @@ namespace DbReader.Tests
             Value2 = 2,
             Value3 = 3
         }
+        public class Args
+        {
+            public EnumParameterWithoutConverterFunction? Status { get; set; }
+        }
     }
+
 
 
 }
