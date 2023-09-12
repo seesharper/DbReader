@@ -5,6 +5,7 @@ namespace DbReader.Mapping
     using System.Data;
     using System.Linq;
     using System.Reflection;
+    using DbReader.Extensions;
     using Selectors;
 
     /// <summary>
@@ -14,7 +15,7 @@ namespace DbReader.Mapping
     public class PropertyMapper : IPropertyMapper
     {
         private readonly IPropertySelector simplePropertySelector;
-        private readonly IFieldSelector fieldSelector;        
+        private readonly IFieldSelector fieldSelector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMapper"/> class.
@@ -40,7 +41,7 @@ namespace DbReader.Mapping
         {
             IReadOnlyDictionary<string, ColumnInfo> fieldOrdinals = fieldSelector.Execute(dataRecord);
             var simpleProperties = simplePropertySelector.Execute(type);
-            
+
             return
                 simpleProperties.Select(
                     property => new MappingInfo(property, TryMapProperty(property, prefix, fieldOrdinals))).ToArray();
@@ -52,7 +53,7 @@ namespace DbReader.Mapping
             {
                 return property.Name;
             }
-            
+
             return prefix + "_" + property.Name;
         }
 
@@ -62,7 +63,11 @@ namespace DbReader.Mapping
             ColumnInfo columnInfo;
             if (!fields.TryGetValue(fieldName, out columnInfo))
             {
-               columnInfo = new ColumnInfo(-1, null, null);
+                fieldName = fieldName.GetUpperCaseLetters();
+                if (!fields.TryGetValue(fieldName, out columnInfo))
+                {
+                    columnInfo = new ColumnInfo(-1, null, null);
+                }
             }
 
             return columnInfo;
@@ -73,8 +78,8 @@ namespace DbReader.Mapping
             string prefix,
             IReadOnlyDictionary<string, ColumnInfo> fields)
         {
-            ColumnInfo columnInfo = GetColumnInfo(property, fields, prefix);           
+            ColumnInfo columnInfo = GetColumnInfo(property, fields, prefix);
             return columnInfo;
-        }      
+        }
     }
 }
