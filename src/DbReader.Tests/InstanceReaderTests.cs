@@ -400,6 +400,29 @@
             result.Children.ShouldBeEmpty();
         }
 
+        [Fact]
+        public void Test()
+        {
+            DbReaderOptions.WhenReading<IEnumerable<ClassWithId>>().Use((dr, ordinal) =>
+            {
+                return Array.Empty<ClassWithId>();
+            });
+
+            var dataRecord = new { Id = 42, Children = "1,2,3" }.ToDataRecord();
+            var reader = GetReader<ClassWithEnumerablePropertySpecifiedInWhenReading>();
+            var instance = reader.Read(dataRecord, string.Empty);
+        }
+
+        public class ClassWithEnumerablePropertySpecifiedInWhenReading
+        {
+            public int Id { get; set; }
+
+            public IEnumerable<ClassWithId> Children { get; set; }
+        }
+
+
+
+
         public enum EnumWithoutConverterFunctionForIntegralType : ushort
         {
             Value1 = 1,

@@ -79,6 +79,16 @@ namespace DbReader.Tests
         }
 
         [Fact]
+        public void ShouldReadCustomerWithCamelHumpFieldName()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customers = connection.Read<Customer>("SELECT CustomerID, CompanyName as CN FROM Customers WHERE CustomerID = 'ALFKI'");
+                customers.Single().CompanyName.ShouldBe("Alfreds Futterkiste");
+            }
+        }
+
+        [Fact]
         public void ShouldReturnEmptyListWithoutNavigationProperties()
         {
             using (var connection = CreateConnection())
@@ -591,9 +601,6 @@ namespace DbReader.Tests
                 }
             }
         }
-
-
-
 
         public class CustomerId
         {

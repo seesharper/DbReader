@@ -26,6 +26,16 @@
         }
 
         [Fact]
+        public void ShouldMapMatchingFieldUsingUpperCaseLetters()
+        {
+            var dataRecord = new { I32P = 42 }.ToDataRecord();
+
+            var result = propertyMapper.Execute(typeof(SampleClass), dataRecord, string.Empty);
+
+            result[0].ColumnInfo.Ordinal.ShouldBe(0);
+        }
+
+        [Fact]
         public void ShouldNotMapUnknownField()
         {
             var dataRecord = new { UnknownProperty = 42 }.ToDataRecord();
