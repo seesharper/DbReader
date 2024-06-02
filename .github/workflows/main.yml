@@ -11,7 +11,7 @@ jobs:
       - name: Install .Net Core
         uses: actions/setup-dotnet@v2.0.0
         with:
-          dotnet-version: "7.0.200"
+          dotnet-version: 8.0.201
       - name: Install dotnet-script
         run: dotnet tool install dotnet-script --global
 

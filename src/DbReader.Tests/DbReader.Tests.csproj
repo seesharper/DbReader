@@ -29,7 +29,7 @@
     <PackageReference Include="ILVerifier" Version="0.0.1" />
   </ItemGroup>
   <PropertyGroup>
-    <TargetFrameworks>net7.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
