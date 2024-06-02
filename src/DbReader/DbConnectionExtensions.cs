@@ -38,10 +38,11 @@ namespace DbReader
         /// <param name="dbConnection">The target <see cref="IDbConnection"/>.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">An object that represents the query arguments.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> that represents the result of the query.</returns>
-        public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string query, object arguments = null)
+        public static IEnumerable<T> Read<T>(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var dataReader = dbConnection.ExecuteReader(query, arguments))
+            using (var dataReader = dbConnection.ExecuteReader(query, arguments, configureCommand))
             {
                 return dataReader.Read<T>();
             }
@@ -55,13 +56,14 @@ namespace DbReader
         /// <param name="dbConnection">The target <see cref="IDbConnection"/>.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">An object that represents the query arguments.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> that represents the result of the query.</returns>
         public static async Task<IEnumerable<T>> ReadAsync<T>(
            this IDbConnection dbConnection,
            string query,
-           object arguments = null)
+           object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            return await dbConnection.ReadAsync<T>(CancellationToken.None, query, arguments).ConfigureAwait(false);
+            return await dbConnection.ReadAsync<T>(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -73,14 +75,15 @@ namespace DbReader
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">An object that represents the query arguments.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> that represents the result of the query.</returns>
         public static async Task<IEnumerable<T>> ReadAsync<T>(
            this IDbConnection dbConnection,
            CancellationToken cancellationToken,
            string query,
-           object arguments = null)
+           object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var dataReader = await dbConnection.ExecuteReaderAsync(cancellationToken, query, arguments).ConfigureAwait(false))
+            using (var dataReader = await dbConnection.ExecuteReaderAsync(cancellationToken, query, arguments, configureCommand).ConfigureAwait(false))
             {
                 SqlStatement.Current = query;
                 return dataReader.Read<T>();
@@ -93,10 +96,11 @@ namespace DbReader
         /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns><see cref="IDataReader"/></returns>
-        public static IDataReader ExecuteReader(this IDbConnection dbConnection, string query, object arguments = null)
+        public static IDataReader ExecuteReader(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var command = CreateCommand(dbConnection, query, arguments))
+            using (var command = CreateCommand(dbConnection, query, arguments, configureCommand))
             {
                 return command.ExecuteReader();
             }
@@ -108,10 +112,11 @@ namespace DbReader
         /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns><see cref="IDataReader"/></returns>
-        public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, string query, object arguments = null)
+        public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            return await dbConnection.ExecuteReaderAsync(CancellationToken.None, query, arguments).ConfigureAwait(false);
+            return await dbConnection.ExecuteReaderAsync(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -121,10 +126,11 @@ namespace DbReader
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns><see cref="IDataReader"/></returns>
-        public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null)
+        public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null, Action<IDbCommand> configureCommand = null)
         {
-            using (var command = CreateCommand(dbConnection, query, arguments))
+            using (var command = CreateCommand(dbConnection, query, arguments, configureCommand))
             {
                 return await ((DbCommand)command).ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
             }
@@ -136,12 +142,14 @@ namespace DbReader
         /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when creating the command.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns><see cref="IDbCommand"/></returns>
-        public static IDbCommand CreateCommand(this IDbConnection dbConnection, string query, object arguments = null)
+        public static IDbCommand CreateCommand(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
             var command = dbConnection.CreateCommand();
             command.CommandText = query;
             CommandInitializer?.Invoke(command);
+            configureCommand?.Invoke(command);
             var queryInfo = ArgumentParser.Parse(query, arguments, () => command.CreateParameter(), command.Parameters.Cast<IDataParameter>().ToArray());
 
             SqlStatement.Current = queryInfo.Query;
@@ -163,10 +171,11 @@ namespace DbReader
         /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns>The number of rows affected.</returns>
-        public static int Execute(this IDbConnection dbConnection, string query, object arguments = null)
+        public static int Execute(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var command = CreateCommand(dbConnection, query, arguments))
+            using (var command = CreateCommand(dbConnection, query, arguments, configureCommand))
             {
                 return command.ExecuteNonQuery();
             }
@@ -178,11 +187,13 @@ namespace DbReader
         /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns>The number of rows affected.</returns>
-        public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, string query, object arguments = null)
+        public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            return await dbConnection.ExecuteAsync(CancellationToken.None, query, arguments).ConfigureAwait(false);
+            return await dbConnection.ExecuteAsync(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
         }
+        
 
         /// <summary>
         /// Executes the given <paramref name="query"/> asynchronously and returns the number of rows affected.
@@ -191,10 +202,11 @@ namespace DbReader
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns>The number of rows affected.</returns>
-        public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null)
+        public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var command = (DbCommand)CreateCommand(dbConnection, query, arguments))
+            using (var command = (DbCommand)CreateCommand(dbConnection, query, arguments, configureCommand))
             {
                 return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             }
@@ -206,11 +218,12 @@ namespace DbReader
         /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <typeparam name="T"></typeparam>
         /// <returns>The type of value to be returned.</returns>
-        public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, string query, object arguments = null)
+        public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var command = (DbCommand)CreateCommand(dbConnection, query, arguments))
+            using (var command = (DbCommand)CreateCommand(dbConnection, query, arguments, configureCommand))
             {
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -225,11 +238,12 @@ namespace DbReader
         /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
         /// <param name="query">The query to be executed.</param>
         /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <typeparam name="T"></typeparam>
         /// <returns>The type of value to be returned.</returns>
-        public static T ExecuteScalar<T>(this IDbConnection dbConnection, string query, object arguments = null)
+        public static T ExecuteScalar<T>(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var command = CreateCommand(dbConnection, query, arguments))
+            using (var command = CreateCommand(dbConnection, query, arguments, configureCommand))
             {
                 using (var reader = command.ExecuteReader())
                 {
