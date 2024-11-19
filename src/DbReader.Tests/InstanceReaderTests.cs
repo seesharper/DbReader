@@ -401,6 +401,29 @@
         }
 
         [Fact]
+        public void ShouldUseDefaultValue()
+        {
+            var dataRecord = new { Id = 1, Property = DBNull.Value }.ToDataRecord();
+            DbReaderOptions.WhenReading<CustomValueType>().Use((dr, i) => new CustomValueType(dr.GetInt32(i))).WithDefaultValue(new CustomValueType(42));
+            var reader = GetReader<ClassWithProperty<CustomValueType>>();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.Value.ShouldBe(42);
+        }
+
+
+        public class CustomValueType
+        {
+            public CustomValueType(int value)
+            {
+                Value = value;
+            }
+
+            public int Value { get; }
+        }
+
+
+
+        [Fact]
         public void Test()
         {
             DbReaderOptions.WhenReading<IEnumerable<ClassWithId>>().Use((dr, ordinal) =>

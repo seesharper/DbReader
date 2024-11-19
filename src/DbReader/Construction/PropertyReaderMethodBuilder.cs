@@ -140,6 +140,14 @@
             EmitGetValue(il, propertyIndex, getMethod, property.PropertyType);
             EmitCallPropertySetterMethod(il, property);
             il.MarkLabel(endLabel);
+            if (ValueConverter.HasDefaultValue(property.PropertyType))
+            {
+                var openGenericGetDefaultValueMethod = typeof(ValueConverter).GetMethod(nameof(ValueConverter.GetDefaultValue), BindingFlags.Static | BindingFlags.NonPublic);
+                var getDefaultValueMethod = openGenericGetDefaultValueMethod.MakeGenericMethod(property.PropertyType);
+                LoadInstance(il, instanceVariable);
+                il.Emit(OpCodes.Call, getDefaultValueMethod);
+                EmitCallPropertySetterMethod(il, property);
+            }
         }
     }
 }
