@@ -16,7 +16,7 @@ jobs:
         run: dotnet tool install dotnet-script --global
 
       - name: Install dotnet-ilverify
-        run: dotnet tool install dotnet-ilverify --global
+        run: dotnet tool install dotnet-ilverify --global --version 8.0.0
 
       - name: Run build script
         run: dotnet-script build/build.csx
