@@ -273,14 +273,14 @@ ON
 	c.CustomerId = @CustomerID
 ```
 
-| CustomerId|CompanyName|OrderId|OrderDate
-| ----------|-----------|-------|---------
-|ALFKI|Alfreds Futterkiste|10643|1997-08-25
-|ALFKI|Alfreds Futterkiste|10692|1997-10-03
-|ALFKI|Alfreds Futterkiste|10702|1997-10-13
-|ALFKI|Alfreds Futterkiste|10835|1998-01-15
-|ALFKI|Alfreds Futterkiste|10952|1998-03-16
-|ALFKI|Alfreds Futterkiste|11011|1998-04-09
+| CustomerId | CompanyName         | OrderId | OrderDate  |
+| ---------- | ------------------- | ------- | ---------- |
+| ALFKI      | Alfreds Futterkiste | 10643   | 1997-08-25 |
+| ALFKI      | Alfreds Futterkiste | 10692   | 1997-10-03 |
+| ALFKI      | Alfreds Futterkiste | 10702   | 1997-10-13 |
+| ALFKI      | Alfreds Futterkiste | 10835   | 1998-01-15 |
+| ALFKI      | Alfreds Futterkiste | 10952   | 1998-03-16 |
+| ALFKI      | Alfreds Futterkiste | 11011   | 1998-04-09 |
 
 As we can see from the result we now have six rows. One for each *Order* and the *Customer* columns are duplicated for each *Order*. 
 
@@ -550,8 +550,41 @@ This instructs **DbReader** to use our custom read delegate whenever it encounte
 The *Guid* also needs to be converted back into a byte array when passing a *Guid* value as a parameter to a query.
 
 ```
-DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray());
+DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray()
 ```
+
+> Note that the conversion function is only invoked if the value from the database is NOT `DBNull`
+
+### Default values
+
+When using a custom conversion function (WhenReading) it is possible to define a default for the value to be used when value from the database is `DBNull`.
+
+Say that we have a class with a property of type `CustomValueType`
+
+```c#
+
+public class CustomValueType
+{
+	public CustomValueType(int value)
+	{
+		Value = value;
+	}
+
+	public int Value { get; }
+}
+
+public class MyClass
+{
+	public CustomValueType SomeProperty { get; set; }
+}
+```
+
+When the property `SomeProperty` we can specify what to return in the case of the field (SomeProperty) being `DBNull` from the `IDataRecord`
+ 
+```C#
+DbReaderOptions.WhenReading<CustomValueType>().Use((dr, i) => new CustomValueType(dr.GetInt32(i))).WithDefaultValue(new CustomValueType(42));
+```
+
 
 ## Simple Types
 

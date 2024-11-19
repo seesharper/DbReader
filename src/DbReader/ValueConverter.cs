@@ -36,6 +36,8 @@ namespace DbReader
         private static readonly ConcurrentDictionary<Type, Delegate> ReadDelegates =
             new ConcurrentDictionary<Type, Delegate>();
 
+        private static readonly ConcurrentDictionary<Type, object> DefaultValues = new ConcurrentDictionary<Type, object>();
+
         /// <summary>
         /// Registers a function delegate that creates a value of <typeparamref name="T"/> from an <see cref="IDataRecord"/>
         /// at the specified ordinal (column index).
@@ -47,6 +49,12 @@ namespace DbReader
             ReadDelegates.AddOrUpdate(typeof(T), type => convertFunction, (type, del) => convertFunction);
         }
 
+        public static void RegisterDefaultValue<T>(T defaultValue)
+        {
+            DefaultValues.AddOrUpdate(typeof(T), type => defaultValue, (type, value) => defaultValue);
+        }
+
+
         /// <summary>
         /// Determines if the given <paramref name="type"/> can be converted.
         /// </summary>        
@@ -56,6 +64,22 @@ namespace DbReader
         {
             return ReadDelegates.ContainsKey(type);
         }
+
+        /// <summary>
+        /// Determines if the given <paramref name="type"/> has a default value to be used when the value from the database is null.
+        /// </summary>
+        /// <param name="type">The type to be checked for a default value.</param>
+        /// <returns>true, if there is a default value registration for the given type, otherwise, false.</returns>
+        internal static bool HasDefaultValue(Type type)
+        {
+            return DefaultValues.ContainsKey(type);
+        }
+
+        internal static T GetDefaultValue<T>()
+        {
+            return (T)DefaultValues[typeof(T)];
+        }
+
 
         /// <summary>
         /// Converts the value from the <paramref name="dataRecord"/> at the given <paramref name="ordinal"/>
