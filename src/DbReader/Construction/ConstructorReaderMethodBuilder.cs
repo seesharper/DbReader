@@ -10,7 +10,7 @@
     /// an instance of <typeparamref name="T"/> using constructor arguments.
     /// </summary>
     /// <typeparam name="T">The type of object to be created.</typeparam>
-    public class ConstructorReaderMethodBuilder<T> : ReaderMethodBuilder<T> 
+    public class ConstructorReaderMethodBuilder<T> : ReaderMethodBuilder<T>
     {
         private readonly IConstructorSelector constructorSelector;
 
@@ -50,7 +50,7 @@
             for (int parameterIndex = 0; parameterIndex < parameters.Length; parameterIndex++)
             {
                 EmitCheckForValidOrdinal(il, parameterIndex, tryLoadNullValue);
-                EmitCheckForDbNull(il, parameterIndex, tryLoadNullValue);
+                EmitGoLabelIfDbNull(il, parameterIndex, tryLoadNullValue);
             }
 
             for (int i = 0; i < parameters.Length; i++)

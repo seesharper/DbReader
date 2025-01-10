@@ -133,13 +133,16 @@
         private void EmitPropertySetter(ILGenerator il, PropertyInfo property, int propertyIndex, LocalBuilder instanceVariable)
         {
             MethodInfo getMethod = MethodSelector.Execute(property.PropertyType);
+            var checkForDefaultValueLabel = il.DefineLabel();
             var endLabel = il.DefineLabel();
-            EmitCheckForValidOrdinal(il, propertyIndex, endLabel);
-            EmitCheckForDbNull(il, propertyIndex, endLabel);
+            EmitCheckForValidOrdinal(il, propertyIndex, checkForDefaultValueLabel);
+            EmitGoLabelIfDbNull(il, propertyIndex, checkForDefaultValueLabel);
             LoadInstance(il, instanceVariable);
             EmitGetValue(il, propertyIndex, getMethod, property.PropertyType);
             EmitCallPropertySetterMethod(il, property);
-            il.MarkLabel(endLabel);
+            il.MarkLabel(checkForDefaultValueLabel);
+            EmitCheckForValidOrdinal(il, propertyIndex, endLabel);
+            EmitGoLabelIfNotDbNull(il, propertyIndex, endLabel);
             if (ValueConverter.HasDefaultValue(property.PropertyType))
             {
                 var openGenericGetDefaultValueMethod = typeof(ValueConverter).GetMethod(nameof(ValueConverter.GetDefaultValue), BindingFlags.Static | BindingFlags.NonPublic);
@@ -148,6 +151,7 @@
                 il.Emit(OpCodes.Call, getDefaultValueMethod);
                 EmitCallPropertySetterMethod(il, property);
             }
+            il.MarkLabel(endLabel);
         }
     }
 }

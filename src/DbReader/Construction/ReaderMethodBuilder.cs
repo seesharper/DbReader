@@ -66,7 +66,7 @@ namespace DbReader.Construction
             LoadOrdinal(il, index);
             LoadIntegerValueOfMinusOne(il);
             EmitCompareValues(il);
-            EmitGotoEndLabelIfValueIsTrue(il, trueLabel);
+            EmitGotoLabelIfValueIsTrue(il, trueLabel);
         }
 
         /// <summary>
@@ -76,12 +76,20 @@ namespace DbReader.Construction
         /// <param name="index">The index of the ordinal to check.</param>
         /// <param name="trueLabel">The <see cref="Label"/> that represents where to jump if 
         /// the value about to be read from the <see cref="IDataRecord"/> is <see cref="DBNull"/>.</param>
-        protected void EmitCheckForDbNull(ILGenerator il, int index, Label trueLabel)
+        protected void EmitGoLabelIfDbNull(ILGenerator il, int index, Label trueLabel)
         {
             LoadDataRecord(il);
             LoadOrdinal(il, index);
             EmitCallIsDbNullMethod(il);
-            EmitGotoEndLabelIfValueIsTrue(il, trueLabel);
+            EmitGotoLabelIfValueIsTrue(il, trueLabel);
+        }
+
+        protected void EmitGoLabelIfNotDbNull(ILGenerator il, int index, Label falseLabel)
+        {
+            LoadDataRecord(il);
+            LoadOrdinal(il, index);
+            EmitCallIsDbNullMethod(il);
+            EmitGotoLabelIfValueIsFalse(il, falseLabel);
         }
 
         /// <summary>
@@ -168,9 +176,14 @@ namespace DbReader.Construction
             il.Emit(OpCodes.Ceq);
         }
 
-        private static void EmitGotoEndLabelIfValueIsTrue(ILGenerator il, Label endLabel)
+        private static void EmitGotoLabelIfValueIsTrue(ILGenerator il, Label trueLabel)
         {
-            il.Emit(OpCodes.Brtrue, endLabel);
+            il.Emit(OpCodes.Brtrue, trueLabel);
+        }
+
+        private static void EmitGotoLabelIfValueIsFalse(ILGenerator il, Label trueLabel)
+        {
+            il.Emit(OpCodes.Brfalse, trueLabel);
         }
 
         private static Func<IDataRecord, int[], T> CreateDelegate(IMethodSkeleton methodSkeleton)
