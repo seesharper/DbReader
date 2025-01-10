@@ -410,6 +410,17 @@
             instance.Property.Value.ShouldBe(42);
         }
 
+        [Fact]
+        public void ShouldNotUseDefaultValue()
+        {
+            var dataRecord = new { Id = 1, Property = 42 }.ToDataRecord();
+            DbReaderOptions.WhenReading<CustomValueType>().Use((dr, i) => new CustomValueType(dr.GetInt32(i))).WithDefaultValue(new CustomValueType(82));
+            var reader = GetReader<ClassWithProperty<CustomValueType>>();
+            var instance = reader.Read(dataRecord, string.Empty);
+            instance.Property.Value.ShouldBe(42);
+        }
+
+
 
         public class CustomValueType
         {
