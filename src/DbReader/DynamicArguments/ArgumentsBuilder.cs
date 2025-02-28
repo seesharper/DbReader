@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using DbReader.DynamicArguments;
+using DbReader.Tracking;
 
 namespace DbReader
 {
