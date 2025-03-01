@@ -6,7 +6,7 @@ namespace DbReader.Tracking;
 
 public class TrackingAssemblyWeaver
 {
-    public static void Weave(string assemblyPath, string attributeName)
+    public void Weave(string assemblyPath, string attributeName)
     {
         var assemblyDefinition = AssemblyDefinition.ReadAssembly(assemblyPath);
         var types = assemblyDefinition.MainModule.Types
