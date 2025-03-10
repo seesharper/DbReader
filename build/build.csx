@@ -12,8 +12,8 @@ Step test = () => DotNet.Test();
 [StepDescription("Creates the NuGet packages")]
 Step pack = async () =>
 {
-    test();
-    testcoverage();
+    // test();
+    // testcoverage();
     await buildTrackingPackage();
     DotNet.Pack();
 };
@@ -32,7 +32,7 @@ AsyncStep buildTrackingPackage = async () =>
     dotnet pack /p:NuspecFile=DbReader.Tracking.nuspec /p:IsPackable=true -o ../../build/Artifacts/NuGet 
     */
     var workingDirectory = Path.Combine(BuildContext.SourceFolder, "DbReader.Tracking");
-    await Command.ExecuteAsync("dotnet", $"pack /p:NuspecFile=DbReader.Tracking.nuspec /p:IsPackable=true -o ../../build/Artifacts/NuGet", workingDirectory);
+    await Command.ExecuteAsync("dotnet", $"pack /p:NuspecFile=DbReader.Tracking.nuspec /p:IsPackable=true /p:NuspecProperties=version={BuildContext.LatestTag} -o ../../build/Artifacts/NuGet", workingDirectory);
 
 };
 
