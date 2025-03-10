@@ -9,8 +9,8 @@ public class WeaveAssembly : Microsoft.Build.Utilities.Task
 
     public override bool Execute()
     {
-        weaver.Weave(TargetAssemblyPath, "TrackedAttribute");
         Log.LogMessage("Weaving assembly {0}", TargetAssemblyPath);
+        weaver.Weave(TargetAssemblyPath, "TrackedAttribute");
         return true;
     }
 }

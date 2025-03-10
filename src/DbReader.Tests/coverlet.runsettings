@@ -1,0 +1,12 @@
+<RunSettings>
+    <DataCollectionRunSettings>
+        <DataCollectors>
+            <DataCollector friendlyName="XPlat code coverage">
+                <Configuration>
+                    <Format>lcov,cobertura</Format>
+                    <Exclude>[Mono.Cecil]*,[Mono.Cecil.Cil]*,[Mono.Cecil.Metadata]*,[Mono.Cecil.Rocks]*</Exclude>
+                </Configuration>
+            </DataCollector>
+        </DataCollectors>
+    </DataCollectionRunSettings>
+</RunSettings>

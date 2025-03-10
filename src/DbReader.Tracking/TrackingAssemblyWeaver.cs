@@ -8,7 +8,10 @@ public class TrackingAssemblyWeaver
 {
     public void Weave(string assemblyPath, string attributeName)
     {
-        var assemblyDefinition = AssemblyDefinition.ReadAssembly(assemblyPath);
+        var readerParameters = new ReaderParameters();
+        readerParameters.ReadSymbols = true;
+        readerParameters.ReadWrite = true;
+        var assemblyDefinition = AssemblyDefinition.ReadAssembly(assemblyPath, readerParameters);
         var types = assemblyDefinition.MainModule.Types
             .Where(t => t.CustomAttributes.Any(a => a.AttributeType.Name == attributeName))
             .ToList();
@@ -23,7 +26,9 @@ public class TrackingAssemblyWeaver
 
 
         File.Delete(assemblyPath);
-        assemblyDefinition.Write(assemblyPath);
+        var writerParameters = new WriterParameters();
+        writerParameters.WriteSymbols = true;
+        assemblyDefinition.Write(assemblyPath, writerParameters);
     }
 
     private static bool HasParameterlessConstructor(TypeDefinition type)

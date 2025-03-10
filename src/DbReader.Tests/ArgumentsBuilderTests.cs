@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using DbReader.DynamicArguments;
 using DbReader.Tracking;
 using DbReader.Tracking.SampleAssembly;
@@ -59,17 +62,35 @@ public class ArgumentsBuilderTests
     }
 
     [Fact]
-    public void Should()
+    public void ShouldTrackChangesForPositionalRecord()
     {
         var positionalRecord = new PositionalRecord(42, "SomeName");
         // set value to 42 via reflection
-        //positionalRecord.GetType().GetProperty("Id")!.SetValue(positionalRecord, 84);
-        //((ITrackedObject)positionalRecord).GetModifiedProperties().ShouldContain("Id");
-        new Verifier()
-               .WithAssemblyReferenceFromType<VerifiableMethodSkeleton>()
-               .WithAssemblyReference(typeof(DbConnectionExtensions).Assembly)
-               .Verify(typeof(PositionalRecord).Assembly);
+        positionalRecord.GetType().GetProperty("Id")!.SetValue(positionalRecord, 84);
+        ((ITrackedObject)positionalRecord).GetModifiedProperties().ShouldContain("Id");
+    }
 
+
+    [Fact]
+    public void ShouldBuildArgumentsObjectOnlyForChangedProperties()
+    {
+        var positionalRecord = new PositionalRecord(42, "SomeName");
+        positionalRecord.GetType().GetProperty("Id")!.SetValue(positionalRecord, 84);
+        var dynamicObject = new ArgumentsBuilder().From(positionalRecord).Build();
+        dynamicObject.GetType().GetProperties().Length.ShouldBe(1);
+        dynamicObject.GetType().GetProperties().Single().Name.ShouldBe("Id");
+
+        var modifiedProperties = ((ITrackedObject)positionalRecord).GetModifiedProperties();
+        string sql = $"""
+            UPDATE Customers
+            SET {string.Join("\n", modifiedProperties.Select(prop => $"{prop} = @{prop}"))}
+            WHERE Id = @Id
+        """;
+    }
+
+    private string BuildUpdateSql<T>(IEnumerable<string> modifiedProperties)
+    {
+        return string.Join("\n", modifiedProperties.Select(prop => $"{prop} = @{prop}"));
     }
 
 
@@ -107,5 +128,37 @@ public class ArgumentsBuilderTests
         public int Id { get; set; }
 
         public string Name;
+    }
+
+    public record Customer2 : ITrackedObject
+    {
+        private readonly HashSet<string> modifiedProperties = [];
+        private string _companyName;
+        private string _customerId;
+
+        public string CustomerId
+        {
+            get => _customerId;
+            set
+            {
+                _customerId = value;
+                modifiedProperties.Add(nameof(CustomerId));
+            }
+        }
+
+        public string CompanyName
+        {
+            get => _companyName;
+            set
+            {
+                _companyName = value;
+                modifiedProperties.Add(nameof(CompanyName));
+            }
+        }
+
+        public HashSet<string> GetModifiedProperties()
+        {
+            return modifiedProperties;
+        }
     }
 }
