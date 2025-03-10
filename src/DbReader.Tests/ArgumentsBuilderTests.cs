@@ -80,12 +80,12 @@ public class ArgumentsBuilderTests
         dynamicObject.GetType().GetProperties().Length.ShouldBe(1);
         dynamicObject.GetType().GetProperties().Single().Name.ShouldBe("Id");
 
-        var modifiedProperties = ((ITrackedObject)positionalRecord).GetModifiedProperties();
-        string sql = $"""
-            UPDATE Customers
-            SET {string.Join("\n", modifiedProperties.Select(prop => $"{prop} = @{prop}"))}
-            WHERE Id = @Id
-        """;
+        // var modifiedProperties = ((ITrackedObject)positionalRecord).GetModifiedProperties();
+        // string sql = $"""
+        //     UPDATE Customers
+        //     SET {string.Join("\n", modifiedProperties.Select(prop => $"{prop} = @{prop}"))}
+        //     WHERE Id = @Id
+        // """;
     }
 
     private string BuildUpdateSql<T>(IEnumerable<string> modifiedProperties)

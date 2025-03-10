@@ -24,6 +24,7 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="**/*.sql" />
