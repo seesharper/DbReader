@@ -12,6 +12,8 @@ jobs:
         uses: actions/setup-dotnet@v2.0.0
         with:
           dotnet-version: 8.0.201
+          uses: actions/checkout@v2
+          submodules: recursive
       - name: Install dotnet-script
         run: dotnet tool install dotnet-script --global
 
