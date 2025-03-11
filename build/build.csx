@@ -1,6 +1,8 @@
 #load "nuget:Dotnet.Build, 0.24.0"
 #load "nuget:dotnet-steps, 0.0.2"
 
+Console.WriteLine($"Building with the latest tag {BuildContext.LatestTag}");
+
 BuildContext.CodeCoverageThreshold = 87;
 
 [StepDescription("Runs the tests with test coverage")]
