@@ -765,7 +765,322 @@ We can now execute the query without specifying the `p_cursor` parameter.
 connection.ReadAsync<Employee>(SQL.emp, new {p_name = "A%"});
 ```
 
+## Tracking
+
+As stated previously, `DbReader` is NOT an ORM and the support for simple object tracking does not change that
+although it opens up a couple of doors for more dynamic SQL, specially when doing updates in the database.
+
+First of all what do we mean by tracking? Let's illustrate with an example. 
+
+Say that we have an WebAPI application that manages customers. We will focus on the update part here. 
+
+The table looks something like the following (SQLite)
+
+```sql
+CREATE TABLE Customers (
+    CustomerID TEXT NOT NULL,
+    CompanyName TEXT NOT NULL,
+    ContactName TEXT,
+    ContactTitle TEXT,
+    Address TEXT,
+    City TEXT,
+    Region TEXT,
+    PostalCode TEXT,
+    Country TEXT,
+    Phone TEXT,
+    Fax TEXT,
+    PRIMARY KEY (CustomerID)
+);
+```
+
+For updating the Customer we could imagine a class or a record like this
+
+```c#
+public record Customer(
+    string CustomerID,
+    string CompanyName,
+    string? ContactName = null,
+    string? ContactTitle = null,
+    string? Address = null,
+    string? City = null,
+    string? Region = null,
+    string? PostalCode = null,
+    string? Country = null,
+    string? Phone = null,
+    string? Fax = null
+);
+```
+The update statement for this table would be 
+
+```sql
+UPDATE Customers
+SET
+    CompanyName = @CompanyName,
+    ContactName = @ContactName,
+    ContactTitle = @ContactTitle,
+    Address = @Address,
+    City = @City,
+    Region = @Region,
+    PostalCode = @PostalCode,
+    Country = @Country,
+    Phone = @Phone,
+    Fax = @Fax
+WHERE
+    CustomerID = @CustomerID;
+```	
+
+So in `DbReader`this would be as simple as
+
+```c# 
+await dbConnection.ExecuteAsync(sql, customer);
+```
+> sql` is the update statement and `customer` is an instance of the `Customer` record.
+ 
+Everything looks and works pretty much as expected so again....
+What is `Tracking` and how could it be useful for updating a customer?
+
+Let's imagine that we wanted to update ONLY the `PostalCode` for a given customer?
+What are our options here?
+
+* Create a new update statement and the plumbing (data access) in C# to update just the `PostalCode`
+
+* Use the existing update statement supplying the new `PostalCode` along with ALL the other values that hasn't changed
+  Note that the `Customer`record has a lot of nullable properties. We need to supply them as well.
+
+* Use `Tracking` to determine which of the properties of the `Customer` record has actually been set and therefore eligible for update. 
+
+Back to the WebAPI application where we have an endpoint for patching a customer
+
+```
+	PATCH api/customers
+```
+
+where the body of the request is a JSON mapping fully or partially to the `Customer` record.
+
+> Note: To keep things simple we assume that everything is provided in the body of the request, including the `CustomerID` which normally would be part of the URL.
 
 
+So it could be 
 
+```json
+{
+  "CustomerID": "ALFKI",
+  "CompanyName": "Alfreds Futterkiste",
+  "ContactName": "Maria Anders",
+  "ContactTitle": "Sales Representative",
+  "Address": "Obere Str. 57",
+  "City": "Berlin",
+  "Region": null,
+  "PostalCode": "12209",
+  "Country": "Germany",
+  "Phone": "030-0074321",
+  "Fax": "030-0076545"
+}
+```
+or it could be just the `PostalCode` which is what we are looking to to update in this example.
 
+```json
+{
+  "CustomerID": "ALFKI",
+  "PostalCode": "12209",  
+}
+```
+
+The goal here is to use the same endpoint and the same C# data access code when doing a full update and also 
+when doing a partial update for the `PostalCode`
+
+When the JSON comes into the endpoint, Asp.Net will deserialize the request into an instance of the `Customer` record populating the record with the properties found in the JSON. 
+A C# record is just a regular class with "readonly" properties. They can still be set using reflection which is how `System.Text.Json.JsonSerializer`sets these properties.
+
+The key takeaway here is that it will only set the properties found in the JSON.
+So what if we could keep track of which properties that was actually set?
+
+Lets make some changes to the `Customer` record. In fact, for simplicity lets just make it a class. 
+
+But first an interface to let us retrieve the properties that has been set/modified. 
+
+```c#
+/// <summary>
+/// This interface is implemented by classes that are tracked for changes.
+/// </summary>
+public interface ITrackedObject
+{
+    /// <summary>
+    /// Gets a list of the properties that have been modified.
+    /// </summary>
+    /// <returns></returns>
+    HashSet<string> GetModifiedProperties();
+}
+```
+Then our new Customer record
+
+```c#
+public record Customer : ITrackedObject
+{
+	private readonly HashSet<string> modifiedProperties = [];
+	private string _companyName;
+	private string _customerId;
+
+	public string CustomerId
+	{
+		get => _customerId;
+		set
+		{
+			_customerId = value;
+			modifiedProperties.Add(nameof(CustomerId));
+		}
+	}
+
+	public string CompanyName
+	{
+		get => _companyName;
+		set
+		{
+			_companyName = value;
+			modifiedProperties.Add(nameof(CompanyName));
+		}
+	}
+
+	// The rest of the properties .............
+
+	public HashSet<string> GetModifiedProperties()
+	{
+		return modifiedProperties;
+	}
+}
+```
+This now gives us the ability to figure out which properties has changed and this information can be used when building the arguments object that is passed to `DbReader`when executing the query. 
+
+```c#
+var arguments = new ArgumentsBuilder().From(customer).Build();
+```
+
+This arguments object will now be an object with properties from the `customer` instance, but since `Customer`implements `ITrackedObject` it will ONLY contain the properties that has been set/modified.
+
+At this point we have the arguments object to be passed to `DbReader`, but in order for this to work we also need to build the SQL that represents our update statement. 
+
+```c#
+var modifiedProperties = ((ITrackedObject)positionalRecord).GetModifiedProperties();
+string sql = $"""
+	UPDATE Customers
+	SET {string.Join("\n", modifiedProperties.Select(prop => $"{prop} = @{prop}"))}
+	WHERE Id = @Id
+""";
+```
+
+So in the example where we just provided the `PostalCode` the resulting SQL would be 
+
+```sql
+UPDATE Customers
+SET PostalCode = @PostalCode
+WHERE CustomerId = @CustomerId
+```
+
+We are finally ready to actually perform the update in the database
+
+```c#
+await dbConnection.ExecuteAsync(sql, arguments);
+```
+
+### DbReader.Tracking
+
+As we learned previously we can leverage this functionally by rewriting our `Customer` record from 
+
+```c#
+public record Customer(
+    string CustomerID,
+    string CompanyName,
+    string? ContactName = null,
+    string? ContactTitle = null,
+    string? Address = null,
+    string? City = null,
+    string? Region = null,
+    string? PostalCode = null,
+    string? Country = null,
+    string? Phone = null,
+    string? Fax = null
+);
+```
+
+to a version that supports tracking changes to properties 
+
+```c#
+public record Customer : ITrackedObject
+{
+	private readonly HashSet<string> modifiedProperties = [];
+	private string _companyName;
+	private string _customerId;
+
+	public string CustomerId
+	{
+		get => _customerId;
+		set
+		{
+			_customerId = value;
+			modifiedProperties.Add(nameof(CustomerId));
+		}
+	}
+
+	public string CompanyName
+	{
+		get => _companyName;
+		set
+		{
+			_companyName = value;
+			modifiedProperties.Add(nameof(CompanyName));
+		}
+	}
+
+	// The rest of the properties .............
+
+	public HashSet<string> GetModifiedProperties()
+	{
+		return modifiedProperties;
+	}
+}
+```
+
+This would require a lot of tedious plumbing code every time we would want this type of behavior. 
+
+`DbReader.Tracking` makes this very easy by just requiring an attribute to be set on the class/record that we want to track.
+
+```c#
+[Tracked]
+public record Customer(
+    string CustomerID,
+    string CompanyName,
+    string? ContactName = null,
+    string? ContactTitle = null,
+    string? Address = null,
+    string? City = null,
+    string? Region = null,
+    string? PostalCode = null,
+    string? Country = null,
+    string? Phone = null,
+    string? Fax = null
+);
+```
+
+By applying the `TrackedAttribute`, `DbReader.Tracking` will automatically implement the `ITrackedObject` interface and modify each property setter to track changes when properties are being set.
+This happens at compile time using [Mono.Cecil]([https://](https://github.com/jbevain/cecil)) 
+
+By default, `DbReader.Tracking` will look for an attribute called `TrackedAttribute`. This can be configured using an MsBuild property called `DbReaderTrackingAttributeName`
+In the example below , `DbReader.Tracking` will look for an attribute called `PatchAttribute` instead of `TrackedAttribute`.
+
+```xml
+<PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DbReaderTrackingAttributeName>PatchAttribute</DbReaderTrackingAttributeName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DbReader" Version="3.0.0" />
+    <PackageReference Include="DbReader.Tracking" Version="2.7.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+```

@@ -12,9 +12,7 @@ namespace DbReader.DynamicArguments
     public static class ValueAccessor<TTarget>
     {
         private static ConcurrentDictionary<string, Delegate> delegateCache = new ConcurrentDictionary<string, Delegate>();
-
-        private static Delegate cachedDelegate;
-
+        
         /// <summary>
         /// Gets the field value based on the given <paramref name="fieldName"/>.
         /// </summary>

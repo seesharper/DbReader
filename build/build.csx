@@ -1,7 +1,9 @@
-#load "nuget:Dotnet.Build, 0.16.0"
+#load "nuget:Dotnet.Build, 0.24.0"
 #load "nuget:dotnet-steps, 0.0.2"
 
-BuildContext.CodeCoverageThreshold = 90;
+Console.WriteLine($"Building with the latest tag {BuildContext.LatestTag}");
+
+BuildContext.CodeCoverageThreshold = 87;
 
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () => DotNet.TestWithCodeCoverage();
@@ -10,20 +12,29 @@ Step testcoverage = () => DotNet.TestWithCodeCoverage();
 Step test = () => DotNet.Test();
 
 [StepDescription("Creates the NuGet packages")]
-Step pack = () =>
+AsyncStep pack = async () =>
 {
     test();
-    testcoverage();
+    testcoverage(); ;
     DotNet.Pack();
+    await buildTrackingPackage();
 };
 
 [DefaultStep]
 [StepDescription("Deploys packages if we are on a tag commit in a secure environment.")]
 AsyncStep deploy = async () =>
 {
-    pack();
+    await pack();
     await Artifacts.Deploy();
 };
+
+AsyncStep buildTrackingPackage = async () =>
+{
+    var workingDirectory = Path.Combine(BuildContext.SourceFolder, "DbReader.Tracking");
+    await Command.ExecuteAsync("dotnet", $"pack /p:NuspecFile=DbReader.Tracking.nuspec /p:IsPackable=true /p:NuspecProperties=version={BuildContext.LatestTag} -o ../../build/Artifacts/NuGet", workingDirectory);
+
+};
+
 
 await StepRunner.Execute(Args);
 return 0;

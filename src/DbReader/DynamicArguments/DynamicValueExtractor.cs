@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using DbReader.Extensions;
+using DbReader.Tracking;
 
 namespace DbReader.DynamicArguments
 {
@@ -15,6 +16,7 @@ namespace DbReader.DynamicArguments
     {
         private static MethodInfo AddMethod = typeof(List<DynamicMemberInfo>).GetMethod(nameof(List<DynamicMemberInfo>.Add));
         private static ConcurrentDictionary<Type, Delegate> delegateCache = new ConcurrentDictionary<Type, Delegate>();
+        private static ConcurrentDictionary<string, Delegate> trackedDelegateCache = new ConcurrentDictionary<string, Delegate>();
 
         /// <summary>
         /// Creates an array of <see cref="DynamicMemberInfo"/> based upon the given <paramref name="value"/>.
@@ -25,16 +27,48 @@ namespace DbReader.DynamicArguments
         public DynamicMemberInfo[] GetDynamicMembers<T>(T value)
         {
             var dynamicMembers = new List<DynamicMemberInfo>();
-            var extractDelegate = delegateCache.GetOrAdd(typeof(T), d => CreateExtractDelegate<T>());
+            Delegate extractDelegate = null;
+            if (value is ITrackedObject trackedObject)
+            {
+
+                var modifiedProperties = trackedObject.GetModifiedProperties();
+                string[] cacheKeyParts = new string[modifiedProperties.Count + 1];
+                modifiedProperties.CopyTo(cacheKeyParts, 0);
+                cacheKeyParts[modifiedProperties.Count] = typeof(T).FullName;
+                var cacheKey = cacheKeyParts.CreateCacheKey();
+                extractDelegate = trackedDelegateCache.GetOrAdd(cacheKey, d => CreateExtractDelegate<T>(value));
+            }
+            else
+            {
+                extractDelegate = delegateCache.GetOrAdd(typeof(T), d => CreateExtractDelegate<T>(value));
+            }
+
+
+
             var typedDelegate = (Action<T, List<DynamicMemberInfo>>)extractDelegate;
             typedDelegate(value, dynamicMembers);
             return dynamicMembers.ToArray();
         }
 
-        private Delegate CreateExtractDelegate<T>()
+        private static Delegate CreateExtractDelegate<T>(T value)
         {
-            var fieldsAndProperties = typeof(T).GetMembers(BindingFlags.Instance | BindingFlags.Public).
-            Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property).OrderByDeclaration().ToArray();
+            MemberInfo[] fieldsAndProperties = null;
+
+            if (typeof(ITrackedObject).IsAssignableFrom(typeof(T)))
+            {
+                var modifiedProperties = ((ITrackedObject)value).GetModifiedProperties();
+                fieldsAndProperties = typeof(T).GetMembers(BindingFlags.Instance | BindingFlags.Public)
+                .Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
+                .Where(m => modifiedProperties.Contains(m.Name)).OrderByDeclaration().ToArray();
+
+            }
+            else
+            {
+                fieldsAndProperties = typeof(T).GetMembers(BindingFlags.Instance | BindingFlags.Public).
+                Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property).OrderByDeclaration().ToArray();
+            }
+
+
 
             var extractMethod = new DynamicMethod("Extract", typeof(void), new Type[] { typeof(T), typeof(List<DynamicMemberInfo>) }, typeof(DynamicValueExtractor), true);
             var generator = extractMethod.GetILGenerator();
