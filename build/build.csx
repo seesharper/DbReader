@@ -12,9 +12,8 @@ Step test = () => DotNet.Test();
 [StepDescription("Creates the NuGet packages")]
 AsyncStep pack = async () =>
 {
-    // test();
-    // testcoverage();;
-
+    test();
+    testcoverage(); ;
     DotNet.Pack();
     await buildTrackingPackage();
 };
