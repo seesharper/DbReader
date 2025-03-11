@@ -15,6 +15,8 @@
         <license type="expression">MIT</license>
         <!-- Optional: Tags -->
         <tags>DbReader Tracking</tags>
+
+        <developmentDependency>true</developmentDependency>
     </metadata>
     <dependencies>
         <dependency id="DbReader" version="3.0.0" />
@@ -29,6 +31,5 @@
         <!-- Include the .targets file in the build folder -->
         <!-- Optional: Include the .props file if you have one -->
         <file src="DbReader.Tracking.targets" target="build" />
-        <file src="DbReader.Tracking.props" target="build" />
     </files>
 </package>

@@ -10,27 +10,25 @@ Step testcoverage = () => DotNet.TestWithCodeCoverage();
 Step test = () => DotNet.Test();
 
 [StepDescription("Creates the NuGet packages")]
-Step pack = async () =>
+AsyncStep pack = async () =>
 {
     // test();
-    // testcoverage();
-    await buildTrackingPackage();
+    // testcoverage();;
+
     DotNet.Pack();
+    await buildTrackingPackage();
 };
 
 [DefaultStep]
 [StepDescription("Deploys packages if we are on a tag commit in a secure environment.")]
 AsyncStep deploy = async () =>
 {
-    pack();
+    await pack();
     await Artifacts.Deploy();
 };
 
 AsyncStep buildTrackingPackage = async () =>
 {
-    /*
-    dotnet pack /p:NuspecFile=DbReader.Tracking.nuspec /p:IsPackable=true -o ../../build/Artifacts/NuGet 
-    */
     var workingDirectory = Path.Combine(BuildContext.SourceFolder, "DbReader.Tracking");
     await Command.ExecuteAsync("dotnet", $"pack /p:NuspecFile=DbReader.Tracking.nuspec /p:IsPackable=true /p:NuspecProperties=version={BuildContext.LatestTag} -o ../../build/Artifacts/NuGet", workingDirectory);
 

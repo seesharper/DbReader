@@ -1,8 +1,0 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <ItemGroup>
-        <!-- Find the package reference for this package and add PrivateAssets -->
-        <PackageReference Update="DbReader.Tracking">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-    </ItemGroup>
-</Project>

@@ -1062,6 +1062,10 @@ public record Customer(
 ```
 
 By applying the `TrackedAttribute`, `DbReader.Tracking` will automatically implement the `ITrackedObject` interface and modify each property setter to track changes when properties are being set.
-This happens at compile time using Mono.Cecil
+This happens at compile time using [Mono.Cecil]([https://](https://github.com/jbevain/cecil)) 
 
+By default, `DbReader.Tracking` will look for an attribute called `TrackedAttribute`. This can be configured using an MsBuild property called `DbReaderTrackingAttributeName`
 
+```
+
+```

@@ -11,6 +11,7 @@ public class TrackingAssemblyWeaver
         var readerParameters = new ReaderParameters();
         readerParameters.ReadSymbols = true;
         readerParameters.ReadWrite = true;
+        readerParameters.InMemory = true;
         var assemblyDefinition = AssemblyDefinition.ReadAssembly(assemblyPath, readerParameters);
         var types = assemblyDefinition.MainModule.Types
             .Where(t => t.CustomAttributes.Any(a => a.AttributeType.Name == attributeName))
@@ -25,7 +26,7 @@ public class TrackingAssemblyWeaver
 
 
 
-        File.Delete(assemblyPath);
+        // File.Delete(assemblyPath);
         var writerParameters = new WriterParameters();
         writerParameters.WriteSymbols = true;
         assemblyDefinition.Write(assemblyPath, writerParameters);
