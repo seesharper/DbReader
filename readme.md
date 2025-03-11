@@ -1065,7 +1065,22 @@ By applying the `TrackedAttribute`, `DbReader.Tracking` will automatically imple
 This happens at compile time using [Mono.Cecil]([https://](https://github.com/jbevain/cecil)) 
 
 By default, `DbReader.Tracking` will look for an attribute called `TrackedAttribute`. This can be configured using an MsBuild property called `DbReaderTrackingAttributeName`
+In the example below , `DbReader.Tracking` will look for an attribute called `PatchAttribute` instead of `TrackedAttribute`.
 
-```
+```xml
+<PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DbReaderTrackingAttributeName>PatchAttribute</DbReaderTrackingAttributeName>
+  </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DbReader" Version="3.0.0" />
+    <PackageReference Include="DbReader.Tracking" Version="2.7.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 ```
