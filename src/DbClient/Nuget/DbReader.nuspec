@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>DbClient</id>
+    <version>1.0.0.0</version>
+    <authors>Bernhard Richter</authors>
+    <owners>Bernhard Richter</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/seesharper/DbClient</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>    
+    <description>A simple and fast database reader for the .Net framework.</description>
+    <copyright>Bernhard Richter</copyright>
+    <tags>data-access orm sql micro-orm</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETFramework4.6" />
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="NETStandard.Library" version="2.0.3" />
+        <dependency id="System.Data.Common" version="4.3.0" />
+        <dependency id="System.Reflection.Emit" version="4.7.0" />
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.7.0" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="4.7.0" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.7.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

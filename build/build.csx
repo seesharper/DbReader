@@ -30,8 +30,8 @@ AsyncStep deploy = async () =>
 
 AsyncStep buildTrackingPackage = async () =>
 {
-    var workingDirectory = Path.Combine(BuildContext.SourceFolder, "DbReader.Tracking");
-    await Command.ExecuteAsync("dotnet", $"pack /p:NuspecFile=DbReader.Tracking.nuspec /p:IsPackable=true /p:NuspecProperties=version={BuildContext.LatestTag} -o ../../build/Artifacts/NuGet", workingDirectory);
+    var workingDirectory = Path.Combine(BuildContext.SourceFolder, "DbClient.Tracking");
+    await Command.ExecuteAsync("dotnet", $"pack /p:NuspecFile=DbClient.Tracking.nuspec /p:IsPackable=true /p:NuspecProperties=version={BuildContext.LatestTag} -o ../../build/Artifacts/NuGet", workingDirectory);
 
 };
 
