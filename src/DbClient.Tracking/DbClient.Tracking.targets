@@ -1,0 +1,19 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <DbClientTrackingAssemblyPath Condition="'$(DbClientTrackingAssemblyPath)' == ''">$(MSBuildThisFileDirectory)../lib/net8.0/DbClient.Tracking.dll</DbClientTrackingAssemblyPath>
+        <DbClientTrackingAttributeName Condition="'$(DbClientTrackingAttributeName)' == ''">TrackedAttribute</DbClientTrackingAttributeName>
+    </PropertyGroup>
+
+    <!-- Register the custom task -->
+    <UsingTask TaskName="DbClient.Tracking.WeaveAssembly" AssemblyFile="$(DbClientTrackingAssemblyPath)" />
+
+    <!-- Define a target that uses the custom task -->
+    <Target Name="RunAssemblyWeaver" AfterTargets="AfterBuild">
+        <!-- Call the custom task -->
+        <DbClient.Tracking.WeaveAssembly TargetAssemblyPath="$(TargetPath)" TrackingAttributeName="$(DbClientTrackingAttributeName)"/>
+    </Target>
+</Project>
+
+
+
+

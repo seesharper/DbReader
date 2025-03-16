@@ -1,6 +1,6 @@
-## What is DbReader
+## What is DbClient
 
-**DbReader** is first and foremost **NOT** an **ORM**. **DbReader** simply maps rows into classes.
+**DbClient** is first and foremost **NOT** an **ORM**. **DbClient** simply maps rows into classes.
 These classes are nothing but representation of the rows returned by the query in the context of .Net. 
 They are not entities, not business objects, they are just rows represented as .Net objects.
 No Magic.
@@ -32,7 +32,7 @@ All the following samples are based on the good old Northwind database since
 
 ## Database agnostic
 
-Most of the functionality in DbReader is implemented on top of the IDataReader/IDataRecord interface. In fact, DbReader can actually be used without any database at all since there is nothing that states that an IDataReader needs to get its data from a relational database. 
+Most of the functionality in DbClient is implemented on top of the IDataReader/IDataRecord interface. In fact, DbClient can actually be used without any database at all since there is nothing that states that an IDataReader needs to get its data from a relational database. 
 
 
 ## Single level 
@@ -72,7 +72,7 @@ var customers = dbConnection.Read<Customer>(sql)
 ```
 
 ## Async
-**DbReader** provides the *ReadAsync* method that uses the DbCommand.ExecuteReaderAsync method to fetch the result set. 
+**DbClient** provides the *ReadAsync* method that uses the DbCommand.ExecuteReaderAsync method to fetch the result set. 
 
 ```
 var result =  await dbConnection.ReadAsync<Customer>(sql)
@@ -97,12 +97,12 @@ WHERE
 | ---------- | ------------------- |
 | ALFKI      | Alfreds Futterkiste |
 
-DbReader makes passing an argument value very easy.
+DbClient makes passing an argument value very easy.
 
 ```
 dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
 ```
-**DbReader** will create an *IDataParameter* for each property of the anonymous type passed in as the argument object.
+**DbClient** will create an *IDataParameter* for each property of the anonymous type passed in as the argument object.
 
 If we need more control with the regards to the parameters, we can simply assign an *IDataParameter* instance to a property of the argument object.
 
@@ -136,7 +136,7 @@ connection.Read<Customer>("SELECT * FROM Customers WHERE Country = @Country AND 
 
 ## Record types
 
-**DbReader** supports [C# records](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record) meaning that we can ensure immutability and it also makes it possible to create a class representing the result of a query with minimum effort.
+**DbClient** supports [C# records](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record) meaning that we can ensure immutability and it also makes it possible to create a class representing the result of a query with minimum effort.
 
 ```c#
 public record Customer(string CustomerId, string CompanyName)
@@ -172,7 +172,7 @@ WHERE
 
 The problem with this approach is that it is not very dynamic as we would have to change the SQL and the arguments object if we wanted to add another value to the list. 
 
-**DbReader** solves this by letting us pass an  `IEnumerable<T>` that will  expand the parameter list based on the number  of items in the list that we pass in. Note that this will only work for IN clauses in the SQL.
+**DbClient** solves this by letting us pass an  `IEnumerable<T>` that will  expand the parameter list based on the number  of items in the list that we pass in. Note that this will only work for IN clauses in the SQL.
 
 ```SQL
 SELECT
@@ -284,15 +284,15 @@ ON
 
 As we can see from the result we now have six rows. One for each *Order* and the *Customer* columns are duplicated for each *Order*. 
 
-This is where the true power of DbReader comes into play as we don't have to do anything special to map these rows into our class representing the master-detail relationship. 
+This is where the true power of DbClient comes into play as we don't have to do anything special to map these rows into our class representing the master-detail relationship. 
 
 ```
 var customers = dbConnection.Read<Customer>(sql, new {CustomerId = "ALFKI"});
 ```
 
-> **DbReader** makes sure that only one instance of the *Customer* class is ever instantiated even if the customer information is "duplicated" six times in the result set.
+> **DbClient** makes sure that only one instance of the *Customer* class is ever instantiated even if the customer information is "duplicated" six times in the result set.
 
-There is no limitation as to the number of levels **DbReader** can handle meaning that we could create a query that represents a master-detail-subdetail query.
+There is no limitation as to the number of levels **DbClient** can handle meaning that we could create a query that represents a master-detail-subdetail query.
 
 ## Many To One
 
@@ -309,7 +309,7 @@ public class Order
 }
 ```
 
-The SQL is exactly the same and the only difference is that we ask **DbReader** to map the result into a list of *Order* instances.
+The SQL is exactly the same and the only difference is that we ask **DbClient** to map the result into a list of *Order* instances.
 
 ```sql
 SELECT
@@ -425,15 +425,15 @@ public class OrderDetail
 	public decimal UnitPrice { get; set; }
 }
 ```
-The convention can easily be changes through the DbReaderOptions class.
+The convention can easily be changes through the DbClientOptions class.
 ```c#
-DbReaderOptions.KeyConvention = (property) => property.IsDefined(typeof(KeyAttribute));
+DbClientOptions.KeyConvention = (property) => property.IsDefined(typeof(KeyAttribute));
 ```
 
-Another possibility is to supply this information using the DbReaderOptions`KeySelector` method.
+Another possibility is to supply this information using the DbClientOptions`KeySelector` method.
 
 ```c#
-DbReaderOptions.KeySelector<Customer>(c => c.CustomerId)
+DbClientOptions.KeySelector<Customer>(c => c.CustomerId)
 ```
 
 ## Prefixes
@@ -474,7 +474,7 @@ public class Order
 } 	
 ```
 
-The *Orders* table and the *Customers* table both define the *ModifiedBy* column and we need a way to tell **DbReader** which *ModifiedBy* column goes into which *ModifiedBy* property.  
+The *Orders* table and the *Customers* table both define the *ModifiedBy* column and we need a way to tell **DbClient** which *ModifiedBy* column goes into which *ModifiedBy* property.  
 
 The solution is really quite simple. We just need to prefix the ModifiedBy column that originates from the Orders table with the name of the navigation property.
 
@@ -503,7 +503,7 @@ The length of the alias name might actually be a problem since we can nest these
 ```
 ol.ModifiedBy AS FirstLevelProperty_SecondLevelProperty_ThirdLevelProperty_ModifiedBy
 ```
-Some database engines might not allow for such long identifiers and **DbReader** allows for CamelHumps (A ReSharper term) that basically means that we compress the property name into its capital letters.
+Some database engines might not allow for such long identifiers and **DbClient** allows for CamelHumps (A ReSharper term) that basically means that we compress the property name into its capital letters.
 
 ```
 ol.ModifiedBy AS FLP_SLP_TLP_ModifiedBy
@@ -511,12 +511,12 @@ ol.ModifiedBy AS FLP_SLP_TLP_ModifiedBy
 
 ## Stored Procedures
 
-**DbReader** makes no attempt to generalize calling stored procedures as this in most cases requires code that is specific to the database engine. **DbReader** allows custom initialization of an IDbCommand through the DbReaderOptions.CommandInitializer property.
+**DbClient** makes no attempt to generalize calling stored procedures as this in most cases requires code that is specific to the database engine. **DbClient** allows custom initialization of an IDbCommand through the DbClientOptions.CommandInitializer property.
 
 This is an extension point where we can plug in support for features that are specific to the database engine. The following example shows how to add support for calling an Oracle procedure.
 
 ```
-DbReaderOptions.CommandInitializer = InitializeCommand;
+DbClientOptions.CommandInitializer = InitializeCommand;
 
 private static void InitializeCommand(IDbCommand command)
 {
@@ -542,15 +542,15 @@ For instance, Oracle does not provide a Guid datatype and the most common way of
 Since we probably don't want to represent a Guid as a byte array in our classes, we need to register a custom delegate to handle the conversion from a byte array to a Guid.
 
 ```
-DbReaderOptions.WhenReading<Guid>().Use((datarecord, ordinal) => new Guid(dataRecord.ReadBytes(1,16)));
+DbClientOptions.WhenReading<Guid>().Use((datarecord, ordinal) => new Guid(dataRecord.ReadBytes(1,16)));
 ```
 
-This instructs **DbReader** to use our custom read delegate whenever it encounters a *Guid* property.
+This instructs **DbClient** to use our custom read delegate whenever it encounters a *Guid* property.
 
 The *Guid* also needs to be converted back into a byte array when passing a *Guid* value as a parameter to a query.
 
 ```
-DbReaderOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray()
+DbClientOptions.WhenPassing<Guid>().Use((parameter, guid) => parameter.Value = guid.ToByArray()
 ```
 
 > Note that the conversion function is only invoked if the value from the database is NOT `DBNull`
@@ -582,7 +582,7 @@ public class MyClass
 When the property `SomeProperty` we can specify what to return in the case of the field (SomeProperty) being `DBNull` from the `IDataRecord`
  
 ```C#
-DbReaderOptions.WhenReading<CustomValueType>().Use((dr, i) => new CustomValueType(dr.GetInt32(i))).WithDefaultValue(new CustomValueType(42));
+DbClientOptions.WhenReading<CustomValueType>().Use((dr, i) => new CustomValueType(dr.GetInt32(i))).WithDefaultValue(new CustomValueType(42));
 ```
 
 
@@ -714,7 +714,7 @@ public class Employee
 
 ## Command Initialization
 
-The `DbReaderOptions` class exposes a `CommandInitializer` property that can be used to initialize an `IDbCommand` after it has been created by `DbReader`.  
+The `DbClientOptions` class exposes a `CommandInitializer` property that can be used to initialize an `IDbCommand` after it has been created by `DbClient`.  
 
 The following example uses an anonymous PL/SQL block to retrieve a list of employees from the SCOTT schema.
 
@@ -746,7 +746,7 @@ connection.ReadAsync<Employee>(sql, new {p_cursor = new OracleParameter{OracleDb
 If we have multiple queries such as this one, it might make more sense to define a convention that always adds the needed cursor parameter. 
 
 ```c#
-DbReaderOptions.CommandInitializer = (command) => {
+DbClientOptions.CommandInitializer = (command) => {
     if (command.CommandText.Contains("p_cursor"))
     {
          command.Parameters.Insert(0, new OracleParameter
@@ -767,7 +767,7 @@ connection.ReadAsync<Employee>(SQL.emp, new {p_name = "A%"});
 
 ## Tracking
 
-As stated previously, `DbReader` is NOT an ORM and the support for simple object tracking does not change that
+As stated previously, `DbClient` is NOT an ORM and the support for simple object tracking does not change that
 although it opens up a couple of doors for more dynamic SQL, specially when doing updates in the database.
 
 First of all what do we mean by tracking? Let's illustrate with an example. 
@@ -829,7 +829,7 @@ WHERE
     CustomerID = @CustomerID;
 ```	
 
-So in `DbReader`this would be as simple as
+So in `DbClient`this would be as simple as
 
 ```c# 
 await dbConnection.ExecuteAsync(sql, customer);
@@ -949,7 +949,7 @@ public record Customer : ITrackedObject
 	}
 }
 ```
-This now gives us the ability to figure out which properties has changed and this information can be used when building the arguments object that is passed to `DbReader`when executing the query. 
+This now gives us the ability to figure out which properties has changed and this information can be used when building the arguments object that is passed to `DbClient`when executing the query. 
 
 ```c#
 var arguments = new ArgumentsBuilder().From(customer).Build();
@@ -957,7 +957,7 @@ var arguments = new ArgumentsBuilder().From(customer).Build();
 
 This arguments object will now be an object with properties from the `customer` instance, but since `Customer`implements `ITrackedObject` it will ONLY contain the properties that has been set/modified.
 
-At this point we have the arguments object to be passed to `DbReader`, but in order for this to work we also need to build the SQL that represents our update statement. 
+At this point we have the arguments object to be passed to `DbClient`, but in order for this to work we also need to build the SQL that represents our update statement. 
 
 ```c#
 var modifiedProperties = ((ITrackedObject)positionalRecord).GetModifiedProperties();
@@ -982,7 +982,7 @@ We are finally ready to actually perform the update in the database
 await dbConnection.ExecuteAsync(sql, arguments);
 ```
 
-### DbReader.Tracking
+### DbClient.Tracking
 
 As we learned previously we can leverage this functionally by rewriting our `Customer` record from 
 
@@ -1042,7 +1042,7 @@ public record Customer : ITrackedObject
 
 This would require a lot of tedious plumbing code every time we would want this type of behavior. 
 
-`DbReader.Tracking` makes this very easy by just requiring an attribute to be set on the class/record that we want to track.
+`DbClient.Tracking` makes this very easy by just requiring an attribute to be set on the class/record that we want to track.
 
 ```c#
 [Tracked]
@@ -1061,11 +1061,11 @@ public record Customer(
 );
 ```
 
-By applying the `TrackedAttribute`, `DbReader.Tracking` will automatically implement the `ITrackedObject` interface and modify each property setter to track changes when properties are being set.
+By applying the `TrackedAttribute`, `DbClient.Tracking` will automatically implement the `ITrackedObject` interface and modify each property setter to track changes when properties are being set.
 This happens at compile time using [Mono.Cecil]([https://](https://github.com/jbevain/cecil)) 
 
-By default, `DbReader.Tracking` will look for an attribute called `TrackedAttribute`. This can be configured using an MsBuild property called `DbReaderTrackingAttributeName`
-In the example below , `DbReader.Tracking` will look for an attribute called `PatchAttribute` instead of `TrackedAttribute`.
+By default, `DbClient.Tracking` will look for an attribute called `TrackedAttribute`. This can be configured using an MsBuild property called `DbClientTrackingAttributeName`
+In the example below , `DbClient.Tracking` will look for an attribute called `PatchAttribute` instead of `TrackedAttribute`.
 
 ```xml
 <PropertyGroup>
@@ -1073,12 +1073,12 @@ In the example below , `DbReader.Tracking` will look for an attribute called `Pa
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <DbReaderTrackingAttributeName>PatchAttribute</DbReaderTrackingAttributeName>
+    <DbClientTrackingAttributeName>PatchAttribute</DbClientTrackingAttributeName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DbReader" Version="3.0.0" />
-    <PackageReference Include="DbReader.Tracking" Version="2.7.1">
+    <PackageReference Include="DbClient" Version="3.0.0" />
+    <PackageReference Include="DbClient.Tracking" Version="2.7.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
