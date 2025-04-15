@@ -100,10 +100,11 @@ namespace DbReader
         /// <returns><see cref="IDataReader"/></returns>
         public static IDataReader ExecuteReader(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var command = CreateCommand(dbConnection, query, arguments, configureCommand))
-            {
-                return command.ExecuteReader();
-            }
+            // var command = CreateCommand(dbConnection, query, arguments, configureCommand);
+            // return command.ExecuteReader();
+            var command = CreateCommand(dbConnection, query, arguments, configureCommand);
+            return new CommandWrappingDataReader((DbCommand)command, (DbDataReader)command.ExecuteReader());
+
         }
 
         /// <summary>
@@ -130,10 +131,8 @@ namespace DbReader
         /// <returns><see cref="IDataReader"/></returns>
         public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null, Action<IDbCommand> configureCommand = null)
         {
-            using (var command = CreateCommand(dbConnection, query, arguments, configureCommand))
-            {
-                return await ((DbCommand)command).ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-            }
+            var command = CreateCommand(dbConnection, query, arguments, configureCommand);
+            return new CommandWrappingDataReader((DbCommand)command, await ((DbCommand)command).ExecuteReaderAsync(cancellationToken));
         }
 
         /// <summary>
@@ -193,7 +192,7 @@ namespace DbReader
         {
             return await dbConnection.ExecuteAsync(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
         }
-        
+
 
         /// <summary>
         /// Executes the given <paramref name="query"/> asynchronously and returns the number of rows affected.
