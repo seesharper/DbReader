@@ -5,13 +5,12 @@ namespace DbReader.Tests
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Data;
-    using System.Data.SQLite;
     using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using DbReader;
-    using Extensions;
+    using Microsoft.Data.Sqlite;
     using Shouldly;
     using Xunit;
 
@@ -41,8 +40,7 @@ namespace DbReader.Tests
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine("Hold your horses..creating database...");
-                SQLiteConnection.CreateFile(dbFile);
-                using (var connection = new SQLiteConnection("Data Source = " + dbFile))
+                using (var connection = new SqliteConnection("Data Source = " + dbFile + ";foreign keys=true;"))
                 {
 
                     connection.Open();
@@ -63,7 +61,7 @@ namespace DbReader.Tests
 
         private IDbConnection CreateConnection()
         {
-            var connection = new SQLiteConnection(connectionString);
+            var connection = new SqliteConnection(connectionString);
             connection.Open();
             return connection;
         }
@@ -241,7 +239,7 @@ namespace DbReader.Tests
             using (var connection = CreateConnection())
             {
                 var customers = connection.Read<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId",
-                    new { CustomerId = new SQLiteParameter("@CustomerId", "ALFKI") });
+                    new { CustomerId = new SqliteParameter("@CustomerId", "ALFKI") });
                 customers.Count().ShouldBe(1);
             }
         }
@@ -317,8 +315,7 @@ namespace DbReader.Tests
             DbReaderOptions.CommandInitializer = null;
         }
 
-
-        [OnlyOnIntelFactAttribute]
+        [Fact]
         public void ShouldReadEmployeeHierarchy()
         {
             using (var connection = CreateConnection())
@@ -546,7 +543,11 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldReadSimpleTypeUsingValueConverter()
         {
-            DbReaderOptions.WhenReading<CustomValueType>().Use((record, ordinal) => new CustomValueType(record.GetInt32(ordinal)));
+            DbReaderOptions.WhenReading<CustomValueType>().Use((record, ordinal) =>
+            {
+                record.ShouldBeOfType(typeof(SqliteDataReader));
+                return new CustomValueType(record.GetInt32(ordinal));
+            });
 
             using (var connection = CreateConnection())
             {

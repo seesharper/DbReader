@@ -18,13 +18,13 @@
     </PackageReference>
     <PackageReference Include="moq" Version="4.20.72" />
     <PackageReference Include="shouldly" Version="4.3.0" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
     <PackageReference Include="ILVerifier" Version="0.0.1" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    
+
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="**/*.sql" />
@@ -34,4 +34,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  
 </Project>
