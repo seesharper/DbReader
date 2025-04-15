@@ -91,7 +91,14 @@ namespace DbReader
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public static T Convert<T>(IDataRecord dataRecord, int ordinal)
         {
-            return ((Func<IDataRecord, int, T>)ReadDelegates[typeof(T)])(dataRecord, ordinal);
+            if (dataRecord is CommandWrappingDataReader reader)
+            {
+                return ((Func<IDataRecord, int, T>)ReadDelegates[typeof(T)])(reader.InnerReader, ordinal);
+            }
+            else
+            {
+                return ((Func<IDataRecord, int, T>)ReadDelegates[typeof(T)])(dataRecord, ordinal);
+            }
         }
 
         /// <summary>

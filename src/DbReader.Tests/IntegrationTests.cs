@@ -9,7 +9,7 @@ namespace DbReader.Tests
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using DbReader;    
+    using DbReader;
     using Microsoft.Data.Sqlite;
     using Shouldly;
     using Xunit;
@@ -39,7 +39,7 @@ namespace DbReader.Tests
         {
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine("Hold your horses..creating database...");                
+                Console.WriteLine("Hold your horses..creating database...");
                 using (var connection = new SqliteConnection("Data Source = " + dbFile + ";foreign keys=true;"))
                 {
 
@@ -315,8 +315,7 @@ namespace DbReader.Tests
             DbReaderOptions.CommandInitializer = null;
         }
 
-
-        [OnlyOnIntelFactAttribute]
+        [Fact]
         public void ShouldReadEmployeeHierarchy()
         {
             using (var connection = CreateConnection())
@@ -544,7 +543,11 @@ namespace DbReader.Tests
         [Fact]
         public void ShouldReadSimpleTypeUsingValueConverter()
         {
-            DbReaderOptions.WhenReading<CustomValueType>().Use((record, ordinal) => new CustomValueType(record.GetInt32(ordinal)));
+            DbReaderOptions.WhenReading<CustomValueType>().Use((record, ordinal) =>
+            {
+                record.ShouldBeOfType(typeof(SqliteDataReader));
+                return new CustomValueType(record.GetInt32(ordinal));
+            });
 
             using (var connection = CreateConnection())
             {
