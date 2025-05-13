@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.13.9" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.7" />
   </ItemGroup>
 
   <!-- Using Cecil directly via project reference generates package dependencies to non-existing cecil packages (https://github.com/NuGet/Home/issues/3891) => use ReferenceOutputAssembly="false" and reference the binaries directly -->
