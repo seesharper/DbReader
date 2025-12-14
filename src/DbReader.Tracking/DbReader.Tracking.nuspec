@@ -1,35 +1,34 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-    <metadata>
-        <!-- Required: Package ID -->
-        <id>DbReader.Tracking</id>
-        <!-- Required: Package version -->
-        <version>0.0.1</version>
-        <!-- Required: Authors -->
-        <authors>Bernhard Richter</authors>
-        <!-- Required: Description -->
-        <description>A custom MSBuild task package.</description>
-        <!-- Optional: Project URL -->
-        <projectUrl>https://github.com/seesharper/DbReader</projectUrl>
-        <!-- Optional: License URL -->
-        <license type="expression">MIT</license>
-        <!-- Optional: Tags -->
-        <tags>DbReader Tracking</tags>
-
-        <developmentDependency>true</developmentDependency>
-    </metadata>
-    <dependencies>
-        <dependency id="DbReader" version="3.0.0" />
-    </dependencies>
-    <files>
-        <!-- Include the custom task assembly (DLL) -->
-        <file src="../DbReader/bin/Release/net8.0/DbReader.dll" target="lib/net8.0" />
-        <file src="bin/Release/net8.0/DbReader.Tracking.dll" target="lib/net8.0" />
-        <file src="../../cecil/bin/Release/netstandard2.0/Mono.Cecil.dll" target="lib/net8.0" />
-        <file src="../../cecil/symbols/pdb/bin/Release/netstandard2.0/Mono.Cecil.Pdb.dll" target="lib/net8.0" />
-        <file src="../../cecil/rocks/bin/Release/netstandard2.0/Mono.Cecil.Rocks.dll" target="lib/net8.0" />
-        <!-- Include the .targets file in the build folder -->
-        <!-- Optional: Include the .props file if you have one -->
-        <file src="DbReader.Tracking.targets" target="build" />
-    </files>
+  <metadata>
+    <!-- Required: Package ID -->
+    <id>DbReader.Tracking</id>
+    <!-- Required: Package version -->
+    <version>0.0.1</version>
+    <!-- Required: Authors -->
+    <authors>Bernhard Richter</authors>
+    <!-- Required: Description -->
+    <description>A custom MSBuild task package.</description>
+    <!-- Optional: Project URL -->
+    <projectUrl>https://github.com/seesharper/DbReader</projectUrl>
+    <!-- Optional: License URL -->
+    <license type="expression">MIT</license>
+    <!-- Optional: Tags -->
+    <tags>DbReader Tracking</tags>
+    <developmentDependency>true</developmentDependency>
+  </metadata>
+  <dependencies>
+    <dependency id="DbReader" version="4.0.1" />
+  </dependencies>
+  <files>
+    <!-- Include the custom task assembly (DLL) -->
+    <file src="../DbReader/bin/Release/net8.0/DbReader.dll" target="lib/net8.0" />
+    <file src="bin/Release/net8.0/DbReader.Tracking.dll" target="lib/net8.0" />
+    <file src="../../cecil/bin/Release/netstandard2.0/Mono.Cecil.dll" target="lib/net8.0" />
+    <file src="../../cecil/symbols/pdb/bin/Release/netstandard2.0/Mono.Cecil.Pdb.dll" target="lib/net8.0" />
+    <file src="../../cecil/rocks/bin/Release/netstandard2.0/Mono.Cecil.Rocks.dll" target="lib/net8.0" />
+    <!-- Include the .targets file in the build folder -->
+    <!-- Optional: Include the .props file if you have one -->
+    <file src="DbReader.Tracking.targets" target="build" />
+  </files>
 </package>

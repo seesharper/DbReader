@@ -1,4 +1,4 @@
-#load "nuget:Dotnet.Build, 0.24.0"
+#load "nuget:Dotnet.Build, 0.26.0"
 #load "nuget:dotnet-steps, 0.0.2"
 
 Console.WriteLine($"Building with the latest tag {BuildContext.LatestTag}");
