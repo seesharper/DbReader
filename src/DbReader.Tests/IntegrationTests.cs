@@ -603,6 +603,18 @@ namespace DbReader.Tests
             }
         }
 
+        [Fact]
+        public async Task ShouldReadFirstOrDefaultAsync()
+        {
+            using (var connection = CreateConnection())
+            {
+                var customer = await connection.ReadFirstOrDefaultAsync<Customer>("SELECT * FROM Customers WHERE CustomerID = @CustomerID", new { CustomerID = "ALFKI" });
+                customer.ShouldNotBeNull();
+                customer.CustomerId.ShouldBe("ALFKI");
+            }    
+        }
+
+
         public class CustomerId
         {
             private string Value { get; set; }
