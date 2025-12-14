@@ -18,8 +18,6 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
-
   <ItemGroup>
     <PackageReference Include="LightInject.Source" Version="7.0.1">
       <PrivateAssets>all</PrivateAssets>
