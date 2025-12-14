@@ -116,9 +116,7 @@ namespace DbReader
         /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns><see cref="IDataReader"/></returns>
         public static async Task<IDataReader> ExecuteReaderAsync(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
-        {
-            return await dbConnection.ExecuteReaderAsync(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
-        }
+            => await dbConnection.ExecuteReaderAsync(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
 
         /// <summary>
         /// Executes the given <paramref name="query"/> asynchronously and returns an <see cref="IDataReader"/>.
@@ -162,8 +160,6 @@ namespace DbReader
             return command;
         }
 
-
-
         /// <summary>
         /// Executes the given <paramref name="query"/> and returns the number of rows affected.
         /// </summary>
@@ -189,10 +185,7 @@ namespace DbReader
         /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
         /// <returns>The number of rows affected.</returns>
         public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
-        {
-            return await dbConnection.ExecuteAsync(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
-        }
-
+            => await dbConnection.ExecuteAsync(CancellationToken.None, query, arguments, configureCommand).ConfigureAwait(false);
 
         /// <summary>
         /// Executes the given <paramref name="query"/> asynchronously and returns the number of rows affected.
@@ -250,6 +243,31 @@ namespace DbReader
                 }
             }
         }
+
+        /// <summary>
+        /// Executes the given <paramref name="query"/> and returns an instance of {T} for the first row or null if no rows."/> that
+        /// </summary>
+        /// <typeparam name="T">The type to be projected from the query.</typeparam>
+        /// <param name="dbConnection">The target <see cref="IDbConnection"/>.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">An object that represents the query arguments.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
+        /// <returns>The first instance of {T}/> that represents the result of the query or null if not found.</returns>    
+        public static async Task<T> ReadFirstOrDefaultAsync<T>(this IDbConnection dbConnection, string query, object? arguments = null, Action<IDbCommand>? configureCommand = null)
+                => await dbConnection.ReadFirstOrDefaultAsync<T>(CancellationToken.None, query, arguments, configureCommand);
+
+        /// <summary>
+        /// Executes the given <paramref name="query"/> and returns an {T} for the first row or null if no rows"/> 
+        /// </summary>
+        /// <typeparam name="T">The type to be projected from the query.</typeparam>
+        /// <param name="dbConnection">The target <see cref="IDbConnection"/>.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">An object that represents the query arguments.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
+        /// <returns>The first instance of {T}/> that represents the result of the query or null if not found.</returns>    
+        public static async Task<T> ReadFirstOrDefaultAsync<T>(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object? arguments = null, Action<IDbCommand>? configureCommand = null)
+            => (await dbConnection.ReadAsync<T>(cancellationToken, query, arguments, configureCommand)).FirstOrDefault();
 
         private static T ReadScalarValue<T>(IDataReader reader)
         {
