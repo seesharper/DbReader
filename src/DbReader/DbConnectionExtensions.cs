@@ -214,15 +214,29 @@ namespace DbReader
         /// <typeparam name="T"></typeparam>
         /// <returns>The type of value to be returned.</returns>
         public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
+            => await dbConnection.ExecuteScalarAsync<T>(CancellationToken.None, query, arguments, configureCommand);
+
+        /// <summary>
+        /// Executes the query asynchronously , and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="IDbConnection"/> to be used when executing the query.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="query">The query to be executed.</param>
+        /// <param name="arguments">The argument object that represents the arguments passed to the query.</param>
+        /// <param name="configureCommand">A function used to configure the underlying <see cref="IDbCommand"/>.</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>The type of value to be returned.</returns>
+        public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, CancellationToken cancellationToken, string query, object arguments = null, Action<IDbCommand> configureCommand = default)
         {
             using (var command = (DbCommand)CreateCommand(dbConnection, query, arguments, configureCommand))
             {
-                using (var reader = await command.ExecuteReaderAsync())
+                using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                 {
                     return ReadScalarValue<T>(reader);
                 }
             }
         }
+
 
         /// <summary>
         /// Executes the query, and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored.
