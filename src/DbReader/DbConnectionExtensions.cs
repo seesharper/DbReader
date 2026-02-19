@@ -83,10 +83,10 @@ namespace DbReader
            string query,
            object arguments = null, Action<IDbCommand> configureCommand = default)
         {
-            using (var dataReader = await dbConnection.ExecuteReaderAsync(cancellationToken, query, arguments, configureCommand).ConfigureAwait(false))
+            using (var dataReader = (System.Data.Common.DbDataReader)await dbConnection.ExecuteReaderAsync(cancellationToken, query, arguments, configureCommand).ConfigureAwait(false))
             {
                 SqlStatement.Current = query;
-                return dataReader.Read<T>();
+                return await dataReader.ReadAsync<T>(cancellationToken).ConfigureAwait(false);
             }
         }
 
