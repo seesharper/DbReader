@@ -1,16 +1,21 @@
 ﻿namespace DbReader
 {
-    using System;
+    using System.Threading;
 
     /// <summary>
     /// Represents the query currently executing.
     /// </summary>
     public class SqlStatement
     {
+        private static readonly AsyncLocal<string> _current = new AsyncLocal<string>();
+
         /// <summary>
-        /// The query currently executing. 
+        /// The query currently executing.
         /// </summary>
-        [ThreadStatic]
-        public static string Current;      
+        public static string Current
+        {
+            get => _current.Value;
+            set => _current.Value = value;
+        }
     }
 }
